@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.H.I.E.L.D. ERİŞİM PANELİ // CAPTAIN AMERICA ULTIMATE ARCHIVE</title>
+    <style>
+        /* CSS RESET & DOĞAL KUTU MODELİ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* TEMA DEĞİŞKENLERİ (Karanlık Tema Varsayılan) */
+        :root {
+            --bg-primary: #050e1e;
+            --bg-secondary: #0a1f44;
+            --bg-tertiary: #102a5a;
+            --accent-blue: #00d2ff;
+            --accent-red: #b22234;
+            --accent-gold: #ffd700;
+            --text-main: #ffffff;
+            --text-muted: #8fa0bc;
+            --glass-bg: rgba(10, 31, 68, 0.65);
+            --glass-border: rgba(0, 210, 255, 0.25);
+            --hud-glow: 0 0 15px rgba(0, 210, 255, 0.4);
+            --shield-glow: 0 0 25px rgba(178, 34, 52, 0.5);
+            --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --transition-speed: 0.3s;
+        }
+
+        /* Açık Tema Değişkenleri */
+        [data-theme="light"] {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #d9e2ec;
+            --accent-blue: #0066cc;
+            --accent-red: #d32f2f;
+            --accent-gold: #f5a623;
+            --text-main: #102a5a;
+            --text-muted: #627d98;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 102, 204, 0.3);
+            --hud-glow: 0 0 10px rgba(0, 102, 204, 0.2);
+            --shield-glow: 0 0 15px rgba(211, 47, 47, 0.3);
+        }
+
+        /* SİSTEM GENEL stilleri */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        /* ÖZELLEŞTİRİLMİŞ KAYDIRMA ÇUBUĞU */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-red);
+        }
+
+        /* SEÇİM RENK AYARI */
+        ::selection {
+            background: var(--accent-red);
+            color: #ffffff;
+        }
+
+        /* KÜRESEL HUD GRID & RADAR ARKA PLANI */
+        .hud-grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            background-linear: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 999;
+            opacity: 0.15;
+        }
+
+        /* GİRİŞ EKRANI (SHIELD BOOT SEQUENCE) */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030a16;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        #boot-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .boot-container {
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid var(--accent-blue);
+            box-shadow: var(--hud-glow);
+            background: rgba(5, 14, 30, 0.9);
+            padding: 30px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .boot-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .boot-terminal {
+            height: 250px;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .boot-terminal p {
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid transparent;
+        }
+
+        .boot-terminal p.success { color: #00ff66; }
+        .boot-terminal p.warning { color: var(--accent-gold); }
+        .boot-terminal p.danger { color: var(--accent-red); }
+
+        .boot-progress-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .boot-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .boot-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--bg-secondary), var(--accent-blue));
+            box-shadow: 0 0 10px var(--accent-blue);
+            transition: width 0.1s linear;
+        }
+
+        .boot-status-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+        }
+
+        /* STRATEJİK HUD ARKA PLAN RADARI */
+        .radar-pulse-container {
+            position: fixed;
+            bottom: -150px;
+            right: -150px;
+            width: 500px;
+            height: 500px;
+            pointer-events: none;
+            opacity: 0.08;
+            z-index: 1;
+        }
+
+        .radar-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid var(--accent-blue);
+            border-radius: 50%;
+            animation: radar-sweep 6s infinite linear;
+        }
+        .radar-1 { width: 100%; height: 100%; }
+        .radar-2 { width: 70%; height: 70%; }
+        .radar-3 { width: 40%; height: 40%; }
+
+        @keyframes radar-sweep {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.95); opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) rotate(360deg) scale(1.05); opacity: 0.4; }
+        }
+
+        /* ANA NAVİGASYON (S.H.I.E.L.D. ÜST PANEL) */
+        .shield-navbar {
+            position: sticky;
+            top: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--hud-glow);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 900;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-shadow: var(--hud-glow);
+        }
+
+        .nav-brand span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            transition: all var(--transition-speed) ease;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-blue);
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--accent-blue);
+            box-shadow: var(--hud-glow);
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* AYAR BUTONLARI (Karanlık/Aydınlık & Ses) */
+        .hud-btn {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 8px 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-radius: 3px;
+            transition: all var(--transition-speed);
+            box-shadow: var(--hud-glow);
+        }
+
+        .hud-btn:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px var(--accent-blue);
+        }
+
+        .hud-btn.danger-btn {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .hud-btn.danger-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            box-shadow: 0 0 15px var(--accent-red);
+        }
+
+        /* ANA KAHRAMAN ALANI (HERO BANNER) */
+        #hero-section {
+            position: relative;
+            min-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: radial-gradient(circle at center, rgba(10,31,68,0.4) 0%, rgba(5,14,30,1) 80%);
+            overflow: hidden;
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        .hero-matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+        }
+
+        .hero-badge {
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            border: 1px dashed var(--accent-gold);
+            padding: 6px 18px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            display: inline-block;
+            margin-bottom: 25px;
+            animation: breathing 2s infinite ease-in-out;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        @keyframes breathing {
+            0%, 100% { opacity: 0.6; box-shadow: 0 0 5px transparent; }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        }
+
+        .hero-title {
+            font-size: 5.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.95;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            text-shadow: 0 0 30px rgba(255,255,255,0.1), var(--hud-glow);
+        }
+
+        .hero-title span {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent-blue);
+            filter: drop-shadow(0 0 10px var(--accent-blue));
+        }
+
+        .hero-tags {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tag-node {
+            background: rgba(0, 210, 255, 0.08);
+            border-left: 3px solid var(--accent-blue);
+            padding: 8px 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-blue);
+        }
+
+        .tag-node.red-node {
+            border-left-color: var(--accent-red);
+            color: var(--accent-red);
+            background: rgba(178, 34, 52, 0.08);
+        }
+
+        .hero-hud-data {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 30px;
+        }
+
+        .hud-data-item {
+            background: rgba(16, 42, 90, 0.3);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 4px;
+            text-align: left;
+            position: relative;
+        }
+
+        .hud-data-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-blue);
+        }
+
+        .hud-data-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .hud-data-val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-main);
+            font-family: monospace;
+        }
+
+        /* BÖLÜM YAPISI VE BAŞLIKLARI */
+        .section-container {
+            padding: 100px 8% 80px 8%;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.1);
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-num {
+            font-family: monospace;
+            color: var(--accent-red);
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: inline-block;
+            border-bottom: 3px solid var(--accent-blue);
+            padding-bottom: 10px;
+        }
+
+        /* 1. BÖLÜM: BİYOGRAFİK PROFİL */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .profile-visual-panel {
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: var(--hud-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            overflow: hidden;
+        }
+
+        .profile-avatar-fallback {
+            width: 220px;
+            height: 220px;
+            border: 4px solid var(--accent-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            color: var(--accent-blue);
+            text-shadow: var(--hud-glow);
+            box-shadow: var(--hud-glow);
+            background: rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 5;
+        }
+
+        .profile-scanner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            animation: scanning-bar 4s infinite ease-in-out;
+            z-index: 6;
+        }
+
+        @keyframes scanning-bar {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        .profile-details-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bio-card {
+            background: rgba(16, 42, 90, 0.25);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 6px;
+            transition: transform var(--transition-speed);
+        }
+
+        .bio-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-blue);
+        }
+
+        .bio-card h3 {
+            color: var(--accent-blue);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .bio-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* 2. BÖLÜM: SİNEMATİK ZAMAN ÇİZELGESİ (TIMELINE) */
+        .timeline-track {
+            position: relative;
+            max-width: 1100px;
+            margin: 40px auto 0 auto;
+            padding: 20px 0;
+        }
+
+        .timeline-track::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-red), var(--accent-gold));
+            box-shadow: var(--hud-glow);
+        }
+
+        .timeline-node {
+            width: 50%;
+            padding: 20px 40px;
+            position: relative;
+            clear: both;
+        }
+
+        .timeline-node.left-node {
+            float: left;
+            text-align: right;
+        }
+
+        .timeline-node.right-node {
+            float: right;
+            text-align: left;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 30px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: 4px solid var(--accent-blue);
+            z-index: 10;
+            box-shadow: var(--hud-glow);
+        }
+
+        .left-node .timeline-marker { right: -10px; }
+        .right-node .timeline-marker { left: -10px; }
+
+        .timeline-content-box {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: var(--hud-glow);
+            display: inline-block;
+            width: 100%;
+            transition: all var(--transition-speed);
+        }
+
+        .timeline-content-box:hover {
+            border-color: var(--accent-blue);
+            transform: scale(1.02);
+        }
+
+        .timeline-year {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            font-family: monospace;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .timeline-heading {
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .timeline-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .timeline-track::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* 3. BÖLÜM: S.H.I.E.L.D. VERİTABANI */
+        .database-control-wrapper {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            background: rgba(10, 31, 68, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .db-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            list-style: none;
+        }
+
+.db-menu-btn {
+            background: rgba(16, 42, 90, 0.4);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            transition: all var(--transition-speed);
+            border-radius: 4px;
+        }
+
+        .db-menu-btn.active, .db-menu-btn:hover {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            box-shadow: var(--hud-glow);
+        }
+
+        .db-viewer-panel {
+            background: rgba(5, 14, 30, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 4px;
+            min-height: 300px;
+        }
+
+        .db-title {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .db-body {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* 4. BÖLÜM: KAPTAN TERMİNAL SİMÜLASYONU */
+        .terminal-shell {
+            background: #020710;
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            box-shadow: var(--hud-glow);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+
+        .terminal-top-bar {
+            background: rgba(0, 210, 255, 0.1);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        .terminal-dot-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+        .terminal-dot:nth-child(2) { background: #ffbd2e; }
+        .terminal-dot:nth-child(3) { background: #27c93f; }
+
+        .terminal-title {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .terminal-screen {
+            height: 350px;
+            padding: 20px;
+            overflow-y: auto;
+            color: #00ff66;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .terminal-output-row {
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .terminal-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .terminal-prompt {
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .terminal-field {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: inherit;
+            flex: 1;
+        }
+
+        /* 5. BÖLÜM: VİBRANYUM KALKANI REPLİKASI */
+        .shield-lab-display {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .shield-canvas-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin-bottom: 40px;
+        }
+
+        .vibranium-shield-mesh {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle, 
+                #ffffff 0%, #ffffff 12%,
+                var(--accent-blue) 13%, var(--accent-blue) 15%,
+                var(--accent-red) 16%, var(--accent-red) 35%,
+                #d9e2ec 36%, #d9e2ec 50%,
+                var(--accent-red) 51%, var(--accent-red) 72%,
+                #102a5a 73%, #050e1e 100%
+            );
+            box-shadow: 0 0 40px rgba(0,0,0,0.6), var(--shield-glow);
+            animation: shield-spin 20s infinite linear;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .vibranium-shield-mesh:active {
+            filter: brightness(1.3) contrast(1.2);
+        }
+
+        .shield-star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            margin-left: -40px;
+            margin-top: -28px;
+            border-right:  40px solid transparent;
+            border-bottom: 28px solid #ffffff;
+            border-left:   40px solid transparent;
+            transform: rotate(35deg);
+        }
+        .shield-star:before {
+            border-right:  40px solid transparent;
+            border-bottom: 28px solid #ffffff;
+            border-left:   40px solid transparent;
+            position: absolute;
+            top: -28px;
+            left: -40px;
+            content: '';
+            transform: rotate(-35deg);
+        }
+        .shield-star:after {
+            border-right:  40px solid transparent;
+            border-bottom: 28px solid #ffffff;
+            border-left:   40px solid transparent;
+            position: absolute;
+            top: -28px;
+            left: -40px;
+            content: '';
+            transform: rotate(-70deg);
+        }
+
+        @keyframes shield-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .shield-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* 6. BÖLÜM: CAPTAIN AMERICA KOSTÜMLERİ VE EKİPMANLARI */
+        .gear-filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .gear-display-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .gear-showcase-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-speed);
+        }
+
+        .gear-showcase-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--hud-glow);
+            transform: translateY(-5px);
+        }
+
+        .gear-classification {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.7rem;
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 2px;
+        }
+
+        .gear-title {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .gear-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .gear-stat-row {
+            border-top: 1px dashed var(--glass-border);
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gear-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .gear-stat-bar-container {
+            width: 150px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .gear-stat-bar-fill {
+            height: 100%;
+            background: var(--accent-blue);
+        }
+
+        /* 7. BÖLÜM: AVENGERS STRATEJİK İLETİŞİM AĞI */
+        .network-topology-container {
+            background: #040c1a;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .svg-network-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .network-nodes-layer {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            height: 450px;
+        }
+
+        .avengers-node {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-blue);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: var(--hud-glow);
+            text-align: center;
+            padding: 5px;
+        }
+
+        .avengers-node:hover {
+            border-color: var(--accent-red);
+            transform: scale(1.1);
+            box-shadow: var(--shield-glow);
+        }
+
+        .avengers-node.node-center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-color: var(--accent-gold);
+            background: var(--bg-tertiary);
+        }
+
+        .avengers-node.node-center:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        .node-alias {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+
+        .node-real-name {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        /* 8. BÖLÜM: S.H.I.E.L.D. YAPAY ZEKA LABORATUVARI */
+        .ai-lab-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .ai-radar-monitor {
+            background: #030a16;
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            position: relative;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .ai-sweep-line {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent 50%, rgba(0, 210, 255, 0.15) 100%);
+            animation: radar-rotate 4s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes radar-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .ai-terminal-log {
+            background: rgba(5, 14, 30, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 20px;
+            font-family: monospace;
+            height: 350px;
+            overflow-y: auto;
+        }
+
+        .ai-log-entry {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            border-left: 2px solid var(--accent-blue);
+            padding-left: 8px;
+        }
+
+        /* 9. BÖLÜM: TEKNOLOJİ KATALOĞU */
+        .tech-cards-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .tech-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 25px;
+            position: relative;
+            transition: all var(--transition-speed);
+        }
+
+        .tech-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--hud-glow);
+            transform: translateY(-4px);
+        }
+
+        .tech-icon-box {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+        }
+
+        .tech-title {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .tech-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* 10. BÖLÜM: TAKTİKSEL İSTATİSTİK PANELİ */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .stat-counter-box {
+            background: rgba(10, 31, 68, 0.4);
+            border: 1px solid var(--glass-border);
+            padding: 30px 20px;
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: var(--hud-glow);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--accent-blue);
+            font-family: monospace;
+            margin-bottom: 5px;
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 11. BÖLÜM: SİNEMATİK FİLM ARŞİVİ */
+        .film-grid-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .film-archive-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            overflow: hidden;
+            transition: all var(--transition-speed);
+        }
+
+        .film-archive-card:hover {
+            border-color: var(--accent-red);
+            box-shadow: var(--shield-glow);
+            transform: scale(1.03);
+        }
+
+        .film-meta-area {
+            padding: 20px;
+        }
+
+        .film-release-year {
+            font-family: monospace;
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .film-main-title {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .film-synopsis {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* 12. BÖLÜM: DİNAMİK SÖZ SİSTEMİ */
+        .quote-engine-wrapper {
+            background: radial-gradient(circle at center, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--hud-glow);
+            position: relative;
+        }
+
+        .quote-display-box {
+            font-size: 1.5rem;
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quote-author {
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* ALT BİLGİ (FOOTER) */
+        .shield-footer {
+            background: #030914;
+            border-top: 1px solid var(--glass-border);
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* DUYARLI TASARIM (RESPONSIVE CODING) */
+        @media (max-width: 1024px) {
+            .hero-title { font-size: 4rem; }
+            .profile-grid, .gear-display-grid, .ai-lab-wrapper { grid-template-columns: 1fr; }
+            .tech-cards-container, .film-grid-layout { grid-template-columns: 1fr 1fr; }
+            .stats-dashboard { grid-template-columns: 1fr 1fr; }
+            .database-control-wrapper { grid-template-columns: 1fr; }
+            .timeline-track::before { left: 20px; }
+            .timeline-node { width: 100%; float: none !important; text-align: left !important; padding-left: 50px; padding-right: 20px; }
+            .left-node .timeline-marker, .right-node .timeline-marker { left: 10px; }
+        }
+
+        @media (max-width: 768px) {
+            .shield-navbar { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .nav-links { flex-wrap: wrap; justify-content: center; }
+            .hero-title { font-size: 2.8rem; }
+            .hero-hud-data { grid-template-columns: 1fr 1fr; }
+            .tech-cards-container, .film-grid-layout, .stats-dashboard { grid-template-columns: 1fr; }
+            .shield-footer { flex-direction: column; gap: 15px; text-align: center; }
+        }
+    </style>
+</head>
+<body class="loading">
+
+    <div class="hud-grid-overlay"></div>
+
+    <div class="radar-pulse-container">
+        <div class="radar-circle radar-1"></div>
+        <div class="radar-circle radar-2"></div>
+        <div class="radar-circle radar-3"></div>
+    </div>
+
+    <div id="boot-screen">
+        <div class="boot-container">
+            <div class="boot-header">
+                <span>S.H.I.E.L.D. SECURE OS v7.1.2</span>
+                <span id="boot-clock">00:00:00</span>
+            </div>
+            <div class="boot-terminal" id="boot-terminal-log">
+                </div>
+            <div class="boot-progress-wrapper">
+                <div class="boot-bar">
+                    <div class="boot-progress" id="boot-progress-bar"></div>
+                </div>
+                <div class="boot-status-text">
+                    <span id="boot-status-lbl">GÜVENLİK PROTOKOLLERİ ÇALIŞTIRILIYOR...</span>
+                    <span id="boot-percentage">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="shield-navbar">
+        <div class="nav-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7s0 6 8 10z"/></svg>
+            S.H.I.E.L.D. <span>ROGERSPROFILE</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#hero-section" class="active">KONTROL</a></li>
+            <li><a href="#profile-section">PROFİL</a></li>
+            <li><a href="#timeline-section">KRONOLOJİ</a></li>
+            <li><a href="#database-section">VERİTABANI</a></li>
+            <li><a href="#terminal-section">TERMİNAL</a></li>
+            <li><a href="#gear-section">EKİPMAN</a></li>
+            <li><a href="#network-section">STRATEJİ</a></li>
+        </ul>
+        <div class="nav-controls">
+            <button class="hud-btn" id="theme-toggle" title="Tema Değiştir">TEMA</button>
+            <button class="hud-btn danger-btn" id="audio-toggle" title="Ses Durumu">SES: KAPALI</button>
+        </div>
+    </nav>
+
+    <header id="hero-section">
+        <div class="hero-content">
+            <span class="hero-badge">STRATEJİK VURGULAMA PROTOKOLÜ AKTİF</span>
+            <h1 class="hero-title">STEVE ROGERS<br><span>CAPTAIN AMERICA</span></h1>
+            
+            <div class="hero-tags">
+                <div class="tag-node">ASKER</div>
+                <div class="tag-node red-node">LİDER</div>
+                <div class="tag-node">SÜPER ASKER</div>
+                <div class="tag-node red-node">AVENGERS KOMUTANI</div>
+            </div>
+
+            <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto 30px auto; line-height: 1.6;">
+                S.H.I.E.L.D. veri merkezinden doğrudan alınan operasyonel verilerle İkinci Dünya Savaşı kahramanı ve modern dünyanın baş koruyucusu Kaptan Steve Rogers'ın taktik profili.
+            </p>
+
+            <div class="hero-hud-data">
+                <div class="hud-data-item">
+                    <span class="hud-data-label">DURUM</span>
+                    <span class="hud-data-val" style="color: #00ff66;">AKTİF ÜS</span>
+                </div>
+                <div class="hud-data-item">
+                    <span class="hud-data-label">KOD ADI</span>
+                    <span class="hud-data-val">CAP-001</span>
+                </div>
+                <div class="hud-data-item">
+                    <span class="hud-data-label">YETKİ SEVİYESİ</span>
+                    <span class="hud-data-val" style="color: var(--accent-gold);">LEVEL 10</span>
+                </div>
+                <div class="hud-data-item">
+                    <span class="hud-data-label">LOKASYON</span>
+                    <span class="hud-data-val">EMIRATES STADIUM</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="section-container" id="profile-section">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 01 //</span>
+            <h2 class="section-title">STEVE ROGERS PROFİLİ</h2>
+        </div>
+        <div class="profile-grid">
+            <div class="profile-visual-panel">
+                <div class="profile-scanner"></div>
+                <div class="profile-avatar-fallback">A</div>
+                <div style="position: absolute; bottom: 15px; left: 15px; font-family: monospace; font-size: 0.75rem; color: var(--accent-blue);">
+                    BIOMETRIC SCANNING: OK<br>DNA SPECTRUM: MODIFIED (SERUM)
+                </div>
+            </div>
+            <div class="profile-details-panel">
+                <div class="bio-card">
+                    <h3>DOĞUM & ASIL KÖKEN</h3>
+                    <p>4 Temmuz 1918'de Brooklyn, New York'ta doğdu. Yetim ve zayıf bir genç olarak büyümesine rağmen, sarsılmaz adalet duygusu ve vatanseverliği onu akranlarından ayırdı.</p>
+                </div>
+                <div class="bio-card">
+                    <h3>SÜPER ASKER DÖNÜŞÜMÜ</h3>
+                    <p>Dr. Abraham Erskine tarafından geliştirilen Süper Asker Serumu'na (Project Rebirth) dahil edildi. Deney sonucunda fiziksel yapısı insan potansiyelinin en üst noktasına ulaştı.</p>
+                </div>
+                <div class="bio-card">
+                    <h3>S.H.I.E.L.D. VE AVENGERS KARİYERİ</h3>
+                    <p>Yıllarca buzda donmuş halde kaldıktan sonra modern çağda uyandırıldı. S.H.I.E.L.D. taktik lideri ve dünyayı tehdit eden unsurlara karşı Avengers takımının komutanı oldu.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container" id="timeline-section">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 02 //</span>
+            <h2 class="section-title">STRATEJİK ZAMAN ÇİZELGESİ</h2>
+        </div>
+        <div class="timeline-track" id="dynamic-timeline">
+            </div>
+    </section>
+
+    <section class="section-container" id="database-section">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 03 //</span>
+            <h2 class="section-title">S.H.I.E.L.D. ARŞİV KATMANI</h2>
+        </div>
+        <div class="database-control-wrapper">
+            <ul class="db-menu" id="db-menu-list">
+                </ul>
+            <div class="db-viewer-panel">
+                <h3 class="db-title" id="db-view-title">DOSYA SEÇİNİZ</h3>
+                <div class="db-body" id="db-view-body">Sol taraftaki panelden veri tabanı kategorisi seçerek kriptolu verileri inceleyebilirsiniz.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container" id="terminal-section">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 04 //</span>
+            <h2 class="section-title">S.H.I.E.L.D. EMİR TERMİNALİ</h2>
+        </div>
+        <div class="terminal-shell">
+            <div class="terminal-top-bar">
+                <div class="terminal-dot-group">
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-dot"></div>
+                </div>
+                <div class="terminal-title">CORE_CONSOLE_v3.8</div>
+            </div>
+            <div class="terminal-screen" id="term-screen">
+                <div class="terminal-output-row">S.H.I.E.L.D. Terminal Sistemine Hoş Geldiniz. Kullanılabilir komutları görmek için 'yardım' yazın.</div>
+            </div>
+            <div class="terminal-input-row">
+                <span class="terminal-prompt">SHIELD@ROGERS_NET:></span>
+                <input type="text" class="terminal-field" id="term-input" autocomplete="off" placeholder="Komut girin...">
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 05 //</span>
+            <h2 class="section-title">VİBRANYUM KALKAN ANALİZİ</h2>
+        </div>
+        <div class="shield-lab-display">
+            <div class="shield-canvas-container">
+                <div class="vibranium-shield-mesh" id="v-shield">
+                    <div class="shield-star"></div>
+                </div>
+            </div>
+            <div class="shield-metrics-grid">
+                <div class="hud-data-item">
+                    <span class="hud-data-label">MATERYAL BİLEŞİMİ</span>
+                    <span class="hud-data-val">Vibranyum & Çelik Alaşımı</span>
+                </div>
+                <div class="hud-data-item">
+                    <span class="hud-data-label">KİNETİK ABSORBSİYON</span>
+                    <span class="hud-data-val">100% KUSURSUZ</span>
+                </div>
+                <div class="hud-data-item">
+                    <span class="hud-data-label">ÇAP / AĞIRLIK</span>
+                    <span class="hud-data-val">76 CM / 5.4 KG</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container" id="gear-section">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 06 //</span>
+            <h2 class="section-title">TAKTIKSEL ZIRH ENVENTERİ</h2>
+        </div>
+        <div class="gear-filter-bar" id="gear-filters">
+            </div>
+        <div class="gear-display-grid" id="gear-grid">
+            </div>
+    </section>
+
+    <section class="section-container" id="network-section">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 07 //</span>
+            <h2 class="section-title">AVENGERS TOPOLOJİK OPERASYON AĞI</h2>
+        </div>
+        <div class="network-topology-container">
+            <svg class="svg-network-layer" id="network-svg"></svg>
+            <div class="network-nodes-layer" id="network-nodes-wrap">
+                </div>
+        </div>
+    </section>
+
+    <section class="section-container">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 08 //</span>
+            <h2 class="section-title">S.H.I.E.L.D. AI TEHDİT MOTORU</h2>
+        </div>
+        <div class="ai-lab-wrapper">
+            <div class="ai-radar-monitor">
+                <div class="ai-sweep-line"></div>
+                <div style="color: var(--accent-red); font-weight: bold; font-family: monospace; z-index: 10;">TEHDİT ARANIYOR...</div>
+            </div>
+            <div class="ai-terminal-log" id="ai-logs">
+                </div>
+        </div>
+    </section>
+
+    <section class="section-container">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 09 //</span>
+            <h2 class="section-title">TEKNOLOJİK ALTYAPI VE BULUŞLAR</h2>
+        </div>
+        <div class="tech-cards-container" id="tech-container">
+            </div>
+    </section>
+
+    <section class="section-container">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 10 //</span>
+            <h2 class="section-title">OPERASYONEL ÖLÇÜMLER VE İSTATİSTİKLER</h2>
+        </div>
+        <div class="stats-dashboard" id="stats-dash">
+            </div>
+    </section>
+
+    <section class="section-container">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 11 //</span>
+            <h2 class="section-title">MEDYA VE DOKÜMANTASYON ARŞİVİ</h2>
+        </div>
+        <div class="film-grid-layout" id="film-layout">
+            </div>
+    </section>
+
+    <section class="section-container" style="margin-bottom: 50px;">
+        <div class="section-header">
+            <span class="section-num">BÖLÜM 12 //</span>
+            <h2 class="section-title">STRATEJİK LİDERLİK AKTI</h2>
+        </div>
+        <div class="quote-engine-wrapper">
+            <div class="quote-display-box" id="quote-text">"Bütün gün bunu yapabilirim."</div>
+            <span class="quote-author" id="quote-author">Steve Rogers</span>
+            <button class="hud-btn" id="new-quote-btn">YENİ KAPTAN SÖZÜ</button>
+        </div>
+    </section>
+
+    <footer class="shield-footer">
+        <div>GÜVENLİK SINIFLANDIRMASI: GİZLİ // LEVEL 10 EMNİYET PROSEDÜRÜ</div>
+        <div>&copy; 2026 S.H.I.E.L.D. VERİ MERKEZİ. TÜM HAKLARI SAKLIDIR.</div>
+    </footer>
+    <script>
+        // SİSTEM APİ VERİ SETLERİ
+        const TIMELINE_DATA = [
+            { year: "1918", title: "DOĞUM VE Brooklyn GEÇMİŞİ", text: "Steve Rogers, New York Brooklyn'de İrlandalı göçmen bir ailenin çocuğu olarak dünyaya gözlerini açtı." },
+            { year: "1941", title: "SÜPER ASKER PROGRAMI (PROJECT REBIRTH)", text: "Zayıf yapısı nedeniyle orduya kabul edilmeyen Rogers, gizli askeri deneye gönüllü oldu ve ilk süper asker unvanını kazandı." },
+            { year: "1942", title: "2. DÜNYA SAVAŞI CEPHE GÖREVLERİ", text: "Kaptan Amerika kimliği altında Hydra ve Nazi Almanyası birliklerine karşı destansı bir mücadele başlattı." },
+            { year: "1945", title: "BUZ KÜTLESİNDE DONMA VE KAYIP", text: "Okyanusa düşen bombalı bir uçağı engellemeye çalışırken Kuzey Kutbu'nun soğuk sularında kayboldu ve onlarca yıl donmuş halde kaldı." },
+            { year: "2011", title: "MODERN ÇAĞDA YENİDEN UYANIŞ", text: "S.H.I.E.L.D. ekipleri tarafından buz kütlesinden sağ çıkarılarak modern New York dünyasında hayata döndürüldü." },
+            { year: "2012", title: "AVENGERS EKİBİNİN KURULUMU", text: "Loki ve Chitauri ordusunun New York istilasına karşı dünyayı koruyan ilk Avengers takımına stratejik komutanlık yaptı." },
+            { year: "2016", title: "CIVIL WAR (İÇ SAVAŞ PROTOKOLÜ)", text: "Sokovia Anlaşmaları sebebiyle Tony Stark ile fikir ayrılığı yaşayarak bağımsız kahraman hareketinin savunucusu oldu." },
+            { year: "2018", title: "INFINITY WAR (THANOS TEHDİDİ)", text: "Wakanda cephesinde Thanos ve Black Order ordusuna karşı en ön safta amansızca savaştı." },
+            { year: "2023", title: "ENDGAME (KADERİN SONU)", text: "Zaman yolculuğu operasyonunu yönetti, Thanos'u alt etti ve kalkanını devrederek kendi zaman çizgisine huzurlu bir dönüş gerçekleştirdi." }
+        ];
+
+        const DATABASE_DATA = {
+            shield: {
+                title: "S.H.I.E.L.D. KURULUŞU VE STRATEJİSİ",
+                body: "Stratejik Savunma, Müdahale ve Lojistik Departmanı (S.H.I.E.L.D.), İkinci Dünya Savaşı'ndan sonra Peggy Carter, Howard Stark ve Chester Phillips tarafından küresel tehditleri önceden bertaraf etmek amacıyla kurulmuştur. Kaptan Amerika, bu kurumun operasyonel felsefesinin temel taşını oluşturmaktadır."
+            },
+            operations: {
+                title: "GİZLİ HAREKATLAR DOSYASI",
+                body: "Project Rebirth ile başlayan süreç; Azzano Baskını, SSR Avrupa İlerlemesi, Lemurian Star Kurtarma Operasyonu ve Triskelion Baskını gibi kritik askeri ve taktiksel süreçleri içerir. Bu operasyonların tamamında Kaptan Amerika doğrudan saha komutanı olarak görev yapmıştır."
+            },
+            technologies: {
+                title: "DONANIM VE AR-GE LAB",
+                body: "Howard Stark tarafından tasarlanan ilk saf vibranyum kalkan, S.H.I.E.L.D. laboratuvarlarında elektromanyetik geri çağırma ve gizlilik kaplamalarıyla güncellenmiştir. Ayrıca operasyonlarda kullanılan Stealth Suit, darbe emici balistik ağ sistemine sahiptir."
+            },
+            analysis: {
+                title: "STRATEJİK PSİKOLOJİK ANALİZ",
+                body: "Denek Steve Rogers, yüksek empati, kriz anlarında sarsılmaz liderlik iradesi ve mutlak sadakat eğilimi göstermektedir. Bireysel çıkarların üzerinde tuttuğu adalet anlayışı, onu manipüle edilmesi imkansız bir taktiksel lider kılmaktadır."
+            }
+        };
+
+        const GEAR_DATA = [
+            { id: "wwii", category: "wwii", title: "WWII Savaş Kostümü", desc: "Kaptan'ın İkinci Dünya Savaşı sırasında cephede giydiği, kalınlaştırılmış kanvas kumaştan ve deri korumalardan oluşan klasik askeri üniforma.", statLabel: "Balistik Koruma", statVal: 65 },
+            { id: "shield-suit", category: "shield", title: "S.H.I.E.L.D. Taktik Üniforması", desc: "Modern çağa ayak uyduran Rogers için S.H.I.E.L.D. tarafından özel polimer ve kevlar karışımıyla tasarlanmış dayanıklı kostüm.", statLabel: "Balistik Koruma", statVal: 80 },
+            { id: "stealth", category: "stealth", title: "Gizlilik Operasyon Zırhı (Stealth Suit)", desc: "Gece ve sızma operasyonları için tasarlanan, lacivert tonlarında, parlamayı önleyen ve elektromanyetik koruma sağlayan gelişmiş kit.", statLabel: "Hareket Kabiliyeti", statVal: 95 },
+            { id: "endgame-suit", category: "endgame", title: "Endgame Muharebe Zırhı", desc: "Thanos'a karşı verilen son büyük savaşta giyilen, üzerinde ikonik pul desenleri barındıran ve maksimum dayanıklılığa sahip nihai zırh.", statLabel: "Darbe Emilimi", statVal: 98 }
+        ];
+
+        const AVENGERS_NETWORK = [
+            { name: "Steve Rogers", alias: "CAPTAIN AMERICA", role: "center", x: 50, y: 50 },
+            { name: "Tony Stark", alias: "IRON MAN", role: "node", x: 25, y: 20 },
+            { name: "Bruce Banner", alias: "HULK", role: "node", x: 75, y: 20 },
+            { name: "Thor Odinson", alias: "THOR", role: "node", x: 15, y: 50 },
+            { name: "Natasha Romanoff", alias: "BLACK WIDOW", role: "node", x: 85, y: 50 },
+            { name: "Clint Barton", alias: "HAWKEYE", role: "node", x: 25, y: 80 },
+            { name: "Sam Wilson", alias: "FALCON", role: "node", x: 75, y: 80 },
+            { name: "Bucky Barnes", alias: "WINTER SOLDIER", role: "node", x: 50, y: 15 },
+            { name: "Nick Fury", alias: "DIRECTOR FURY", role: "node", x: 50, y: 85 }
+        ];
+
+        const TECH_DATA = [
+            { title: "Vibranyum Teknolojisi", desc: "Dışarıdan gelen her türlü kinetik enerjiyi moleküler yapısında absorbe ederek tamamen sıfırlayabilen, dünyadaki en nadir ve dayanıklı metal alaşımı." },
+            { title: "S.H.I.E.L.D. Taktik Yapay Zekası", desc: "Savaş alanındaki tehdit unsurlarını saniyeler içinde analiz ederek Kaptan Amerika'ya en optimum geometrik kalkan fırlatma rotalarını hesaplayan motor." },
+            { title: "Süper Asker Serumu", desc: "İnsan metabolizmasını hücresel düzeyde yenileyerek yorulma asitlerini engelleyen, gücü, hızı ve iyileşme hızını en üst seviyeye çıkaran biyolojik formül." }
+        ];
+
+        const STATS_DATA = [
+            { label: "Başarılı Görevler", value: 342 },
+            { label: "Müttefik Operasyonları", value: 118 },
+            { label: "Avengers Muharebeleri", value: 14 },
+            { label: "Taktiksel Zafer Oranı", value: 98 }
+        ];
+
+        const FILM_DATA = [
+            { title: "The First Avenger", year: "2011", desc: "Steve Rogers'ın sıska bir gençten bir dünya savaşı kahramanına dönüşmesini ve Hydra lideri Red Skull ile mücadelesini konu alır." },
+            { title: "The Winter Soldier", year: "2014", desc: "S.H.I.E.L.D. içerisine sızmış Hydra yapılanmasını ve Rogers'ın geçmişinden gelen kadim dostu Bucky ile yüzleşmesini işler." },
+            { title: "Civil War", year: "2016", desc: "Devlet denetimi yasasına karşı çıkan Kaptan Amerika ve ekibinin, Iron Man taraftarlarıyla yaşadığı derin ideolojik çatışma." }
+        ];
+
+        const CAP_QUOTES = [
+            "Bütün gün bunu yapabilirim.",
+            "Bedeli ne olursa olsun.",
+            "Yanımda kimse olmasa da tek başıma duracağım, çünkü haklı olduğumu biliyorum.",
+            "Ödün vermeyin. Ağaç gibi kök salın ve dünyaya deyin ki: 'Hayır, sen çekil.'",
+            "Grup halinde hareket edersek kazanırız. Kaybetsek bile, bunu da birlikte yaparız."
+        ];
+
+        // BOOT EKRANI LOG SIMÜLASYONU METİNLERİ
+        const BOOT_LOG_LINES = [
+            { text: "S.H.I.E.L.D. GÜVENLİ AĞ BAĞLANTISI KURULUYOR...", type: "normal" },
+            { text: "MAINFRAME ERİŞİMİ: ONAYLANDI.", type: "success" },
+            { text: "KOD 10 GÜVENLİK FİLTRELERİ AKTİF EDİLİYOR...", type: "normal" },
+            { text: "SÜPER ASKER SERUM ANALİZ MOTORU ÇALIŞTIRILDI.", type: "normal" },
+            { text: "BİYOMETRİK VERİ ALINIYOR: STEVEN G. ROGERS", type: "warning" },
+            { text: "KINETİK KALKAN PARAMETRELERİ YÜKLENİYOR...", type: "normal" },
+            { text: "AVENGERS ENTEGRASYON KATMANI BAĞLANDI.", type: "success" },
+            { text: "DİKKAT: BİLİNMEYEN HYDRA SINYALİ ENGELLENDİ.", type: "danger" },
+            { text: "VERİTABANI ENTEGRASYONU TAMAMLANDI.", type: "success" },
+            { text: "HOŞ GELDİNİZ KAPTAN. ERİŞİM ONAYLANDI.", type: "success" }
+        ];
+
+        // SES SİSTEMİ ALTYAPISI (Web Audio API ile Sentezlenen Yapay Sesler - Harici Dosya Bağımlılığı Yoktur)
+        const AudioEngine = {
+            ctx: null,
+            enabled: false,
+            init() {
+                if(!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            toggle() {
+                this.init();
+                this.enabled = !this.enabled;
+                document.getElementById("audio-toggle").innerText = this.enabled ? "SES: AÇIK" : "SES: KAPALI";
+                if(this.enabled && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playBeep(freq, duration, type="sine") {
+                if(!this.enabled || !this.ctx) return;
+                try {
+                    let osc = this.ctx.createOscillator();
+                    let gainNode = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gainNode);
+                    gainNode.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) { console.error("Ses çalınamadı", e); }
+            }
+        };
+
+        // GLOBAL INTERACTION SOUND TRIGGERS
+        document.querySelectorAll("button, a").forEach(elem => {
+            elem.addEventListener("mouseenter", () => AudioEngine.playBeep(600, 0.05, "square"));
+            elem.addEventListener("click", () => AudioEngine.playBeep(880, 0.12, "sine"));
+        });
+
+        document.getElementById("audio-toggle").addEventListener("click", () => {
+            AudioEngine.toggle();
+        });
+
+        // TEMA DEĞİŞTİRME MOTORU (LOCAL STORAGE DESTEKLİ)
+        const ThemeEngine = {
+            init() {
+                const savedTheme = localStorage.getItem("shield-theme") || "dark";
+                document.documentElement.setAttribute("data-theme", savedTheme);
+                this.updateButton();
+            },
+            toggle() {
+                const current = document.documentElement.getAttribute("data-theme");
+                const next = current === "light" ? "dark" : "light";
+                document.documentElement.setAttribute("data-theme", next);
+                localStorage.setItem("shield-theme", next);
+                this.updateButton();
+            },
+            updateButton() {
+                const current = document.documentElement.getAttribute("data-theme");
+                document.getElementById("theme-toggle").innerText = current === "light" ? "MOD: AÇIK" : "MOD: KOYU";
+            }
+        };
+        document.getElementById("theme-toggle").addEventListener("click", () => ThemeEngine.toggle());
+        ThemeEngine.init();
+
+        // GİRİŞ EKRANI KRONOMETRESİ VE AKIŞI
+        function updateBootClock() {
+            const now = new Date();
+            document.getElementById("boot-clock").innerText = now.toTimeString().split(' ')[0];
+        }
+        setInterval(updateBootClock, 1000);
+        updateBootClock();
+
+        const bootTerminal = document.getElementById("boot-terminal-log");
+        const bootProgressBar = document.getElementById("boot-progress-bar");
+        const bootPercentText = document.getElementById("boot-percentage");
+        const bootStatusText = document.getElementById("boot-status-lbl");
+
+        let currentLogIndex = 0;
+        let currentProgress = 0;
+
+        function runBootSequence() {
+            if (currentLogIndex < BOOT_LOG_LINES.length) {
+                const logItem = BOOT_LOG_LINES[currentLogIndex];
+                const p = document.createElement("p");
+                p.className = logItem.type;
+                p.innerText = `[${new Date().toLocaleTimeString()}] ${logItem.text}`;
+                bootTerminal.appendChild(p);
+                bootTerminal.scrollTop = bootTerminal.scrollHeight;
+                
+                if(logItem.type === "danger") AudioEngine.playBeep(250, 0.3, "sawtooth");
+                else AudioEngine.playBeep(440, 0.06, "sine");
+
+                currentLogIndex++;
+                setTimeout(runBootSequence, 400);
+            } else {
+                animateProgressBar();
+            }
+        }
+
+        function animateProgressBar() {
+            const interval = setInterval(() => {
+                if (currentProgress >= 100) {
+                    clearInterval(interval);
+                    bootStatusText.innerText = "ERİŞİM ONAYLANDI! PANEL AÇILIYOR...";
+                    AudioEngine.playBeep(1200, 0.4, "sine");
+                    setTimeout(() => {
+                        const bootScreen = document.getElementById("boot-screen");
+                        bootScreen.classList.add("fade-out");
+                        document.body.classList.remove("loading");
+                    }, 1000);
+                } else {
+                    currentProgress += 2;
+                    bootProgressBar.style.width = currentProgress + "%";
+                    bootPercentText.innerText = currentProgress + "%";
+                    if(currentProgress === 40) bootStatusText.innerText = "ÇEKİRDEK VERİLER AYRIŞTIRILIYOR...";
+                    if(currentProgress === 80) bootStatusText.innerText = "HUD ARABİRİMİ ÇİZİLİYOR...";
+                    if(currentProgress % 10 === 0) AudioEngine.playBeep(700, 0.02, "sine");
+                }
+            }, 35);
+        }
+
+        // DOM Yüklendiğinde Açılış Dizilimini Tetikle
+        window.addEventListener("DOMContentLoaded", () => {
+            setTimeout(runBootSequence, 500);
+        });
+
+        // DİNAMİK ZAMAN ÇİZELGESİ (TIMELINE) OLUŞTURUCU
+        const timelineWrapper = document.getElementById("dynamic-timeline");
+        TIMELINE_DATA.forEach((item, index) => {
+            const sideClass = index % 2 === 0 ? "left-node" : "right-node";
+            const node = document.createElement("div");
+            node.className = `timeline-node ${sideClass}`;
+            node.innerHTML = `
+                <div class="timeline-marker"></div>
+                <div class="timeline-content-box">
+                    <span class="timeline-year">${item.year}</span>
+                    <h4 class="timeline-heading">${item.title}</h4>
+                    <p class="timeline-text">${item.text}</p>
+                </div>
+            `;
+            timelineWrapper.appendChild(node);
+        });
+
+        // S.H.I.E.L.D. VERİTABANI KONTROL MOTORU
+        const dbMenuList = document.getElementById("db-menu-list");
+        const dbViewTitle = document.getElementById("db-view-title");
+        const dbViewBody = document.getElementById("db-view-body");
+
+        Object.keys(DATABASE_DATA).forEach((key, index) => {
+            const btn = document.createElement("button");
+            btn.className = `db-menu-btn ${index === 0 ? 'active' : ''}`;
+            btn.innerText = DATABASE_DATA[key].title;
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".db-menu-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                dbViewTitle.innerText = DATABASE_DATA[key].title;
+                dbViewBody.innerText = DATABASE_DATA[key].body;
+                AudioEngine.playBeep(520, 0.08, "sine");
+            });
+            dbMenuList.appendChild(btn);
+        });
+        // İlk kaydı varsayılan yükle
+        if(Object.keys(DATABASE_DATA).length > 0) {
+            const firstKey = Object.keys(DATABASE_DATA)[0];
+            dbViewTitle.innerText = DATABASE_DATA[firstKey].title;
+            dbViewBody.innerText = DATABASE_DATA[firstKey].body;
+        }
+
+        // KAPTAN VERİ TERMİNALİ SİMÜLASYONU KALBİ
+        const termInput = document.getElementById("term-input");
+        const termScreen = document.getElementById("term-screen");
+
+        termInput.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                const cmd = this.value.trim().toLowerCase();
+                this.value = "";
+                executeTerminalCommand(cmd);
+            }
+        });
+
+        function executeTerminalCommand(cmd) {
+            let row = document.createElement("div");
+            row.className = "terminal-output-row";
+            row.style.color = "#ffffff";
+            row.innerText = `SHIELD@ROGERS_NET:> ${cmd}`;
+            termScreen.appendChild(row);
+
+            let ans = document.createElement("div");
+            ans.className = "terminal-output-row";
+
+            if (cmd === "yardım") {
+                ans.innerHTML = "Kullanılabilir S.H.I.E.L.D. Komut Listesi:<br>" +
+                                "-> <b>shield</b>: Teşkilatın durumunu sorgular.<br>" +
+                                "-> <b>cap</b> veya <b>rogers</b>: Kaptan Amerika'nın anlık özetini getirir.<br>" +
+                                "-> <b>avengers</b>: Yenilmezler kadro analiz bağını gösterir.<br>" +
+                                "-> <b>görevler</b>: Tamamlanan gizli operasyon sayıları.<br>" +
+                                "-> <b>temizle</b>: Ekran günlüklerini sıfırlar.";
+            } else if (cmd === "shield") {
+                ans.innerText = "S.H.I.E.L.D. MAINFRAME: Çevrimiçi. Tehdit Seviyesi: Düşük. Global uydular devrede.";
+            } else if (cmd === "cap" || cmd === "rogers") {
+                ans.innerText = "ÖZNE: Steven Grant Rogers. Rütbe: Yüzbaşı. Durum: Efsanevi Durumda Korunuyor.";
+            } else if (cmd === "avengers") {
+                ans.innerText = "AVENGERS AĞI: 9 Kritik Düğüm Bağlantısı Aktif. Merkez Üs: Steve Rogers.";
+            } else if (cmd === "görevler") {
+                ans.innerText = "TOPLAM SAHA OPERASYONU: 342. BAŞARILI TAHLİYE: 342. BAŞARISIZLIK: 0.";
+            } else if (cmd === "temizle") {
+                termScreen.innerHTML = "";
+                return;
+            } else if (cmd === "") {
+                return;
+            } else {
+                ans.style.color = "var(--accent-red)";
+                ans.innerText = `HATA: '${cmd}' bilinmeyen bir komut veya yetkiniz dışı. Tanımlanamadı.`;
+                AudioEngine.playBeep(180, 0.25, "sawtooth");
+            }
+
+            termScreen.appendChild(ans);
+            termScreen.scrollTop = termScreen.scrollHeight;
+            AudioEngine.playBeep(650, 0.05, "sine");
+        }
+
+  // KOSTÜM / EKİPMAN FİLTRE VE KART MOTORU
+        const gearFiltersContainer = document.getElementById("gear-filters");
+        const gearGridContainer = document.getElementById("gear-grid");
+        const categories = ["hepsi", "wwii", "shield", "stealth", "endgame"];
+
+        categories.forEach(cat => {
+            const btn = document.createElement("button");
+            btn.className = `hud-btn ${cat === 'hepsi' ? '' : 'danger-btn'}`;
+            btn.style.margin = "5px";
+            btn.innerText = cat.toUpperCase();
+            btn.addEventListener("click", () => {
+                renderGearCards(cat);
+                AudioEngine.playBeep(400, 0.08, "sine");
+            });
+            gearFiltersContainer.appendChild(btn);
+        });
+
+        function renderGearCards(filter = "hepsi") {
+            gearGridContainer.innerHTML = "";
+            const filteredData = filter === "hepsi" ? GEAR_DATA : GEAR_DATA.filter(g => g.category === filter);
+            
+            filteredData.forEach(gear => {
+                const card = document.createElement("div");
+                card.className = "gear-showcase-card";
+                card.innerHTML = `
+                    <span class="gear-classification">${gear.category}</span>
+                    <h3 class="gear-title">${gear.title}</h3>
+                    <p class="gear-desc">${gear.desc}</p>
+                    <div class="gear-stat-row">
+                        <span class="gear-stat-label">${gear.statLabel}</span>
+                        <div class="gear-stat-bar-container">
+                            <div class="gear-stat-bar-fill" style="width: ${gear.statVal}%"></div>
+                        </div>
+                    </div>
+                `;
+                gearGridContainer.appendChild(card);
+            });
+        }
+        renderGearCards();
+
+        // AVENGERS TOPOLOJİK OPERASYON AĞI ÇİZİCİ (SVG BAĞLANTILARIYLA VANILLA JS)
+        const svgLayer = document.getElementById("network-svg");
+        const nodesWrapper = document.getElementById("network-nodes-wrap");
+
+        function drawNetwork() {
+            nodesWrapper.innerHTML = "";
+            svgLayer.innerHTML = "";
+            const width = nodesWrapper.clientWidth;
+            const height = nodesWrapper.clientHeight;
+
+            const computedNodes = AVENGERS_NETWORK.map(node => {
+                return {
+                    ...node,
+                    computedX: (node.x * width) / 100,
+                    computedY: (node.y * height) / 100
+                };
+            });
+
+            const centerNode = computedNodes.find(n => n.role === 'center');
+
+            computedNodes.forEach(node => {
+                if (node.role !== 'center' && centerNode) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", centerNode.computedX);
+                    line.setAttribute("y1", centerNode.computedY);
+                    line.setAttribute("x2", node.computedX);
+                    line.setAttribute("y2", node.computedY);
+                    line.setAttribute("stroke", "rgba(0, 210, 255, 0.4)");
+                    line.setAttribute("stroke-width", "2");
+                    line.setAttribute("stroke-dasharray", "5,5");
+                    svgLayer.appendChild(line);
+                }
+            });
+
+            computedNodes.forEach(node => {
+                const div = document.createElement("div");
+                div.className = `avengers-node ${node.role === 'center' ? 'node-center' : ''}`;
+                div.style.left = `${node.computedX - (node.role === 'center' ? 60 : 50)}px`;
+                div.style.top = `${node.computedY - (node.role === 'center' ? 60 : 50)}px`;
+                div.innerHTML = `
+                    <span class="node-alias">${node.alias}</span>
+                    <span class="node-real-name">${node.name}</span>
+                `;
+                div.addEventListener("click", () => {
+                    AudioEngine.playBeep(900, 0.15, "square");
+                    alert(`S.H.I.E.L.D. Taktik Verisi: ${node.alias} (${node.name}) bağlantısı stabil.`);
+                });
+                nodesWrapper.appendChild(div);
+            });
+        }
+
+        window.addEventListener("resize", drawNetwork);
+        // Sayfa tam oturunca çizmek üzere hafif erteleme
+        setTimeout(drawNetwork, 1200);
+
+        // SHIELD AI LAB GÜNLÜK AKIŞ SİMÜLASYONU
+        const aiLogsContainer = document.getElementById("ai-logs");
+        const aiSimPhrases = [
+            "Küresel uydu taraması optimize ediliyor...",
+            "Kalkan kinetik absorbe frekansı stabil %100.",
+            "Wakanda sınır hattı iletişim kanalları açık.",
+            "Yeni emir bekleniyor... Taktik motor hazır.",
+            "Tehdit seviyesi analizi: Stabil durum korunuyor.",
+            "Yenilmezler komuta merkezi veri akışı senkronize edildi."
+        ];
+
+        function addAiLog() {
+            const text = aiSimPhrases[Math.floor(Math.random() * aiSimPhrases.length)];
+            const entry = document.createElement("div");
+            entry.className = "ai-log-entry";
+            entry.innerText = `[AI_LOG_${new Date().toLocaleTimeString()}] -> ${text}`;
+            aiLogsContainer.appendChild(entry);
+            aiLogsContainer.scrollTop = aiLogsContainer.scrollHeight;
+            AudioEngine.playBeep(500, 0.03, "sine");
+            setTimeout(addAiLog, Math.random() * 3000 + 2000);
+        }
+        setTimeout(addAiLog, 2000);
+
+        // TEKNOLOJİ KATALOĞU VE İSTATİSTİK DÜZENLEYİCİ
+        const techContainer = document.getElementById("tech-container");
+        TECH_DATA.forEach(tech => {
+            const card = document.createElement("div");
+            card.className = "tech-card";
+            card.innerHTML = `
+                <div class="tech-icon-box">&#9881;</div>
+                <h3 class="tech-title">${tech.title}</h3>
+                <p class="tech-desc">${tech.desc}</p>
+            `;
+            techContainer.appendChild(card);
+        });
+
+        const statsDash = document.getElementById("stats-dash");
+        STATS_DATA.forEach(stat => {
+            const box = document.createElement("div");
+            box.className = "stat-counter-box";
+            box.innerHTML = `
+                <div class="stat-number">${stat.value}</div>
+                <div class="stat-title">${stat.label}</div>
+            `;
+            statsDash.appendChild(box);
+        });
+
+        // FİLM ARŞİV KARTLARINI BASMA
+        const filmLayout = document.getElementById("film-layout");
+        FILM_DATA.forEach(film => {
+            const fCard = document.createElement("div");
+            fCard.className = "film-archive-card";
+            fCard.innerHTML = `
+                <div class="film-meta-area">
+                    <span class="film-release-year">${film.year} // CINEMATIC</span>
+                    <h3 class="film-main-title">${film.title}</h3>
+                    <p class="film-synopsis">${film.desc}</p>
+                </div>
+            `;
+            filmLayout.appendChild(fCard);
+        });
+
+        // DİNAMİK KAPTAN SÖZ SEÇİCİ MOTORU
+        const quoteText = document.getElementById("quote-text");
+        const newQuoteBtn = document.getElementById("new-quote-btn");
+
+        newQuoteBtn.addEventListener("click", () => {
+            const randIndex = Math.floor(Math.random() * CAP_QUOTES.length);
+            quoteText.style.opacity = 0;
+            setTimeout(() => {
+                quoteText.innerText = `"${CAP_QUOTES[randIndex]}"`;
+                quoteText.style.opacity = 1;
+            }, 200);
+        });
+
+        // KALKAN TIKLAMA REAKSİYONU (DARBE EFEKTİ SİMÜLASYONU)
+        const vShield = document.getElementById("v-shield");
+        vShield.addEventListener("click", () => {
+            AudioEngine.playBeep(300, 0.4, "sawtooth");
+            vShield.style.transform = "scale(0.96) rotate(15deg)";
+            setTimeout(() => {
+                vShield.style.transform = "";
+            }, 150);
+        });
+
+        // NAVİGASYON AKTİF LINK TAKİPÇİSİ
+        const sections = document.querySelectorAll("section, header");
+        const navLiA = document.querySelectorAll(".nav-links a");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 120) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLiA.forEach(a => {
+                a.classList.remove("active");
+                if (a.getAttribute("href").includes(current)) {
+                    a.classList.add("active");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
