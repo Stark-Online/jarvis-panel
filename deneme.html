@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekibimize Katıl - Başvuru Formu</title>
+    <style>
+        /* --- CSS DEĞİŞKENLERİ VE TEMA SİSTEMİ --- */
+        :root, [data-theme="dark"] {
+            --bg-1: #0f172a;
+            --bg-2: #1e1b4b;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.5);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --border-color: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        [data-theme="light"] {
+            --bg-1: #f1f5f9;
+            --bg-2: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        [data-theme="blue"] {
+            --bg-1: #0284c7;
+            --bg-2: #0369a1;
+            --card-bg: rgba(12, 74, 110, 0.75);
+            --text-color: #f0f9ff;
+            --text-muted: #bae6fd;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.5);
+            --input-bg: rgba(7, 89, 133, 0.6);
+            --border-color: #0c4a6e;
+            --success: #4ade80;
+            --error: #f87171;
+        }
+
+        [data-theme="red"] {
+            --bg-1: #991b1b;
+            --bg-2: #7f1d1d;
+            --card-bg: rgba(69, 10, 10, 0.75);
+            --text-color: #fef2f2;
+            --text-muted: #fca5a5;
+            --accent-color: #f87171;
+            --accent-glow: rgba(248, 113, 113, 0.5);
+            --input-bg: rgba(127, 29, 29, 0.6);
+            --border-color: #450a0a;
+            --success: #4ade80;
+            --error: #f87171;
+        }
+
+        /* --- GENEL AYARLAR --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        /* --- HAREKETLİ GRADIENT ARKA PLAN --- */
+        .bg-gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            background-size: 400% 400%;
+            z-index: -2;
+            animation: gradientMove 15s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Arka Plan Yüzen Parçacıklar (Canvas) */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- ÜST KONTROLLER (Tema ve Müzik) --- */
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(0,0,0,0.1);
+            padding: 5px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .theme-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transform: scale(0.9);
+            transition: transform 0.2s;
+        }
+
+        .theme-btn:hover { transform: scale(1.1); }
+        .theme-btn.active { border-color: var(--text-color); transform: scale(1.1); }
+        .btn-dark { background: #1e293b; }
+        .btn-light { background: #f1f5f9; }
+        .btn-blue { background: #38bdf8; }
+        .btn-red { background: #f87171; }
+
+        .music-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* --- FORM KART YAPISI --- */
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* --- FORM ALANLARI VE ANİMASYONLARI --- */
+        .form-group {
+            margin-bottom: 22px;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Sıralı giriş (staggered) efekti gecikmeleri */
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.15s; }
+        .form-group:nth-child(3) { animation-delay: 0.2s; }
+        .form-group:nth-child(4) { animation-delay: 0.25s; }
+        .form-group:nth-child(5) { animation-delay: 0.3s; }
+        .form-group:nth-child(6) { animation-delay: 0.35s; }
+        .form-group:nth-child(7) { animation-delay: 0.4s; }
+        .form-group:nth-child(8) { animation-delay: 0.45s; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        label .note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            transform: scale(1.01);
+        }
+
+        /* Checkbox Grubu Gridi */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--input-bg);
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: normal;
+            font-size: 0.9rem;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .checkbox-label:hover {
+            border-color: var(--accent-color);
+        }
+
+        .checkbox-label input {
+            accent-color: var(--accent-color);
+            width: 16px;
+            height: 16px;
+        }
+
+        #other-tech-wrapper {
+            margin-top: 10px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Karakter Sayacı */
+        .counter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .counter {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --- HATA VE VALIDASYON STİLLERİ --- */
+        .error-msg {
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group.invalid input,
+        .form-group.invalid textarea,
+        .form-group.invalid select {
+            border-color: var(--error) !important;
+        }
+
+        .form-group.invalid {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- BUTONLAR VE FOOTER --- */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--border-color);
+            color: var(--text-muted);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: not-allowed;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+
+        .submit-btn.ready {
+            background: var(--accent-color);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .submit-btn.ready:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--accent-color);
+        }
+
+        .submit-btn.ready:active {
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --- BAŞARILI MODAL UYARISI --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--bg-1);
+            border: 2px solid var(--accent-color);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            margin: 0 auto 20px;
+        }
+
+        .modal h2 { margin-bottom: 10px; }
+        .modal p { color: var(--text-muted); margin-bottom: 20px; }
+        
+        .modal-btn {
+            padding: 10px 25px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --- ANİMASYON KEYFRAMES --- */
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* --- MOBİL UYUMLULUK --- */
+        @media (max-width: 600px) {
+            body { padding: 80px 12px 20px 12px; }
+            .container { padding: 24px 16px; }
+            .top-controls { top: 15px; right: 15px; }
+            .checkbox-group { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-gradient-bg"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="top-controls">
+        <div class="theme-selector">
+            <button class="theme-btn btn-dark active" onclick="setTheme('dark')" title="Karanlık Tema"></button>
+            <button class="theme-btn btn-light" onclick="setTheme('light')" title="Aydınlık Tema"></button>
+            <button class="theme-btn btn-blue" onclick="setTheme('blue')" title="Mavi Tema"></button>
+            <button class="theme-btn btn-red" onclick="setTheme('red')" title="Kırmızı Tema"></button>
+        </div>
+        
+        <audio id="bg-music" src="bg-music.mp3" loop></audio>
+        <button class="music-btn" id="music-toggle" onclick="toggleMusic()" title="Müziği Başlat/Durdur">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M11.536 14.01A8.473 8.473 0 0 0 14.02 12a.5.5 0 0 0-.83-.445 7.472 7.472 0 0 1-2.2 1.779.5.5 0 1 0 .545.836zm2.422-2.735A8.471 8.471 0 0 0 15 8.5a.5.5 0 0 0-1 0 7.471 7.471 0 0 1-.418 2.443.5.5 0 1 0 .954.332zm.082-3.275a.5.5 0 0 0 .1-.61 8.475 8.475 0 0 0-2.203-2.61.5.5 0 1 0-.649.762 7.476 7.476 0 0 1 1.936 2.292.5.5 0 0 0 .816.166zm-1.12-3.158a.5.5 0 0 0 .76-.634A8.485 8.485 0 0 0 10.25 1.25a.5.5 0 1 0-.5 1 7.486 7.486 0 0 1 3.125 1.322zM8 1.5a.5.5 0 0 0-1 0v13a.5.5 0 0 0 .707.455l4-2A.5.5 0 0 0 12 12.5V3.5a.5.5 0 0 0-.293-.455l-4-2zM10.5 4.707 11 5v6l-.5.293V4.707zM5 4H2.5A1.5 1.5 0 0 0 1 5.5v5A1.5 1.5 0 0 0 2.5 12H5V4z"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Ekibimize Katıl</h1>
+            <p>Projelerimizi bir üst seviyeye taşımak için yeni yetenekler arıyoruz. Aşağıdaki formu eksiksiz doldurarak topluluğumuzun bir parçası olma şansını yakala!</p>
+        </div>
+
+        <form id="application-form" novalidate>
+            
+            <div class="form-group">
+                <label for="real-name">İsim / Başvuru Adı <span class="note">(İstemiyorsanız boş bırakabilirsiniz)</span></label>
+                <input type="text" id="real-name" placeholder="Örn: Ahmet Yılmaz">
+            </div>
+
+            <div class="form-group">
+                <label for="username">Sanal İsim / Kullanıcı Adı *</label>
+                <input type="text" id="username" placeholder="Örn: MatrixDeveloper" required>
+                <div class="error-msg">Bu alan zorunludur.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="age">Yaş *</label>
+                <input type="number" id="age" min="13" max="99" placeholder="Örn: 20" required>
+                <div class="error-msg" id="age-error">Yaş alanı zorunludur ve 13-99 arasında olmalıdır.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Hangi alanlarda deneyimin var? * <span class="note">(En az bir adet seçiniz)</span></label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" name="experience" value="Web Geliştirme"> Web Geliştirme</label>
+                    <label class="checkbox-label"><input type="checkbox" name="experience" value="Oyun Geliştirme"> Oyun Geliştirme</label>
+                    <label class="checkbox-label"><input type="checkbox" name="experience" value="Grafik / Tasarım"> Grafik / Tasarım</label>
+                    <label class="checkbox-label"><input type="checkbox" name="experience" value="Video Düzenleme"> Video Düzenleme</label>
+                    <label class="checkbox-label"><input type="checkbox" name="experience" value="Yazılım / Backend"> Yazılım / Backend</label>
+                    <label class="checkbox-label"><input type="checkbox" name="experience" value="Diğer" id="chk-other"> Diğer</label>
+                </div>
+                <div id="other-tech-wrapper">
+                    <input type="text" id="other-experience" placeholder="Lütfen diğer deneyim alanınızı belirtin">
+                </div>
+                <div class="error-msg" id="checkbox-error">Lütfen en az bir deneyim alanı seçiniz.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="contribution">Topluluğa/Sohbet grubuna ne katabilirsin? *</label>
+                <textarea id="contribution" rows="4" maxlength="300" placeholder="Ekibe katacağı yenilikleri, teknik becerilerini veya enerjini kısaca anlat..." required></textarea>
+                <div class="counter-container">
+                    <div class="error-msg">Bu alan zorunludur.</div>
+                    <div class="counter"><span id="contrib-count">0</span> / 300</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="time-commitment">Günde ortalama ne kadar zaman ayırabilirsin? *</label>
+                <select id="time-commitment" required>
+                    <option value="" disabled selected hidden>Süre seçiniz...</option>
+                    <option value="1 saatten az">1 saatten az</option>
+                    <option value="1-3 saat">1-3 saat</option>
+                    <option value="3+ saat">3+ saat</option>
+                </select>
+                <div class="error-msg">Lütfen bir süre seçeneği belirleyin.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="discord">Discord / İletişim Kullanıcı Adı <span class="note">(Opsiyonel)</span></label>
+                <input type="text" id="discord" placeholder="Örn: kullanıcı#0000 veya kullanıcı_adi">
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Kısaca kendinden bahset <span class="note">(Opsiyonel)</span></label>
+                <textarea id="bio" rows="3" maxlength="200" placeholder="Hobilerin, genel ilgi alanların vb."></textarea>
+                <div class="counter-container">
+                    <div></div>
+                    <div class="counter"><span id="bio-count">0</span> / 200</div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">Gönder</button>
+        </form>
+
+        <footer>
+            <p>Bilgileriniz sadece ekip değerlendirmesi için kullanılacaktır.</p>
+        </footer>
+    </div>
+
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal">
+            <div class="modal-icon">✓</div>
+            <h2>Başvurunuz Alındı!</h2>
+            <p>Ekibimize göstermiş olduğunuz ilgi için teşekkür ederiz. Başvurunuz titizlikle incelenip en kısa sürede dönüş yapılacaktır.</p>
+            <button class="modal-btn" onclick="closeModal()">Harika!</button>
+        </div>
+    </div>
+
+<script>
+        /* --- TEMA YÖNETİMİ --- */
+        function setTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('selectedTheme', themeName);
+            
+            // Aktif buton görsel güncellemesi
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.btn-${themeName}`);
+            if(activeBtn) activeBtn.classList.add('active');
+        }
+
+        // Sayfa açıldığında hafızadaki temayı yükle
+        const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
+        setTheme(savedTheme);
+
+
+        /* --- ARKA PLAN MÜZİK KONTROLÜ --- */
+        const music = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-toggle');
+        let isMusicPlaying = false;
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                music.pause();
+                musicBtn.style.transform = 'scale(1)';
+                musicBtn.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            } else {
+                // Tarayıcı autoplay kısıtlamasını aşmak için tıklama anında tetiklenir
+                music.play().catch(err => console.log("Müzik dosyası bulunamadı veya yüklenemedi."));
+                musicBtn.style.transform = 'scale(1.1)';
+                musicBtn.style.boxShadow = '0 0 15px var(--accent-color)';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+
+        /* --- DİNAMİK PARÇACIK ANİMASYONU (Canvas) --- */
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.speedY = Math.random() * 0.6 - 0.3;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                // Aktif temanın yazı renginden hafif opaklık alarak çizilir
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color') + '22';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < 60; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particlesArray.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        initParticles();
+        animateParticles();
+
+
+        /* --- UX, DİNAMİK ALANLAR VE KARAKTER SAYACI --- */
+        const form = document.getElementById('application-form');
+        const chkOther = document.getElementById('chk-other');
+        const otherTechWrapper = document.getElementById('other-tech-wrapper');
+        const otherInput = document.getElementById('other-experience');
+
+        // "Diğer" seçeneği işaretlenince input alanını aç/kapa
+        chkOther.addEventListener('change', function() {
+            if(this.checked) {
+                otherTechWrapper.style.display = 'block';
+                otherInput.setAttribute('required', 'true');
+            } else {
+                otherTechWrapper.style.display = 'none';
+                otherInput.removeAttribute('required');
+                otherInput.value = '';
+            }
+            checkFormValidity();
+        });
+
+        // Karakter Sayaçları Kontrolü
+        const contribTextarea = document.getElementById('contribution');
+        const contribCount = document.getElementById('contrib-count');
+        contribTextarea.addEventListener('input', () => {
+            contribCount.textContent = contribTextarea.value.length;
+        });
+
+        const bioTextarea = document.getElementById('bio');
+        const bioCount = document.getElementById('bio-count');
+        bioTextarea.addEventListener('input', () => {
+            bioCount.textContent = bioTextarea.value.length;
+        });
+
+
+        /* --- ANLIK FORM GEÇERLİLİK KONTROLÜ (Glow Buton Efekti) --- */
+        const submitBtn = document.getElementById('submit-btn');
+
+        function isFormValid() {
+            // Zorunlu Standart Input Validasyonu
+            const requiredFields = form.querySelectorAll('[required]');
+            for(let field of requiredFields) {
+                if(!field.value.trim()) return false;
+            }
+
+            // Yaş Validasyonu (13 - 99)
+            const ageVal = parseInt(document.getElementById('age').value);
+            if(isNaN(ageVal) || ageVal < 13 || ageVal > 99) return false;
+
+            // Checkbox En Az Bir Seçim Kontrolü
+            const checkboxes = form.querySelectorAll('input[name="experience"]:checked');
+            if(checkboxes.length === 0) return false;
+
+            return true;
+        }
+
+        function checkFormValidity() {
+            if(isFormValid()) {
+                submitBtn.classList.add('ready');
+            } else {
+                submitBtn.classList.remove('ready');
+            }
+        }
+
+        // Formdaki tüm değişimleri dinleerek butonu parlat
+        form.addEventListener('input', checkFormValidity);
+        form.addEventListener('change', checkFormValidity);
+
+
+        /* --- SUBMIT VE MANUEL VALIDASYON (Hata/Shake Yönetimi) --- */
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let hasError = false;
+
+            // Tüm hata durumlarını sıfırla
+            form.querySelectorAll('.form-group').forEach(g => g.classList.remove('invalid'));
+            form.querySelectorAll('.error-msg').forEach(m => m.style.display = 'none');
+
+            // 1. Sanal İsim Kontrolü
+            const username = document.getElementById('username');
+            if(!username.value.trim()) {
+                setError(username);
+                hasError = true;
+            }
+
+            // 2. Yaş Kontrolü
+            const age = document.getElementById('age');
+            const ageVal = parseInt(age.value);
+            if(!age.value || isNaN(ageVal) || ageVal < 13 || ageVal > 99) {
+                setError(age);
+                hasError = true;
+            }
+
+            // 3. Deneyim Alanı Kontrolü
+            const checkboxes = form.querySelectorAll('input[name="experience"]:checked');
+            if(checkboxes.length === 0) {
+                const group = document.getElementById('checkbox-error').parentElement;
+                group.classList.add('invalid');
+                document.getElementById('checkbox-error').style.display = 'block';
+                hasError = true;
+            }
+
+            // 4. "Diğer" seçilmiş ama input boş bırakılmışsa kontrolü
+            if(chkOther.checked && !otherInput.value.trim()) {
+                setError(otherInput);
+                hasError = true;
+            }
+
+            // 5. Katkı Değeri Kontrolü
+            if(!contribTextarea.value.trim()) {
+                setError(contribTextarea);
+                hasError = true;
+            }
+
+            // 6. Zaman Ayrımı Seçim Kontrolü
+            const timeCommit = document.getElementById('time-commitment');
+            if(!timeCommit.value) {
+                setError(timeCommit);
+                hasError = true;
+            }
+
+            // Hata varsa işlemi durdur
+            if(hasError) return;
+
+            /* --- BAŞARILI DURUM: VERİ TOPLAMA VE JSON ÇIKTI --- */
+            const selectedExperience = [];
+            form.querySelectorAll('input[name="experience"]:checked').forEach(cb => {
+                selectedExperience.push(cb.value);
+            });
+
+            const formDataJson = {
+                realName: document.getElementById('real-name').value.trim() || null,
+                username: username.value.trim(),
+                age: ageVal,
+                experienceAreas: selectedExperience,
+                otherExperienceDetail: chkOther.checked ? otherInput.value.trim() : null,
+                contribution: contribTextarea.value.trim(),
+                timeCommitment: timeCommit.value,
+                discord: document.getElementById('discord').value.trim() || null,
+                bio: bioTextarea.value.trim() || null,
+                submittedAt: new Date().toISOString()
+            };
+
+            // Konsola JSON Çıktısı Yazdırılması
+            console.log("=== YENİ BAŞVURU ALINDI (JSON) ===");
+            console.log(JSON.stringify(formDataJson, null, 2));
+
+            // Modalı tetikle
+            document.getElementById('success-modal').classList.add('active');
+        });
+
+        // Hata yakalandığında tetiklenen görsel fonksiyon
+        function setError(element) {
+            const group = element.closest('.form-group');
+            group.classList.add('invalid');
+            const errorMsg = group.querySelector('.error-msg');
+            if(errorMsg) errorMsg.style.display = 'block';
+        }
+
+        // Modalı Kapatma ve Form Sıfırlama Fonksiyonu
+        function closeModal() {
+            document.getElementById('success-modal').classList.remove('active');
+            form.reset();
+            contribCount.textContent = 0;
+            bioCount.textContent = 0;
+            otherTechWrapper.style.display = 'none';
+            checkFormValidity();
+        }
+    </script>
+</body>
+</html>
