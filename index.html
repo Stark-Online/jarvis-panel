@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stark Industries — J.A.R.V.I.S. Ana Veritabanı</title>
+    <style>
+        /* ==========================================================================
+           CSS RESET & DEĞİŞKENLER
+           ========================================================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        :root {
+            --bg-pure: #050505;
+            --bg-dark: #0b0b0b;
+            --bg-card: rgba(15, 15, 25, 0.7);
+            --bg-glow: rgba(0, 217, 255, 0.03);
+            --cyan: #00D9FF;
+            --cyan-glow: rgba(0, 217, 255, 0.5);
+            --red: #FF3B30;
+            --red-glow: rgba(255, 59, 48, 0.6);
+            --gold: #FFD700;
+            --gold-glow: rgba(255, 215, 0, 0.5);
+            --text-main: #E0F7FA;
+            --text-muted: #8A9A9F;
+            --border-glow: rgba(0, 217, 255, 0.2);
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .light-theme {
+            --bg-pure: #f0f4f8;
+            --bg-dark: #e1e8f0;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-glow: rgba(0, 150, 255, 0.02);
+            --cyan: #007799;
+            --cyan-glow: rgba(0, 119, 153, 0.4);
+            --red: #cc241d;
+            --text-main: #1a2630;
+            --text-muted: #5a6e7f;
+            --border-glow: rgba(0, 119, 153, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-pure);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--cyan) var(--bg-pure);
+        }
+
+        body::-webkit-scrollbar {
+            width: 6px;
+        }
+        body::-webkit-scrollbar-track {
+            background: var(--bg-pure);
+        }
+        body::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+            border-radius: 3px;
+        }
+
+        /* ==========================================================================
+           HOLOGRAFİK ARKA PLAN GRID VE PARÇACIKLAR
+           ========================================================================== */
+        #hologram-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: 
+                linear-gradient(rgba(0, 217, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.7;
+        }
+
+        #canvas-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ==========================================================================
+           GİRİŞ EKRANI (BOOT SCREEN)
+           ========================================================================== */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #020205;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--cyan);
+            font-family: monospace;
+            transition: opacity 0.8s ease;
+        }
+
+        .boot-container {
+            width: 80%;
+            max-width: 600px;
+            padding: 30px;
+            border: 1px solid var(--border-glow);
+            background: rgba(5, 15, 25, 0.85);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.15);
+            position: relative;
+        }
+
+        .boot-title {
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-glow);
+            padding-bottom: 10px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .boot-logs {
+            height: 180px;
+            overflow-y: hidden;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .boot-log-entry {
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .boot-progress-wrapper {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            border: 1px solid var(--cyan);
+            background: rgba(0,0,0,0.5);
+            padding: 2px;
+        }
+
+        .boot-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--cyan),
+                var(--cyan) 10px,
+                rgba(0, 119, 153, 0.8) 10px,
+                rgba(0, 119, 153, 0.8) 20px
+            );
+            box-shadow: 0 0 15px var(--cyan-glow);
+            transition: width 0.1s linear;
+        }
+
+        .boot-percentage {
+            position: absolute;
+            right: 0;
+            top: -22px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        /* ==========================================================================
+           ÜST NAVİGASYON VE UTILITY BAR
+           ========================================================================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(11, 11, 11, 0.85);
+            border-bottom: 1px solid var(--border-glow);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyan-glow);
+            position: relative;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        .logo-text {
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+            background: linear-gradient(90deg, var(--text-main), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--cyan);
+            border-color: var(--border-glow);
+            background: rgba(0, 217, 255, 0.05);
+            text-shadow: 0 0 8px var(--cyan-glow);
+        }
+
+        .utility-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .util-btn {
+            background: transparent;
+            border: 1px solid var(--border-glow);
+            color: var(--cyan);
+            padding: 8px 14px;
+            font-family: monospace;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .util-btn:hover {
+            background: var(--cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        /* ==========================================================================
+           ANA SARMALAYICI VE REUSABLE PANELLER
+           ========================================================================== */
+        main {
+            position: relative;
+            z-index: 10;
+            padding-top: 70px;
+            width: 100%;
+        }
+
+        .stark-section {
+            padding: 80px 10%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            color: transparent;
+            background: linear-gradient(90deg, var(--cyan), var(--text-main));
+            -webkit-background-clip: text;
+            border-left: 4px solid var(--cyan);
+            padding-left: 15px;
+        }
+
+        .glass-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .glass-panel:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* ==========================================================================
+           HERO SEKTÖRÜ
+           ========================================================================== */
+        #hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            min-height: calc(100vh - 70px);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+            font-family: monospace;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(255, 59, 48, 0.2);
+        }
+
+        .hero-title {
+            font-size: 5.5rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .hero-title span {
+            color: var(--cyan);
+            text-shadow: 0 0 30px var(--cyan-glow);
+        }
+
+        .hero-subtitle-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .subtitle-tag {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .subtitle-tag:not(:last-child)::after {
+            content: '•';
+            position: absolute;
+            right: -20px;
+            color: var(--cyan);
+        }
+
+        .hero-cta-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 1: BİYOGRAFİ VE PROFİL
+           ========================================================================== */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .profile-meta-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .profile-meta-list li {
+            margin-bottom: 12px;
+            font-size: 1rem;
+            border-bottom: 1px dashed rgba(255,255,255,0.08);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile-meta-list span.label {
+            color: var(--cyan);
+            font-family: monospace;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 2: ZAMAN ÇİZGELESİ
+           ========================================================================== */
+        .timeline-container {
+            position: relative;
+            padding-left: 30px;
+            border-left: 2px solid var(--border-glow);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .timeline-item:hover {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -37px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan-glow);
+            border: 2px solid var(--bg-pure);
+        }
+
+        .timeline-year {
+            font-family: monospace;
+            font-size: 1.3rem;
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 3: STARK INDUSTRIES
+           ========================================================================== */
+        .stark-ind-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 4: J.A.R.V.I.S. TERMINAL
+           ========================================================================== */
+        .terminal-box {
+            background: #020205;
+            border: 1px solid var(--cyan);
+            font-family: monospace;
+            color: var(--cyan);
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-output {
+            flex-grow: 1;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .terminal-input-row {
+            display: flex;
+            align-items: center;
+        }
+
+        .terminal-prompt {
+            margin-right: 10px;
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-family: monospace;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 5: ARC REACTOR ENERJİ SİSTEMİ
+           ========================================================================== */
+        .reactor-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0;
+        }
+
+        .arc-reactor {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(0,217,255,0.1) 0%, transparent 70%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 4px dashed var(--cyan);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        .ring-1 {
+            width: 220px;
+            height: 220px;
+            animation: rotate-clockwise 12s linear infinite;
+        }
+
+        .ring-2 {
+            width: 170px;
+            height: 170px;
+            border-color: var(--gold);
+            border-style: dotted;
+            box-shadow: 0 0 15px var(--gold-glow);
+            animation: rotate-counter 8s linear infinite;
+        }
+
+        .ring-3 {
+            width: 120px;
+            height: 120px;
+            border-width: 6px;
+            animation: rotate-clockwise 4s linear infinite;
+        }
+
+        .reactor-core {
+            width: 70px;
+            height: 70px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px #fff,
+                0 0 60px var(--cyan),
+                0 0 100px var(--cyan);
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 6: ZIRH LABORATUVARI
+           ========================================================================== */
+        .filter-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .armor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .armor-card {
+            display: block;
+        }
+
+        .armor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .armor-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .stat-bar-wrapper {
+            margin-top: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan-glow);
+            width: 0;
+            transition: width 1.5s ease-out;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 7 VE 8: AI & TEKNOLOJİ KATALOGU
+           ========================================================================== */
+        .ai-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 9: AVENGERS MATRIX AĞI
+           ========================================================================== */
+        .network-container {
+            width: 100%;
+            height: 450px;
+            border: 1px solid var(--border-glow);
+            background: rgba(5,5,10,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .network-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node-element {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+            background: rgba(15,25,40,0.9);
+            border: 1px solid var(--cyan);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-family: monospace;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+            transform: translate(-50%, -50%);
+        }
+
+        .node-element:hover {
+            box-shadow: 0 0 15px var(--cyan-glow);
+            border-color: #fff;
+        }
+
+        .node-center {
+            border-color: var(--red);
+            box-shadow: 0 0 15px var(--red-glow);
+            font-weight: bold;
+        }
+
+        /* ==========================================================================
+           SEKTÖR 10, 11 VE 12: İSTATİSTİK, GALERİ & SÖZLER
+           ========================================================================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--cyan);
+            text-shadow: 0 0 15px var(--cyan-glow);
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(10,10,15,0.6);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .movie-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.05);
+        }
+
+        .quote-box {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .quote-text {
+            font-size: 1.6rem;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            min-height: 80px;
+        }
+
+        /* ==========================================================================
+           ANİMASYON METRİKLERİ
+           ========================================================================== */
+        @keyframes rotate-clockwise {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes rotate-counter {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 0.6; box-shadow: 0 0 15px var(--cyan-glow); }
+            100% { opacity: 1; box-shadow: 0 0 30px var(--cyan-glow); }
+        }
+
+        /* ==========================================================================
+           RESPONSIVE MEDYA KURALLARI
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .profile-grid, .stark-ind-grid, .ai-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .hero-title { font-size: 4rem; }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 0 20px; }
+            nav { display: none; }
+            .profile-grid, .stark-ind-grid, .ai-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-title { font-size: 2.8rem; }
+            .stark-section { padding: 60px 5%; }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+    <div id="hologram-grid"></div>
+    <canvas id="canvas-particles"></canvas>
+
+    <div id="boot-screen">
+        <div class="boot-container">
+            <div class="boot-title">Stark Core OS v4.81</div>
+            <div class="boot-logs" id="boot-log-container"></div>
+            <div class="boot-progress-wrapper">
+                <div class="boot-percentage" id="boot-perc">0%</div>
+                <div class="boot-progress-bar" id="boot-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo-section">
+            <div class="logo-icon"></div>
+            <div class="logo-text">STARK ENTERPRISES</div>
+        </div>
+        <nav>
+            <a href="#hero" class="nav-link active">Zirve</a>
+            <a href="#profil" class="nav-link">Profil</a>
+            <a href="#kronoloji" class="nav-link">Zaman Akışı</a>
+            <a href="#zirhlar" class="nav-link">Zırh Laboratuvarı</a>
+            <a href="#terminal" class="nav-link">J.A.R.V.I.S.</a>
+        </nav>
+        <div class="utility-controls">
+            <button class="util-btn" id="theme-toggle">ARAYÜZ MODU</button>
+        </div>
+    </header>
+
+    <main>
+        
+        <section id="hero" class="stark-section">
+            <div>
+                <div class="hero-badge">Sistem Durumu: Çevrimiçi</div>
+                <h1 class="hero-title">TONY <span>STARK</span></h1>
+                <div class="hero-subtitle-container">
+                    <div class="subtitle-tag">Dahi</div>
+                    <div class="subtitle-tag">Milyarder</div>
+                    <div class="subtitle-tag">Playboy</div>
+                    <div class="subtitle-tag">Hayırsever</div>
+                </div>
+                <div class="hero-cta-wrapper">
+                    <a href="#profil" class="util-btn" style="text-decoration:none;">VERİTABANINI AÇ</a>
+                    <a href="#terminal" class="util-btn" style="text-decoration:none; background:var(--cyan); color:#000;">TERMİNALE BAĞLAN</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="profil" class="stark-section">
+            <h2 class="section-title">01 // BİYOGRAFİK PROFİL</h2>
+            <div class="profile-grid">
+                <div class="glass-panel">
+                    <h3 style="color:var(--cyan); margin-bottom:15px;">Kişisel Arşiv Bilgileri</h3>
+                    <p style="line-height:1.6; color:var(--text-muted); margin-bottom: 15px;">
+                        Anthony Edward "Tony" Stark, küresel teknoloji ekosistemini ve savunma sanayisini kökten değiştiren Stark Industries'in kurucu lideridir. Mucit dehası, sadece zırh mekanikleriyle sınırlı kalmayıp, sürdürülebilir temiz enerji kaynaklarından yapay zeka entegrasyonlarına kadar insanlığın teknolojik sınırlarını yeniden çizmiştir.
+                    </p>
+                    <ul class="profile-meta-list">
+                        <li><span class="label">Tam Adı:</span> <span>Anthony Edward Stark</span></li>
+                        <li><span class="label">Eğitim:</span> <span>MIT (Massachusetts Institute of Technology) - Çift Doktora</span></li>
+                        <li><span class="label">Doğum Tarihi:</span> <span>29 Mayıs 1970</span></li>
+                        <li><span class="label">Uzmanlık Alanı:</span> <span>Yapay Zeka, Robotik, Kuantum Mekaniği, İleri Metalurji</span></li>
+                    </ul>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color:var(--gold); margin-bottom:15px;">Kişilik Parametreleri</h3>
+                    <p style="line-height:1.6; color:var(--text-muted);">
+                        Yüksek entelektüel kapasite, kriz anlarında sarsılmaz liderlik ve vizyoner gelecek planlaması. Afganistan'daki dönüm noktasından sonra, kâr odaklı silah üretimini tamamen durdurarak tüm kaynaklarını küresel koruma sistemleri, temiz enerji ve savunma kalkanı projelerine aktarmıştır.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="kronoloji" class="stark-section">
+            <h2 class="section-title">02 // STRATEJİK ZAMAN AKIŞI</h2>
+            <div class="timeline-container">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">1974 - Erken Dönem Mucitlik</div>
+                    <div class="glass-panel">Henüz 4 yaşındayken ilk mikro devre kartını tasarladı ve üstün zeka seviyesini kanıtladı.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">1987 - MIT Mezuniyeti</div>
+                    <div class="glass-panel">Massachusetts Institute of Technology bünyesinden mühendislik ve fizik alanlarında en yüksek dereceyle mezun oldu.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2008 - Iron Man Doğuşu</div>
+                    <div class="glass-panel">Afganistan'da esir düştüğü mağarada ilk Ark Reaktörü'nü ve prototip Mark I zırhını üreterek kurtuldu.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2012 - New York Savaşı</div>
+                    <div class="glass-panel">Avengers ekibiyle birlikte istilaya karşı koydu; nükleer füzeyi uzay boşluğuna taşıyarak dünyayı kurtardı.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2018 - Infinity War Kontrolü</div>
+                    <div class="glass-panel">Nanoteknolojik zırh altyapısını kurarak evrensel tehdit Thanos'a karşı ilk doğrudan gezegenler arası savunmayı yönetti.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2023 - Endgame Son Darbe</div>
+                    <div class="glass-panel">Kuantum zaman yolculuğunu çözdü, Nano Eldiven'i tasarladı ve kendi hayatı pahasına evrendeki tüm yaşamı geri getirdi.</div>
+                </div>
+            </div>
+        </section>
+        <section id="sirket" class="stark-section">
+            <h2 class="section-title">03 // STARK INDUSTRIES GLOBAL OPERASYONLAR</h2>
+            <div class="stark-ind-grid">
+                <div class="glass-panel">
+                    <h4 style="color:var(--cyan); margin-bottom:10px;">Temiz Enerji Bölümü</h4>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Dünyanın ilk sıfır emisyonlu, ark reaktörü tabanlı şehir enerji şebekelerinin kurulumu ve yönetimi.</p>
+                </div>
+                <div class="glass-panel">
+                    <h4 style="color:var(--cyan); margin-bottom:10px;">İleri Siber Sibernetik</h4>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Gelişmiş protezler, nöral arayüz teknolojileri ve endüstriyel otomasyon algoritmaları geliştirme laboratuvarları.</p>
+                </div>
+                <div class="glass-panel">
+                    <h4 style="color:var(--cyan); margin-bottom:10px;">Havacılık ve Uzay Sistemleri</h4>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Yörünge savunma uyduları, derin uzay tarama modülleri ve atmosfer dışı itki motorları optimizasyonu.</p>
+                </div>
+                <div class="glass-panel">
+                    <h4 style="color:var(--cyan); margin-bottom:10px;">Yapay Zeka Mimarisi</h4>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Küresel tehdit analizi yapabilen, tam otonom ve yüksek bilişsel kapasiteli dijital asistan altyapıları.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="terminal" class="stark-section">
+            <h2 class="section-title">04 // J.A.R.V.I.S. İNTERAKTİF TERMİNAL MODÜLÜ</h2>
+            <div class="glass-panel">
+                <div style="margin-bottom:15px; font-family:monospace; color:var(--text-muted); font-size:0.85rem;">
+                    [SİSTEM UYARISI] Mevcut komutlar: <span style="color:var(--gold);">yardım</span>, <span style="color:var(--gold);">ironman</span>, <span style="color:var(--gold);">stark</span>, <span style="color:var(--gold);">avengers</span>, <span style="color:var(--gold);">jarvis</span>, <span style="color:var(--gold);">temizle</span>
+                </div>
+                <div class="terminal-box" id="term-box">
+                    <div class="terminal-output" id="term-out">
+                        J.A.R.V.I.S. Ana Terminaline Hoş Geldiniz, Efendim. Sistem emirlerinizi bekliyor...<br><br>
+                    </div>
+                    <div class="terminal-input-row">
+                        <span class="terminal-prompt">STARK_OS&gt;</span>
+                        <input type="text" class="terminal-input" id="term-in" autofocus autocomplete="off">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="reactor-core-sec" class="stark-section">
+            <h2 class="section-title">05 // MERKEZİ GÜÇ ÜNİTESİ: ARC REACTOR</h2>
+            <div class="glass-panel" style="text-align:center;">
+                <p style="color:var(--text-muted); margin-bottom:30px; max-width:600px; margin-left:auto; margin-right:auto;">
+                    Saniyede 3 gigajoule enerji çıkışı sağlayan, göğüs kafesine entegre minyatürleştirilmiş termonükleer paladyum çekirdeği. Nanoteknolojik zırhların ana yakıt kaynağıdır.
+                </p>
+                <div class="reactor-container">
+                    <div class="arc-reactor">
+                        <div class="ring ring-1"></div>
+                        <div class="ring ring-2"></div>
+                        <div class="ring ring-3"></div>
+                        <div class="reactor-core"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="zirhlar" class="stark-section">
+            <h2 class="section-title">06 // HANGAR - IRON MAN ZIRHLARI</h2>
+            <div class="filter-nav">
+                <button class="util-btn" onclick="filterArmor('all')">TÜMÜ</button>
+                <button class="util-btn" onclick="filterArmor('klasik')">KLASİK DÖNEM</button>
+                <button class="util-btn" onclick="filterArmor('gelismis')">GELİŞMİŞ</button>
+                <button class="util-btn" onclick="filterArmor('nano')">NANOTEKNOLOJİ</button>
+            </div>
+            <div class="armor-grid" id="armor-grid-container">
+                </div>
+        </section>
+
+        <section id="ai-lab" class="stark-section">
+            <h2 class="section-title">07 // YAPAY ZEKA SİSTEM MİMARİLERİ</h2>
+            <div class="ai-grid">
+                <div class="glass-panel">
+                    <h3 style="color:var(--cyan); margin-bottom:10px;">J.A.R.V.I.S.</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Just A Rather Very Intelligent System. Ev otomasyonu, taktiksel analiz ve laboratuvar asistanlığının temel direği.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color:var(--red); margin-bottom:10px;">F.R.I.D.A.Y.</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Ultron krizinden sonra geliştirilen, doğrudan savaş arayüzü ve operasyon odaklı ana muharebe yapay zekası.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color:var(--gold); margin-bottom:10px;">E.D.I.T.H.</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Even Dead, I'm The Hero. Küresel güvenlik uyduları, insansız hava araçları filosu ve tam yetkili savunma matrisi kontrolörü.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="teknolojiler" class="stark-section">
+            <h2 class="section-title">08 // ÇEKİRDEK MÜHENDİSLİK TEKNOLOJİLERİ</h2>
+            <div class="tech-grid">
+                <div class="glass-panel">
+                    <h3 style="color:var(--cyan);">Minyatür Ark Reaktörü</h3>
+                    <p style="color:var(--text-muted); margin-top:10px; font-size:0.9rem;">Sürdürülebilir ve tükenmez temiz enerji üretim teknolojisi.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color:var(--cyan);">Sıvı Nanoteknoloji</h3>
+                    <p style="color:var(--text-muted); margin-top:10px; font-size:0.9rem;">Zihinsel komutlarla milisaniyeler içinde şekil değiştiren metal parçacık matrisi.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color:var(--cyan);">Repulsör İtki Teknolojisi</h3>
+                    <p style="color:var(--text-muted); margin-top:10px; font-size:0.9rem;">Yoğunlaştırılmış plazma enerjisi kullanan hem uçuş hem de ofansif saldırı sistemi.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color:var(--cyan);">Kuantum Navigasyon Sistemi</h3>
+                    <p style="color:var(--text-muted); margin-top:10px; font-size:0.9rem;">Zaman ve mekan düzleminde rotalama yapabilen ileri düzey fizik motoru.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="avengers-ag" class="stark-section">
+            <h2 class="section-title">09 // AVENGERS TAKTİKSEL MATRİS AĞI</h2>
+            <div class="glass-panel">
+                <div class="network-container" id="net-container">
+                    </div>
+            </div>
+        </section>
+
+        <section id="istatistikler" class="stark-section">
+            <h2 class="section-title">10 // OPERASYONEL İSTATİSTİKLER</h2>
+            <div class="stats-grid">
+                <div class="glass-panel stat-box">
+                    <div class="stat-number" data-target="85">0</div>
+                    <div style="color:var(--text-muted); font-size:0.85rem; letter-spacing:1px;">AKTİF ZIRH MODELİ</div>
+                </div>
+                <div class="glass-panel stat-box">
+                    <div class="stat-number" data-target="1420">0</div>
+                    <div style="color:var(--text-muted); font-size:0.85rem; letter-spacing:1px;">PATENTLİ PROJE</div>
+                </div>
+                <div class="glass-panel stat-box">
+                    <div class="stat-number" data-target="312">0</div>
+                    <div style="color:var(--text-muted); font-size:0.85rem; letter-spacing:1px;">BAŞARILI GÖREV</div>
+                </div>
+                <div class="glass-panel stat-box">
+                    <div class="stat-number" data-target="99">0</div>
+                    <div style="color:var(--text-muted); font-size:0.85rem; letter-spacing:1px;">NET ENERJİ VERİMLİLİĞİ (%)</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="galeri" class="stark-section">
+            <h2 class="section-title">11 // SİNEMATİK MEDYA ARŞİVİ</h2>
+            <div class="gallery-grid">
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Iron Man (2008)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Her şeyin başladığı an. Milyarder mucidin zırhlı koruyucuya dönüşümü.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Iron Man 2 (2010)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Paladyum zehirlenmesine karşı yeni element keşfi ve War Machine entegrasyonu.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">The Avengers (2012)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Dünyanın en güçlü kahramanlarının bir araya gelerek istilayı durdurması.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Iron Man 3 (2013)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Travmalarla yüzleşme ve tüm zırh filosunun otonom kontrol protokolü.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Avengers: Age of Ultron (2015)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Yapay zeka sınırlarının zorlanması ve tehlikeli küresel koruma vizyonu.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Captain America: Civil War (2016)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">İdeolojik bölünme, Sokovia Anlaşması ve kahramanlar arası iç çatışma.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Avengers: Infinity War (2018)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Kozmik tehdit Thanos'a karşı nanoteknoloji ile verilen mutlak direniş.</p>
+                </div>
+                <div class="movie-card glass-panel">
+                    <h4 style="color:var(--cyan);">Avengers: Endgame (2019)</h4>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Son görev. Evrenin kurtuluşu için yapılan nihai fedakarlık performansı.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="replikler" class="stark-section">
+            <h2 class="section-title">12 // REPLİK VE PROTOKOL MOTİVASYONU</h2>
+            <div class="glass-panel quote-box">
+                <div class="quote-text" id="quote-display">"Ben Demir Adam'ım."</div>
+                <button class="util-btn" onclick="generateNewQuote()">YENİ SÖZ ÜRET</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // SİSTEM BAZLI VERİ SETLERİ
+        const bootLogs = [
+            "STARK CORE BOOT SEQUENCE INITIATED...",
+            "NUCLEUS KERNEL: ACTIVE ON VERSION 4.81",
+            "CONNECTING TO INTEGRATED J.A.R.V.I.S. NETWORKS...",
+            "AUTHENTICATING SECURE PROTOCOLS: COMPLETE",
+            "SCANNING ARC REACTOR POWER OUTPUTS...",
+            "PALADIUM CORE TEMPERATURE: OPTIMAL (3400K)",
+            "STARK INDUSTRIES ENCRYPTED DATABASE RETRIEVED.",
+            "LOADING NANOTECHNOLOGY INTERACTION MATRICES...",
+            "HOLOGRAPHIC RENDERING GRID ENGAGED...",
+            "AVENGERS EMERGENCY DATALINK ESTABLISHED.",
+            "SECURITY LEVEL 10 GRANTED. WELCOME BACK, SIR."
+        ];
+
+        const armorData = [
+            { mark: "Mark I", type: "klasik", desc: "Zorunlu mağara koşullarında hurda metallerden üretilen ilk prototip.", power: 30, tech: "Kaba Demir, İlkel Roket Sistemi" },
+            { mark: "Mark III", type: "klasik", desc: "Klasik altın ve kırmızı renk paletine geçiş yapan, tam entegre uçuş zırhı.", power: 55, tech: "Altın-Titanyum Alaşımı, Entegre Silahlar" },
+            { mark: "Mark XLII", type: "gelismis", desc: "Ayrı ayrı parçalar halinde nöral komutla çağrılabilen otonom zırh sistemi.", power: 75, tech: "Nöral Altyapı Telemetrisi" },
+            { mark: "Mark XLIV (Hulkbuster)", type: "gelismis", desc: "Kontrolden çıkan Hulk tehdidini durdurmak üzere yörüngeden modüler destek alan devasa zırh.", power: 90, tech: "Çoklu Ark Reaktör Desteği, Maksimum Hidrolik Güç" },
+            { mark: "Mark L", type: "nano", desc: "Vücudu saniyeler içinde sarabilen ve her türlü silaha dönüşebilen ilk nanoteknoloji harikası.", power: 98, tech: "Sıvı Nanopartiküller, İleri Kalkan Sistemleri" },
+            { mark: "Mark LXXXV", type: "nano", desc: "Kuantum alan ve Nano Eldiven teknolojisiyle birleştirilmiş en son, en güçlü nihai zırh.", power: 100, tech: "Kuantum Stabilizatörleri, Nano-Plazma Repulsörleri" }
+        ];
+
+        const starkQuotes = [
+            "Ben Demir Adam'ım.",
+            "Dahi, milyarder, playboy, hayırsever.",
+            "Bazen yürümeyi öğrenmeden önce koşman gerekir.",
+            "Her şey yoluna girecek. Şimdi uyuyabilirsin.",
+            "Seni 3000 kat seviyorum.",
+            "Barış, saldırmak için daha büyük bir sopaya sahip olduğun anlamına gelir.",
+            "Zırhın arkasındaki şey benim, zırh sadece bir araç."
+        ];
+
+        const networkNodes = [
+            { name: "Tony Stark", x: 50, y: 50, type: "center" },
+            { name: "Steve Rogers", x: 25, y: 30, type: "normal" },
+            { name: "Thor Odinson", x: 75, y: 25, type: "normal" },
+            { name: "Bruce Banner", x: 30, y: 70, type: "normal" },
+            { name: "Natasha Romanoff", x: 70, y: 75, type: "normal" },
+            { name: "Peter Parker", x: 50, y: 20, type: "normal" },
+            { name: "Doctor Strange", x: 85, y: 50, type: "normal" }
+        ];
+
+        // BOOT SCREEN LOGIC
+        let currentLogIndex = 0;
+        const logContainer = document.getElementById("boot-log-container");
+        const progressFill = document.getElementById("boot-progress");
+        const percDisplay = document.getElementById("boot-perc");
+
+        function printLog() {
+            if (currentLogIndex < bootLogs.length) {
+                const p = document.createElement("div");
+                p.className = "boot-log-entry";
+                p.innerText = `> ${bootLogs[currentLogIndex]}`;
+                logContainer.appendChild(p);
+                currentLogIndex++;
+                
+                let progressValue = (currentLogIndex / bootLogs.length) * 100;
+                progressFill.style.width = `${progressValue}%`;
+                percDisplay.innerText = `${Math.round(progressValue)}%`;
+
+                setTimeout(printLog, 300);
+            } else {
+                setTimeout(() => {
+                    const bootScreen = document.getElementById("boot-screen");
+                    bootScreen.style.opacity = "0";
+                    setTimeout(() => bootScreen.style.display = "none", 800);
+                    initializeMainExperience();
+                }, 500);
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            printLog();
+            initParticles();
+        });
+
+        // PARÇACIK ANIMASYON MOTORU
+        const canvas = document.getElementById("canvas-particles");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function initParticles() {
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: (Math.random() - 0.5) * 0.6
+                });
+            }
+            animateParticles();
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = document.body.classList.contains("light-theme") ? "rgba(0,119,153,0.3)" : "rgba(0, 217, 255, 0.4)";
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // ANA DENEYİM BAŞLATICI
+        function initializeMainExperience() {
+            renderArmorCards('all');
+            buildNetworkMatrix();
+            initScrollCounters();
+            initNavigationTracking();
+        }
+
+        // NAVIGATION ACTIVE TRACKING
+        function initNavigationTracking() {
+            const sections = document.querySelectorAll(".stark-section");
+            const navLinks = document.querySelectorAll("nav .nav-link");
+
+            window.addEventListener("scroll", () => {
+                let currentSectionId = "";
+                sections.forEach(sec => {
+                    const top = sec.offsetTop - 100;
+                    if (window.scrollY >= top) {
+                        currentSectionId = sec.getAttribute("id");
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove("active");
+                    if (link.getAttribute("href") === `#${currentSectionId}`) {
+                        link.classList.add("active");
+                    }
+                });
+            });
+        }
+
+   // ZIRH FILTRELEME SİSTEMİ
+        function renderArmorCards(filterType) {
+            const container = document.getElementById("armor-grid-container");
+            container.innerHTML = "";
+            
+            const filtered = armorData.filter(a => filterType === 'all' || a.type === filterType);
+            
+            filtered.forEach(a => {
+                const card = document.createElement("div");
+                card.className = "glass-panel armor-card";
+                card.innerHTML = `
+                    <div class="armor-header">
+                        <span class="armor-title">${a.mark}</span>
+                        <span style="font-size:0.75rem; color:var(--cyan); font-family:monospace;">${a.type.toUpperCase()}</span>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); min-height:45px;">${a.desc}</p>
+                    <div class="stat-bar-wrapper">
+                        <div class="stat-label"><span>Güç Kapasitesi</span><span>%${a.power}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" data-width="${a.power}%"></div></div>
+                    </div>
+                    <div style="margin-top:10px; font-size:0.75rem; color:var(--gold);">Mühendislik: ${a.tech}</div>
+                `;
+                container.appendChild(card);
+            });
+
+            setTimeout(() => {
+                const fills = container.querySelectorAll(".stat-bar-fill");
+                fills.forEach(f => f.style.width = f.getAttribute("data-width"));
+            }, 100);
+        }
+
+        function filterArmor(type) {
+            renderArmorCards(type);
+        }
+
+        // INTERAKTIF J.A.R.V.I.S TERMINAL MOTORU
+        const termInput = document.getElementById("term-in");
+        const termOut = document.getElementById("term-out");
+
+        termInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                const cmd = termInput.value.trim().toLowerCase();
+                termOut.innerHTML += `<br><span style="color:var(--red);">STARK_OS&gt;</span> ${termInput.value}<br>`;
+                processTerminalCommand(cmd);
+                termInput.value = "";
+                document.getElementById("term-box").scrollTop = document.getElementById("term-box").scrollHeight;
+            }
+        });
+
+        function processTerminalCommand(cmd) {
+            switch(cmd) {
+                case "yardım":
+                    termOut.innerHTML += "Kullanılabilir Sistem Protokolleri:<br>- <span style='color:var(--gold);'>ironman</span>: Mevcut aktif zırh durum raporu.<br>- <span style='color:var(--gold);'>stark</span>: Tony Stark temel kimlik doğrulaması.<br>- <span style='color:var(--gold);'>avengers</span>: Takım koordinasyon ağı durumu.<br>- <span style='color:var(--gold);'>jarvis</span>: AI çekirdek durum kontrolü.<br>- <span style='color:var(--gold);'>temizle</span>: Ekranı sıfırlar.";
+                    break;
+                case "ironman":
+                    termOut.innerHTML += "ZIRH DURUMU: Hangar stabil. Mark LXXXV şarj seviyesi %100. Nanopartiküller kuantum stabil durumda.";
+                    break;
+                case "stark":
+                    termOut.innerHTML += "KİMLİK DOĞRULANDI: Anthony Edward Stark — Stark Enterprises CEO & Yönetim Kurulu Başkanı.";
+                    break;
+                case "avengers":
+                    termOut.innerHTML += "AVENGERS NETWORK: Dünya Koruma Kalkanı aktif. Taktiksel veri akışı stabil.";
+                    break;
+                case "jarvis":
+                    termOut.innerHTML += "J.A.R.V.I.S. BILGİLENDİRME: Ben her zaman buradayım efendim. Tüm sistemleri arka planda optimize etmeye devam ediyorum.";
+                    break;
+                case "temizle":
+                    termOut.innerHTML = "Terminal temizlendi. Sistem emirlerinizi bekliyor...<br>";
+                    break;
+                default:
+                    termOut.innerHTML += `<span style='color:var(--red);'>[HATA] Bilinmeyen komut dizilimi: "${cmd}". Yardım almak için 'yardım' yazın.</span>`;
+            }
+        }
+
+        // AVENGERS MATRIX SVG GRAPH VE NODELARI
+        function buildNetworkMatrix() {
+            const container = document.getElementById("net-container");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            let svgHtml = `<svg class="network-svg">`;
+            
+            networkNodes.forEach(node => {
+                if (node.type !== "center") {
+                    const cx = width * 0.5;
+                    const cy = height * 0.5;
+                    const nx = width * (node.x / 100);
+                    const ny = height * (node.y / 100);
+                    svgHtml += `<line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="rgba(0, 217, 255, 0.2)" stroke-width="2" />`;
+                }
+            });
+            svgHtml += `</svg>`;
+            container.innerHTML = svgHtml;
+
+            networkNodes.forEach(node => {
+                const div = document.createElement("div");
+                div.className = `node-element ${node.type === 'center' ? 'node-center' : ''}`;
+                div.style.left = `${node.x}%`;
+                div.style.top = `${node.y}%`;
+                div.innerText = node.name;
+                container.appendChild(div);
+            });
+        }
+
+        // REAL-TIME SCROLL SAYICI (ANIMATED COUNTERS)
+        function initScrollCounters() {
+            const counters = document.querySelectorAll(".stat-number");
+            const options = { threshold: 0.5 };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        const countTo = parseInt(target.getAttribute("data-target"));
+                        let current = 0;
+                        const duration = 2000;
+                        const stepTime = Math.max(Math.floor(duration / countTo), 15);
+                        
+                        const timer = setInterval(() => {
+                            current += Math.ceil(countTo / 50);
+                            if (current >= countTo) {
+                                target.innerText = countTo;
+                                clearInterval(timer);
+                            } else {
+                                target.innerText = current;
+                            }
+                        }, stepTime);
+                        observer.unobserve(target);
+                    }
+                });
+            }, options);
+
+            counters.forEach(c => observer.observe(c));
+        }
+
+        // SÖZ ÜRETİCİ MOTORU
+        function generateNewQuote() {
+            const display = document.getElementById("quote-display");
+            const currentText = display.innerText;
+            let filtered = starkQuotes.filter(q => `"${q}"` !== currentText);
+            const randomQuote = filtered[Math.floor(Math.random() * filtered.length)];
+            display.innerText = `"${randomQuote}"`;
+        }
+
+        // THEME-TOGGLE (DARK / LIGHT MODE MANTIĞI)
+        const themeBtn = document.getElementById("theme-toggle");
+        themeBtn.addEventListener("click", () => {
+            if (document.body.classList.contains("dark-theme")) {
+                document.body.classList.remove("dark-theme");
+                document.body.classList.add("light-theme");
+                localStorage.setItem("stark-theme", "light");
+            } else {
+                document.body.classList.remove("light-theme");
+                document.body.classList.add("dark-theme");
+                localStorage.setItem("stark-theme", "dark");
+            }
+        });
+
+        // RE-BUILD MATRIX ON RESIZE TO PREVENT GRAPH LAYOUT DISTORTION
+        window.addEventListener("resize", () => {
+            if(document.getElementById("net-container").children.length > 0) {
+                buildNetworkMatrix();
+            }
+        });
+    </script>
+</body>
+</html>
