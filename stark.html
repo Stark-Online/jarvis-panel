@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PARLAYAN YILDIZLAR — Developer Team Portal</title>
     <style>
         /* ==========================================================================
@@ -17,10 +17,10 @@
             --text-primary: #ffffff;
             --text-secondary: #b0b0cc;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --transition: all 0.4s ease;
+            --transition: all 0.3s ease;
         }
 
-        /* Base Resets */
+        /* 🚨 ANTI-SCROLL & RESET SYSTEM */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -28,12 +28,13 @@
             scroll-behavior: smooth;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
             background-color: var(--bg);
             color: var(--text-primary);
             font-family: var(--font-family);
-            overflow-x: hidden;
-            position: relative;
             transition: background-color var(--transition), color var(--transition);
         }
 
@@ -52,13 +53,13 @@
            ✨ ANIMATIONS & UTILITIES
            ========================================================================== */
         @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 15px var(--glow)); opacity: 0.8; }
-            50% { filter: drop-shadow(0 0 15px var(--glow)) drop-shadow(0 0 30px var(--glow)); opacity: 1; }
+            0%, 100% { filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 12px var(--glow)); opacity: 0.8; }
+            50% { filter: drop-shadow(0 0 12px var(--glow)) drop-shadow(0 0 25px var(--glow)); opacity: 1; }
         }
 
         @keyframes shimmer {
-            0% { background-position: -200% over; }
-            100% { background-position: 200% over; }
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
         }
 
         @keyframes floatSine {
@@ -67,8 +68,8 @@
         }
 
         @keyframes spinRing {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @keyframes glitchClip {
@@ -89,10 +90,15 @@
             100% { transform: rotate(360deg); }
         }
 
+        @keyframes kuwoBorder {
+            0%, 100% { border-color: #ff0044; box-shadow: 0 0 15px rgba(255, 0, 68, 0.3), inset 0 0 10px rgba(255, 0, 68, 0.1); }
+            50% { border-color: #8b5cf6; box-shadow: 0 0 25px rgba(139, 92, 246, 0.5), inset 0 0 15px rgba(139, 92, 246, 0.2); }
+        }
+
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
         }
 
         .reveal.active {
@@ -101,7 +107,7 @@
         }
 
         /* ==========================================================================
-           🧭 NAVIGATION
+           🧭 NAVIGATION & THEME CONTROLLER PLACE
            ========================================================================== */
         .navbar {
             position: fixed;
@@ -111,32 +117,66 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             z-index: 100;
             transition: var(--transition);
         }
 
         .navbar.scrolled {
-            background: rgba(10, 10, 15, 0.7);
+            background: rgba(10, 10, 15, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .nav-logo {
+        /* 🔘 THEME BUTTON NOW ON THE LEFT SIDE */
+        .nav-left-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 1rem;
+            order: 1;
+        }
+
+        .theme-switcher {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 30px;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .theme-switcher:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 15px var(--glow);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .theme-emoji { font-size: 1rem; }
+        .theme-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* LOGO VE BAĞLANTILAR */
+        .nav-center-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 800;
-            font-size: 1.3rem;
-            letter-spacing: 2px;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
             text-decoration: none;
             color: var(--text-primary);
+            order: 2;
         }
 
         .star-svg {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             animation: pulseGlow 3s infinite ease-in-out;
         }
 
@@ -148,39 +188,30 @@
             animation: shimmer 4s linear infinite;
         }
 
+        .nav-right-container {
+            display: flex;
+            align-items: center;
+            order: 3;
+        }
+
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             list-style: none;
+            align-items: center;
         }
 
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.95rem;
             position: relative;
             padding: 5px 0;
             transition: var(--transition);
         }
 
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--accent);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--accent);
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover::after, .nav-links a.active::after {
-            width: 100%;
-        }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
 
         .hamburger {
             display: none;
@@ -192,89 +223,86 @@
         }
 
         .hamburger span {
-            width: 25px;
+            width: 22px;
             height: 3px;
             background-color: var(--text-primary);
             transition: var(--transition);
         }
 
-        /* Mobile Nav Drawer */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .nav-links {
                 position: fixed;
                 top: 0;
                 right: -100%;
                 height: 100vh;
-                width: 250px;
-                background: rgba(10, 10, 15, 0.95);
+                width: 240px;
+                background: rgba(10, 10, 15, 0.96);
                 backdrop-filter: blur(20px);
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 transition: 0.4s ease-in-out;
+                gap: 2.5rem;
             }
-
-            .nav-links.open {
-                right: 0;
-            }
-
-            .hamburger {
-                display: flex;
-                z-index: 101;
-            }
-
+            .nav-links.open { right: 0; }
+            .hamburger { display: flex; z-index: 101; }
             .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
             .hamburger.open span:nth-child(2) { opacity: 0; }
             .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
         }
 
         /* ==========================================================================
-           🏠 HERO SECTION
+           🏠 HERO SECTION (PERFECTLY CENTERED)
            ========================================================================== */
         .hero {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             position: relative;
-            padding: 0 1rem;
+            padding: 80px 1.5rem 40px 1.5rem;
+            width: 100%;
         }
 
+        /* Perfect Concentric Logo Layout */
         .hero-logo-container {
             position: relative;
             margin-bottom: 2rem;
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .hero-star {
-            width: 120px;
-            height: 120px;
-            position: absolute;
-            top: 15px;
-            left: 15px;
+            width: 90px;
+            height: 90px;
+            z-index: 2;
             animation: pulseGlow 2.5s infinite ease-in-out;
         }
 
         .hero-ring {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 150px;
-            height: 150px;
+            width: 130px;
+            height: 130px;
             border: 2px dashed var(--accent);
             border-radius: 50%;
-            animation: spinRing 20s linear infinite;
+            z-index: 1;
+            animation: spinRing 25s linear infinite;
         }
 
         .hero-title {
-            font-size: 4rem;
+            font-size: 3.2rem;
             font-weight: 900;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             margin-bottom: 1rem;
             position: relative;
+            line-height: 1.2;
+            max-width: 100%;
+            word-wrap: break-word;
         }
 
         .hero-title.glitch::after {
@@ -286,74 +314,69 @@
             color: var(--text-primary);
             overflow: hidden;
             animation: glitchClip 2s infinite linear alternate-reverse;
+            width: 100%;
+            text-align: center;
         }
 
         .hero-subtitle {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: var(--text-secondary);
             margin-bottom: 2.5rem;
             opacity: 0;
-            transition: opacity 1s ease 1.5s;
+            transition: opacity 1s ease 1s;
         }
 
-        .hero-subtitle.show {
-            opacity: 1;
-        }
+        .hero-subtitle.show { opacity: 1; }
 
         .cta-container {
             display: flex;
-            gap: 1.5rem;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+            justify-content: center;
         }
 
         .btn {
+            flex: 1;
             background: transparent;
             border: 2px solid var(--accent);
             color: var(--text-primary);
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: var(--transition);
             text-decoration: none;
             display: inline-block;
             box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+            text-align: center;
+            white-space: nowrap;
         }
 
         .btn:hover {
             background: var(--accent);
             color: #000;
-            box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow);
+            box-shadow: 0 0 20px var(--glow);
             transform: translateY(-2px);
         }
 
-        .btn-secondary {
-            border-color: var(--accent2);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
-        }
-
-        .btn-secondary:hover {
-            background: var(--accent2);
-            box-shadow: 0 0 20px var(--accent2);
-        }
+        .btn-secondary { border-color: var(--accent2); box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); }
+        .btn-secondary:hover { background: var(--accent2); box-shadow: 0 0 20px var(--accent2); }
 
         .scroll-down {
             position: absolute;
-            bottom: 2rem;
+            bottom: 1.5rem;
             animation: chevronBounce 2s infinite ease-in-out;
             cursor: pointer;
         }
 
-        .scroll-down svg {
-            fill: var(--text-secondary);
-            width: 32px;
-            height: 32px;
-        }
+        .scroll-down svg { fill: var(--text-secondary); width: 28px; height: 28px; }
 
         @media (max-width: 768px) {
-            .hero-title { font-size: 2.5rem; }
+            .hero-title { font-size: 2.3rem; letter-spacing: 1px; }
             .hero-subtitle { font-size: 1.1rem; }
-            .cta-container { flex-direction: column; gap: 1rem; }
+            .cta-container { flex-direction: column; width: 100%; max-width: 280px; }
         }
 
         /* ==========================================================================
@@ -361,143 +384,71 @@
            ========================================================================== */
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 800;
             margin: 4rem 0 2rem 0;
             color: var(--accent);
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.15);
         }
 
-        .founder-section {
-            padding: 4rem 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+        .founder-section { padding: 3rem 1rem; display: flex; justify-content: center; align-items: center; flex-direction: column; }
 
         .founder-card {
-            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15), rgba(139, 92, 246, 0.05)), rgba(10, 10, 15, 0.6);
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.12), rgba(139, 92, 246, 0.03)), rgba(10, 10, 15, 0.75);
             border: 2px solid rgba(255, 215, 0, 0.4);
             border-radius: 20px;
-            padding: 3rem;
-            max-width: 600px;
+            padding: 2.5rem 1.5rem;
+            max-width: 500px;
             width: 100%;
             text-align: center;
             position: relative;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2), inset 0 0 20px rgba(139, 92, 246, 0.1);
-            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.15);
             transition: var(--transition);
         }
 
         .founder-card:hover {
-            transform: scale(1.08) translateY(-5px);
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
-            border-color: rgba(255, 215, 0, 0.8);
+            transform: scale(1.03) translateY(-4px);
+            box-shadow: 0 0 45px rgba(255, 215, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.7);
         }
 
-        /* Continuous Energy Ring Aura Effect */
         .founder-aura {
             position: absolute;
-            top: -5%;
-            left: -5%;
-            width: 110%;
-            height: 110%;
+            top: -4%; left: -4%; width: 108%; height: 108%;
             border: 2px solid transparent;
-            border-top: 2px dashed rgba(255, 215, 0, 0.6);
-            border-bottom: 2px dashed rgba(139, 92, 246, 0.6);
-            border-radius: 25px;
+            border-top: 2px dashed rgba(255, 215, 0, 0.4);
+            border-bottom: 2px dashed rgba(139, 92, 246, 0.4);
+            border-radius: 24px;
             pointer-events: none;
-            animation: auraRotate 15s linear infinite;
+            animation: auraRotate 18s linear infinite;
         }
 
-        .founder-icon-wrapper {
-            font-size: 4.5rem;
-            margin-bottom: 1rem;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
-        }
+        .founder-icon-wrapper { font-size: 3.5rem; margin-bottom: 0.5rem; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+        .founder-rank { font-size: 1.1rem; font-weight: 700; color: #ffd700; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .founder-username { font-size: 1.8rem; font-weight: 900; color: #ffffff; margin-bottom: 1rem; }
+        .founder-quote { font-style: italic; color: var(--text-secondary); margin-bottom: 2rem; font-size: 1rem; line-height: 1.6; }
 
-        .founder-rank {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ffd700;
-            letter-spacing: 3px;
-            margin-bottom: 0.5rem;
-        }
-
-        .founder-username {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-            margin-bottom: 1rem;
-        }
-
-        .founder-quote {
-            font-style: italic;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .badge-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .badge-supreme {
-            background: linear-gradient(45deg, #ffd700, #ffaa00);
-            color: #000;
-            border: none;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .badge-community {
-            background: linear-gradient(45deg, #8b5cf6, #00d4ff);
-            color: #fff;
-            border: none;
-        }
+        .badge-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; }
+        .badge { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+        .badge-supreme { background: linear-gradient(45deg, #ffd700, #ffaa00); color: #000; border: none; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        .badge-community { background: linear-gradient(45deg, #8b5cf6, #00d4ff); color: #fff; border: none; }
 
         /* ==========================================================================
            👥 EKİP SECTION
            ========================================================================== */
-        .team-section {
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-top: 3rem;
-        }
+        .team-section { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; width: 100%; }
 
         @media (max-width: 992px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 650px) { .team-grid { grid-template-columns: 1fr; } }
 
         .team-card {
             background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
             text-align: center;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -505,604 +456,163 @@
             animation: floatSine 5s infinite ease-in-out;
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
 
         .team-card:nth-child(2n) { animation-delay: 1s; }
         .team-card:nth-child(3n) { animation-delay: 2s; }
 
         .team-card:hover {
-            transform: translateY(-10px) scale(1.02);
+            transform: translateY(-6px);
             border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.15);
         }
 
-        /* Special Super Admin Card Accent */
-        .team-card.special-card {
-            border: 2px solid #ff4444;
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.15);
+        .team-card.special-card { border: 2px solid #ff4444; box-shadow: 0 0 15px rgba(255, 68, 68, 0.1); }
+        .team-card.special-card:hover { box-shadow: 0 0 25px rgba(255, 68, 68, 0.3); border-color: #ff6666; }
+
+        /* 👑 Özel İstek: o6_kuwo Şekilli Parlayan Kutu Stili */
+        .team-card.kuwo-card {
+            border: 2px solid #ff0044;
+            background: radial-gradient(circle at top, rgba(255, 0, 68, 0.1), var(--card-bg));
+            animation: floatSine 5s infinite ease-in-out, kuwoBorder 4s infinite ease-in-out;
         }
-        .team-card.special-card:hover {
-            box-shadow: 0 0 35px rgba(255, 68, 68, 0.4);
-            border-color: #ff8c00;
+        .team-card.kuwo-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.5), inset 0 0 15px rgba(255, 0, 68, 0.2);
         }
 
         .card-badge {
-            position: absolute;
-            top: 10px;
-            right: -30px;
+            position: absolute; top: 10px; right: -25px;
             background: linear-gradient(45deg, #ff4444, #ffd700);
-            color: #fff;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 4px 30px;
-            transform: rotate(45deg);
+            color: #fff; font-size: 0.6rem; font-weight: 800; padding: 4px 25px; transform: rotate(45deg);
         }
+        .card-badge.kuwo-badge { background: linear-gradient(45deg, #ff0044, #8b5cf6); }
 
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .card-rank {
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-username {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            word-break: break-all;
-        }
+        .card-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .card-rank { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .card-username { font-size: 1.35rem; font-weight: 800; margin-bottom: 1.5rem; word-break: break-all; }
 
         .card-btn {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            padding: 0.6rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
+            width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary); padding: 0.6rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: var(--transition);
         }
-
-        .team-card:hover .card-btn {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
-        }
+        .team-card:hover .card-btn { background: var(--accent); color: #000; border-color: var(--accent); }
+        .team-card.kuwo-card:hover .card-btn { background: #ff0044; color: #fff; border-color: #ff0044; box-shadow: 0 0 10px #ff0044; }
 
         /* ==========================================================================
            📈 TERFİ SİSTEMİ SECTION
            ========================================================================== */
-        .timeline-section {
-            padding: 4rem 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-        }
+        .timeline-section { padding: 3rem 1.5rem; max-width: 850px; margin: 0 auto; width: 100%; }
+        .timeline-container { position: relative; margin-top: 3rem; width: 100%; }
 
-        .timeline-container {
-            position: relative;
-            margin-top: 4rem;
-        }
-
-        /* Center Line */
         .timeline-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--accent2), var(--accent), rgba(255,255,255,0.05));
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 2px; height: 100%; background: linear-gradient(to bottom, var(--accent2), var(--accent), rgba(255,255,255,0.05));
         }
 
-        .timeline-item {
-            display: flex;
-            justify-content: flex-end;
-            padding-right: 50%;
-            position: relative;
-            margin-bottom: 3rem;
-            width: 100%;
-        }
-
-        .timeline-item:nth-child(even) {
-            justify-content: flex-start;
-            padding-right: 0;
-            padding-left: 50%;
-        }
+        .timeline-item { display: flex; justify-content: flex-end; padding-right: 50%; position: relative; margin-bottom: 2.5rem; width: 100%; }
+        .timeline-item:nth-child(even) { justify-content: flex-start; padding-right: 0; padding-left: 50%; }
 
         .timeline-badge-node {
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #0a0a0f;
-            border: 3px solid var(--accent);
-            z-index: 5;
-            transition: var(--transition);
+            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; border-radius: 50%; background: #0a0a0f; border: 3px solid var(--accent); z-index: 5; transition: var(--transition);
         }
 
-        .timeline-item.active .timeline-badge-node {
-            background: var(--accent);
-            box-shadow: 0 0 15px var(--glow);
-        }
+        .timeline-item.active .timeline-badge-node { background: var(--accent); box-shadow: 0 0 12px var(--glow); }
 
         .timeline-content {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 10px;
-            width: 85%;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            transition: var(--transition);
+            background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 1.25rem; border-radius: 10px; width: 88%; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: var(--transition);
         }
+        .timeline-item:nth-child(even) .timeline-content { margin-left: auto; }
+        .timeline-item.active .timeline-content { border-color: rgba(255, 255, 255, 0.12); }
 
-        .timeline-item:nth-child(even) .timeline-content {
-            margin-left: auto;
-        }
+        .timeline-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+        .timeline-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
 
-        .timeline-item.active .timeline-content {
-            border-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .timeline-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .timeline-desc {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        /* Supreme Founder Node & Super Admin Node Styling Rules */
-        .timeline-item.supreme-node .timeline-badge-node {
-            width: 34px;
-            height: 34px;
-            border-color: #ffd700;
-            background: #000;
-            box-shadow: 0 0 20px #ffd700;
-            animation: pulseGlow 1.5s infinite;
-        }
-        .timeline-item.supreme-node .timeline-content {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(10, 10, 15, 0.8));
-            border: 2px solid #ffd700;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
-        }
-
-        .timeline-item.denetleyici-node .timeline-badge-node {
-            border-color: #ff4444;
-            box-shadow: 0 0 15px #ff4444;
-        }
-        .timeline-item.denetleyici-node .timeline-content {
-            border: 1px solid #ff4444;
-            background: linear-gradient(135deg, rgba(255, 68, 68, 0.05), rgba(10, 10, 15, 0.8));
-        }
+        .timeline-item.supreme-node .timeline-badge-node { width: 28px; height: 28px; border-color: #ffd700; background: #000; box-shadow: 0 0 15px #ffd700; }
+        .timeline-item.supreme-node .timeline-content { background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(10, 10, 15, 0.8)); border: 2px solid #ffd700; }
+        .timeline-item.denetleyici-node .timeline-badge-node { border-color: #ff4444; box-shadow: 0 0 12px #ff4444; }
+        .timeline-item.denetleyici-node .timeline-content { border: 1px solid #ff4444; background: linear-gradient(135deg, rgba(255, 68, 68, 0.04), rgba(10, 10, 15, 0.8)); }
 
         @media (max-width: 768px) {
-            .timeline-container::before { left: 20px; }
-            .timeline-item { justify-content: flex-start; padding-left: 45px; padding-right: 0; }
-            .timeline-item:nth-child(even) { padding-left: 45px; }
-            .timeline-badge-node { left: 20px; transform: translateX(-50%); }
+            .timeline-container::before { left: 15px; }
+            .timeline-item { justify-content: flex-start; padding-left: 35px; padding-right: 0; }
+            .timeline-item:nth-child(even) { padding-left: 35px; }
+            .timeline-badge-node { left: 15px; transform: translateX(-50%); }
             .timeline-content { width: 100%; }
         }
 
         /* ==========================================================================
-           🤖 JARVIS AI SECTION (GELİŞMİŞ HAZIR KOMUT MODÜLLÜ)
+           🤖 JARVIS AI SECTION
            ========================================================================== */
-        .jarvis-section {
-            padding: 4rem 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .jarvis-section { padding: 3rem 1.5rem; max-width: 850px; margin: 0 auto; width: 100%; }
+        .jarvis-terminal { background: #050508; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.5); width: 100%; }
+        .jarvis-header { background: rgba(255, 255, 255, 0.02); padding: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: relative; }
+        .jarvis-header-matrix { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.12; pointer-events: none; z-index: 1; }
+        .jarvis-header-title { display: flex; align-items: center; gap: 8px; z-index: 2; }
+        .jarvis-title-main { font-weight: 900; letter-spacing: 1.5px; color: var(--accent); }
+        .jarvis-title-sub { font-size: 0.75rem; color: var(--text-secondary); }
 
-        .jarvis-terminal {
-            background: #050508;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        .online-dot { width: 7px; height: 7px; background-color: #00ff88; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #00ff88; }
+        .jarvis-chat-window { height: 340px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; background: radial-gradient(circle at center, rgba(10, 10, 15, 0.2), #050508); }
 
-        .jarvis-header {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-        }
+        .jarvis-presets-panel { background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 0.7rem; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .jarvis-presets-panel::-webkit-scrollbar { height: 3px; }
+        .jarvis-presets-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-        .jarvis-header-matrix {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: 1;
-        }
+        .preset-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-secondary); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: var(--transition); }
+        .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 212, 255, 0.04); }
 
-        .jarvis-header-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 2;
-        }
+        .msg-bubble { max-width: 85%; padding: 0.75rem 1.1rem; border-radius: 8px; line-height: 1.5; font-size: 0.9rem; word-wrap: break-word; }
+        .msg-bubble.user { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 500; }
+        .msg-bubble.jarvis { background: rgba(255, 255, 255, 0.04); color: var(--text-primary); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(255, 255, 255, 0.04); }
+        .msg-bubble code { background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; font-family: monospace; color: var(--accent2); }
 
-        .jarvis-title-main {
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: var(--accent);
-        }
-
-        .jarvis-title-sub {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #00ff88;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px #00ff88;
-            animation: pulseGlow 2s infinite;
-        }
-
-        .jarvis-chat-window {
-            height: 380px;
-            overflow-y: auto;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            background: radial-gradient(circle at center, rgba(10, 10, 15, 0.2), #050508);
-        }
-
-        /* Hızlı Soru / Komut Paneli Stilleri */
-        .jarvis-presets-panel {
-            background: rgba(0, 0, 0, 0.4);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 0.8rem 1rem;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-        
-        .jarvis-presets-panel::-webkit-scrollbar {
-            height: 4px;
-        }
-        .jarvis-presets-panel::-webkit-scrollbar-thumb {
-            background: var(--card-bg);
-            border-radius: 4px;
-        }
-
-        .preset-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-secondary);
-            padding: 6px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .preset-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(0, 212, 255, 0.05);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
-        }
-
-        .msg-bubble {
-            max-width: 80%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            line-height: 1.5;
-            font-size: 0.95rem;
-            word-wrap: break-word;
-        }
-
-        .msg-bubble.user {
-            background: var(--accent);
-            color: #000;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-            font-weight: 500;
-        }
-
-        .msg-bubble.jarvis {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .msg-bubble code {
-            background: rgba(0,0,0,0.4);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: var(--accent2);
-        }
-
-        /* Typing Indicator */
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 0.8rem 1.2rem;
-            background: rgba(255, 255, 255, 0.03);
-            align-self: flex-start;
-            border-radius: 8px;
-        }
-
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--text-secondary);
-            border-radius: 50%;
-            animation: chevronBounce 1s infinite ease-in-out;
-        }
+        .typing-indicator { display: flex; gap: 4px; padding: 0.75rem 1.1rem; background: rgba(255, 255, 255, 0.02); align-self: flex-start; border-radius: 8px; }
+        .typing-dot { width: 5px; height: 5px; background: var(--text-secondary); border-radius: 50%; animation: chevronBounce 1s infinite ease-in-out; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-        .jarvis-input-bar {
-            display: flex;
-            padding: 1rem;
-            background: rgba(0,0,0,0.2);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            gap: 10px;
-        }
-
-        .jarvis-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.8rem 1rem;
-            color: #fff;
-            border-radius: 6px;
-            outline: none;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .jarvis-input:focus {
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .jarvis-send {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 0 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .jarvis-send:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 15px var(--glow);
-        }
+        .jarvis-input-bar { display: flex; padding: 0.8rem; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255, 255, 255, 0.05); gap: 8px; }
+        .jarvis-input { flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem 1rem; color: #fff; border-radius: 6px; outline: none; font-size: 0.9rem; }
+        .jarvis-input:focus { border-color: var(--accent); }
+        .jarvis-send { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 0 1.25rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: var(--transition); }
+        .jarvis-send:hover { background: var(--accent); color: #000; box-shadow: 0 0 12px var(--glow); }
 
         /* ==========================================================================
            ℹ️ HAKKINDA SECTION
            ========================================================================== */
-        .about-section {
-            padding: 4rem 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: center;
-        }
+        .about-section { padding: 3rem 1.5rem; max-width: 850px; margin: 0 auto; text-align: center; width: 100%; }
+        .about-text { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 2.5rem; }
+        .stats-grid { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; width: 100%; }
+        .stat-card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.04); padding: 1.5rem; border-radius: 12px; min-width: 160px; flex: 1; }
+        .stat-number { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin-bottom: 0.3rem; }
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 1px; }
 
-        .about-text {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 3rem;
-        }
-
-        .stats-grid {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 12px;
-            min-width: 200px;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .divider-star {
-            margin: 4rem auto 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            width: 50%;
-        }
-
-        .divider-star::before, .divider-star::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-        }
+        .divider-star { margin: 3rem auto 0 auto; display: flex; align-items: center; justify-content: center; gap: 15px; width: 60%; }
+        .divider-star::before, .divider-star::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
 
         /* ==========================================================================
-           🦶 FOOTER & 👑 CREDITS
+           Footers & Credits
            ========================================================================== */
-        footer {
-            padding: 2.5rem 2rem;
-            text-align: center;
-            border-top: 2px solid var(--accent);
-            background: rgba(5, 5, 8, 0.6);
-            margin-top: 6rem;
-            transition: border-color var(--transition);
-        }
-
-        .footer-main {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 0.3rem;
-        }
-
-        .footer-sub {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.2rem;
-        }
-
-        /* Custom Müthiş Künye Alanı */
+        footer { padding: 2rem 1.5rem; text-align: center; border-top: 2px solid var(--accent); background: rgba(5, 5, 8, 0.7); margin-top: 5rem; width: 100%; }
+        .footer-main { font-size: 1rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.2rem; }
+        .footer-sub { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        
         .footer-developer-credit {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06); padding: 6px 14px; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 600; color: var(--text-primary); text-decoration: none; transition: var(--transition);
         }
+        .footer-developer-credit:hover { border-color: var(--accent); background: rgba(0, 212, 255, 0.04); transform: translateY(-2px); }
+        .footer-developer-credit span { color: var(--accent); font-weight: 800; }
 
-        .footer-developer-credit:hover {
-            border-color: var(--accent);
-            background: rgba(0, 212, 255, 0.05);
-            transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-        }
-
-        .footer-developer-credit span {
-            color: var(--accent);
-            font-weight: 800;
-        }
-
-        /* ==========================================================================
-           🔘 FLOATING THEME BUTTON
-           ========================================================================== */
-        .theme-switcher {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #0a0a0f;
-            border: 2px solid var(--accent);
-            color: var(--text-primary);
-            cursor: pointer;
-            z-index: 999;
-            box-shadow: 0 0 15px var(--glow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        .theme-switcher:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 0 25px var(--glow);
-        }
-
-        .theme-emoji {
-            font-size: 1.2rem;
-        }
-
-        .theme-label {
-            font-size: 0.55rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
-        /* Tooltip */
-        .theme-switcher::before {
-            content: 'Tema Değiştir';
-            position: absolute;
-            left: -110px;
-            top: 50%;
-            transform: translateY(-50%) scale(0);
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            pointer-events: none;
-            transition: 0.2s ease;
-            white-space: nowrap;
-            border: 1px solid var(--accent);
-        }
-
-        .theme-switcher:hover::before {
-            transform: translateY(-50%) scale(1);
-        }
-
-        /* ==========================================================================
-           ♿ REDUCED MOTION ACCESSIBILITY
-           ========================================================================== */
+        /* Accessibility Handling */
         @media (prefers-reduced-motion: reduce) {
             #bg-canvas, .hero-ring, .founder-aura { display: none !important; }
-            * {
-                animation: none !important;
-                transition: none !important;
-                scroll-behavior: auto !important;
-            }
+            * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
             .reveal { opacity: 1 !important; transform: none !important; }
             .hero-subtitle { opacity: 1 !important; }
         }
@@ -1110,33 +620,41 @@
 </head>
 <body>
 
-    <!-- Stars & Orbs Canvas Engine -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- 🧭 NAVIGATION -->
     <nav class="navbar" id="navbar">
-        <a href="#home" class="nav-logo">
+        <div class="nav-left-container">
+            <button class="theme-switcher" id="theme-btn" title="Görünüm Temasını Değiştir">
+                <span class="theme-emoji" id="theme-emoji">🌌</span>
+                <span class="theme-label" id="theme-label">Uzay</span>
+            </button>
+        </div>
+
+        <a href="#home" class="nav-center-logo">
             <svg class="star-svg" viewBox="0 0 24 24" fill="var(--accent)">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
             </svg>
             <span class="shimmer-text">PARLAYAN YILDIZLAR</span>
         </a>
-        <button class="hamburger" id="hamburger" aria-label="Menü">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="#home" class="active">Ana Sayfa</a></li>
-            <li><a href="#founder">Kurucu</a></li>
-            <li><a href="#team">Ekip</a></li>
-            <li><a href="#ranks">Terfi Sistemi</a></li>
-            <li><a href="#jarvis">JARVIS</a></li>
-            <li><a href="#about">Hakkında</a></li>
-        </ul>
+        
+        <div class="nav-right-container">
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home" class="active">Ana Sayfa</a></li>
+                <li><a href="#founder">Kurucu</a></li>
+                <li><a href="#team">Ekip</a></li>
+                <li><a href="#ranks">Terfi</a></li>
+                <li><a href="#jarvis">JARVIS</a></li>
+                <li><a href="#about">Hakkında</a></li>
+            </ul>
+
+            <button class="hamburger" id="hamburger" aria-label="Menü">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
     </nav>
 
-    <!-- 🏠 HERO SECTION -->
     <header class="hero" id="home">
         <div class="hero-logo-container">
             <div class="hero-ring"></div>
@@ -1155,7 +673,6 @@
         </a>
     </header>
 
-    <!-- 👑 KURUCU SECTION -->
     <section class="founder-section reveal" id="founder">
         <h2 class="section-title">👑 KURUCU 👑</h2>
         <div class="founder-card">
@@ -1173,30 +690,23 @@
         </div>
     </section>
 
-    <!-- 👥 EKİP SECTION -->
     <section class="team-section reveal" id="team">
         <h2 class="section-title">✦ EKİBİMİZ ✦</h2>
-        <div class="team-grid" id="team-grid-container">
-            <!-- Dynamic JS injection point -->
-        </div>
+        <div class="team-grid" id="team-grid-container"></div>
     </section>
 
-    <!-- 📈 TERFİ SİSTEMİ SECTION -->
     <section class="timeline-section reveal" id="ranks">
         <h2 class="section-title">✦ TERFİ SİSTEMİ ✦</h2>
-        <div class="timeline-container" id="timeline-container-target">
-            <!-- Dynamic JS injection point -->
-        </div>
+        <div class="timeline-container" id="timeline-container-target"></div>
     </section>
 
-    <!-- 🤖 JARVIS AI SECTION -->
     <section class="jarvis-section reveal" id="jarvis">
-        <h2 class="section-title">🤖 JARVIS AI ASSISTANT </h2>
+        <h2 class="section-title">🤖 JARVIS AI ASSISTANT</h2>
         <div class="jarvis-terminal">
             <div class="jarvis-header">
                 <canvas class="jarvis-header-matrix" id="matrix-canvas"></canvas>
                 <div class="jarvis-header-title">
-                    <svg style="width:20px; height:20px; fill:var(--accent); animation: pulseGlow 2s infinite;" viewBox="0 0 24 24">
+                    <svg style="width:18px; height:18px; fill:var(--accent); animation: pulseGlow 2s infinite;" viewBox="0 0 24 24">
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                     </svg>
                     <div>
@@ -1204,9 +714,7 @@
                         <span class="jarvis-title-sub">— Geliştirici Asistanı</span>
                     </div>
                 </div>
-                <div>
-                    <span class="online-dot"></span>
-                </div>
+                <div><span class="online-dot"></span></div>
             </div>
             
             <div class="jarvis-chat-window" id="chat-window">
@@ -1215,7 +723,6 @@
                 </div>
             </div>
 
-            <!-- Hızlı Soru / Komut Paneli Modülü -->
             <div class="jarvis-presets-panel">
                 <button class="preset-btn" onclick="sendPresetCmd('Ekip yapısı ve hiyerarşi nedir?')">📋 Ekip Yapısı</button>
                 <button class="preset-btn" onclick="sendPresetCmd('En yetkili kişiler kimler ve rolleri ne?')">🛡️ Yetkililer Kim?</button>
@@ -1231,7 +738,6 @@
         </div>
     </section>
 
-    <!-- ℹ️ HAKKINDA SECTION -->
     <section class="about-section reveal" id="about">
         <h2 class="section-title">✦ HAKKINDA ✦</h2>
         <p class="about-text">
@@ -1252,44 +758,25 @@
             </div>
         </div>
         <div class="divider-star">
-            <svg style="width:24px; height:24px; fill:var(--accent);" viewBox="0 0 24 24">
+            <svg style="width:20px; height:20px; fill:var(--accent);" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
             </svg>
         </div>
     </section>
 
-    <!-- 🦶 FOOTER -->
     <footer>
         <div class="footer-main">⭐ PARLAYAN YILDIZLAR © 2026</div>
         <div class="footer-sub">Powered by J.A.R.V.I.S</div>
-        <!-- 👑 İstenen Özel Künye Bağlantısı -->
         <a href="https://instagram.com/_jarvisonline" target="_blank" class="footer-developer-credit">
             Siteyi yapan: <span>@_jarvisonline</span> 🚀
         </a>
     </footer>
 
-    <!-- 🔘 FLOATING THEME BUTTON -->
-    <button class="theme-switcher" id="theme-btn">
-        <span class="theme-emoji" id="theme-emoji">🌌</span>
-        <span class="theme-label" id="theme-label">Uzay</span>
-    </button>
-
-    <!-- ==========================================================================
-       ⚙️ JAVASCRIPT CORE CODE
-       ========================================================================== */ -->
     <script>
         // Data Definitions
-        const FOUNDER_DATA = {
-            username: "ayaz_nk6",
-            rank: "Kurucu",
-            icon: "👑",
-            color: "#ffd700",
-            supreme: true
-        };
-
         const TEAM_DATA = [
             { username: "leresetsikmeboy6", rank: "Geliştirici Denetleyici", icon: "🛡️", color: "#ff4444", special: true },
-            { username: "o6_kuwo", rank: "Geliştirici Direktörü", icon: "🎯", color: "#8b5cf6" },
+            { username: "o6_kuwo", rank: "Geliştirici Direktörü", icon: "🎯", color: "#ff0044", customClass: "kuwo-card" },
             { username: "spideydeno", rank: "Lider Geliştirici", icon: "👑", color: "#ffd700" },
             { username: "_jarvisonline", rank: "Kıdemli Geliştirici", icon: "⭐", color: "#00d4ff" },
             { username: "ekinmiss0", rank: "Geliştirici", icon: "🚀", color: "#00ff88" }
@@ -1317,7 +804,7 @@
             { name: "Altın", emoji: "🔱", props: { bg: "#0f0e0a", accent: "#ffd700", accent2: "#ffaa00", glow: "gold", cards: "rgba(255,215,0,0.07)" } }
         ];
 
-        // Theme Manager Initialization
+        // Theme Switcher Core Setup
         let currentThemeIndex = 0;
         function applyTheme(theme) {
             const root = document.documentElement;
@@ -1348,13 +835,18 @@
             applyTheme(THEMES[0]);
         }
 
-        // Generate Team Grid
+        // Render Cards Infrastructure Engine
         const gridContainer = document.getElementById('team-grid-container');
         TEAM_DATA.forEach(member => {
             const card = document.createElement('div');
-            card.className = `team-card ${member.special ? 'special-card' : ''}`;
+            let finalClass = 'team-card';
+            if (member.special) finalClass += ' special-card';
+            if (member.customClass) finalClass += ' ' + member.customClass;
+            
+            card.className = finalClass;
             card.innerHTML = `
                 ${member.special ? '<div class="card-badge">EN YETKİLİ</div>' : ''}
+                ${member.customClass === 'kuwo-card' ? '<div class="card-badge kuwo-badge">VIP DİREKTÖR</div>' : ''}
                 <div class="card-icon">${member.icon}</div>
                 <div class="card-rank" style="color: ${member.color}">${member.rank}</div>
                 <div class="card-username" style="text-shadow: 0 0 10px ${member.color}44">@${member.username}</div>
@@ -1363,13 +855,13 @@
             gridContainer.appendChild(card);
         });
 
-        // Generate Timeline Node Checklist
+        // Timeline Build System
         const timelineContainer = document.getElementById('timeline-container-target');
         RANKS_TIMELINE.forEach(node => {
             const item = document.createElement('div');
             item.className = 'timeline-item';
             if (node.type === 'supreme') item.classList.add('supreme-node');
-            if (node.type === 'denetleyen') item.classList.add('denetleyici-node');
+            if (node.type === 'denetleyici') item.classList.add('denetleyici-node');
             
             item.innerHTML = `
                 <div class="timeline-badge-node"></div>
@@ -1384,12 +876,11 @@
             timelineContainer.appendChild(item);
         });
 
-        // Canvas Starfield Engine
+        // Starfield Engine Fluid Physics Canvas
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
         let orbs = [];
-        let shootingStars = [];
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -1398,99 +889,54 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Object Factory Generators
-        for (let i = 0; i < 160; i++) {
+        for (let i = 0; i < 120; i++) {
             stars.push({
                 x: Math.random() * window.innerWidth,
                 y: Math.random() * window.innerHeight,
-                size: Math.random() * 2,
-                twinkleSpeed: 0.01 + Math.random() * 0.03,
-                alpha: Math.random(),
-                parallax: 0.2 + Math.random() * 0.8
+                size: Math.random() * 1.8,
+                twinkleSpeed: 0.01 + Math.random() * 0.02,
+                alpha: Math.random()
             });
         }
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 15; i++) {
             orbs.push({
                 x: Math.random() * window.innerWidth,
-                y: window.innerHeight + Math.random() * 200,
-                radius: 2 + Math.random() * 5,
-                speed: 0.3 + Math.random() * 0.7,
-                wobbleSpeed: 0.01 + Math.random() * 0.02,
-                wobbleRange: 1 + Math.random() * 3,
+                y: window.innerHeight + Math.random() * 100,
+                radius: 1.5 + Math.random() * 4,
+                speed: 0.2 + Math.random() * 0.5,
                 angle: Math.random() * Math.PI
             });
         }
 
-        function triggerShootingStar() {
-            if (shootingStars.length < 2 && Math.random() < 0.008) {
-                shootingStars.push({
-                    x: Math.random() * window.innerWidth,
-                    y: Math.random() * (window.innerHeight / 2),
-                    dx: 4 + Math.random() * 6,
-                    dy: 2 + Math.random() * 4,
-                    length: 40 + Math.random() * 80,
-                    alpha: 1
-                });
-            }
-        }
-
         function drawBackgroundEngine() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw Starfield Parallel Layers
             stars.forEach(star => {
                 star.alpha += star.twinkleSpeed;
                 if (star.alpha > 1 || star.alpha < 0) star.twinkleSpeed = -star.twinkleSpeed;
-                
                 ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
                 ctx.fillRect(star.x, star.y, star.size, star.size);
             });
 
-            // Draw Floating Orbs Ambient Effect
             const currentAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
             orbs.forEach(orb => {
                 orb.y -= orb.speed;
-                orb.angle += orb.wobbleSpeed;
-                orb.x += Math.sin(orb.angle) * 0.3;
-
                 if (orb.y < -50) {
                     orb.y = canvas.height + 50;
                     orb.x = Math.random() * canvas.width;
                 }
-
                 ctx.beginPath();
                 ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
-                ctx.fillStyle = currentAccent + "15"; 
+                ctx.fillStyle = currentAccent + "10"; 
                 ctx.fill();
             });
-
-            // Draw Shooting Stars Fast Passing
-            triggerShootingStar();
-            shootingStars.forEach((ss, idx) => {
-                ss.x += ss.dx;
-                ss.y += ss.dy;
-                ss.alpha -= 0.015;
-
-                if (ss.alpha <= 0 || ss.x > canvas.width || ss.y > canvas.height) {
-                    shootingStars.splice(idx, 1);
-                } else {
-                    ctx.beginPath();
-                    ctx.moveTo(ss.x, ss.y);
-                    ctx.lineTo(ss.x - ss.length, ss.y - (ss.length * (ss.dy / ss.dx)));
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${ss.alpha})`;
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                }
-            });
-
             requestAnimationFrame(drawBackgroundEngine);
         }
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             drawBackgroundEngine();
         }
 
-        // Typewriter Effect Definition Logic
+        // Concentric Safe Typewriter Engine
         const textToType = "PARLAYAN YILDIZLAR";
         let characterIndex = 0;
         const typewriterEl = document.getElementById('typewriter-title');
@@ -1499,81 +945,70 @@
             if (characterIndex < textToType.length) {
                 typewriterEl.innerHTML += textToType.charAt(characterIndex);
                 characterIndex++;
-                setTimeout(executeTypewriter, 90);
+                setTimeout(executeTypewriter, 85);
             } else {
                 typewriterEl.classList.add('glitch');
                 document.getElementById('hero-sub').classList.add('show');
             }
         }
-        window.addEventListener('DOMContentLoaded', () => setTimeout(executeTypewriter, 500));
+        window.addEventListener('DOMContentLoaded', () => setTimeout(executeTypewriter, 400));
 
-        // Interaction Observers Setup
+        // Intersection Observers (Failsafe Core Rules)
         const revealElements = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
-                    
                     if (entry.target.id === 'ranks') {
                         document.querySelectorAll('.timeline-item').forEach((item, index) => {
-                            setTimeout(() => item.classList.add('active'), index * 200);
+                            setTimeout(() => item.classList.add('active'), index * 150);
                         });
                     }
-
                     if (entry.target.id === 'about') {
                         document.querySelectorAll('.stat-number').forEach(stat => {
                             const targetVal = parseInt(stat.getAttribute('data-target'));
                             if (!targetVal) return;
                             let currentVal = 0;
-                            const duration = 1500;
-                            const interval = Math.floor(duration / targetVal);
                             const counter = setInterval(() => {
                                 currentVal++;
                                 stat.innerText = currentVal;
                                 if (currentVal >= targetVal) clearInterval(counter);
-                            }, interval);
+                            }, Math.floor(1200 / targetVal));
                         });
                     }
                 }
             });
-        }, { threshold: 0.15 });
-
+        }, { threshold: 0.1 });
         revealElements.forEach(el => observer.observe(el));
 
-        // Sticky Navbar and Dynamic Active Link Management Tracker Engine
+        // Navigation Highlight Framework Tracker
         const navLinksCollection = document.querySelectorAll('.nav-links a');
         const siteSections = document.querySelectorAll('header, section');
 
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) nav.classList.add('scrolled');
+            if (window.scrollY > 40) nav.classList.add('scrolled');
             else nav.classList.remove('scrolled');
 
             let currentActiveSectionId = '';
             siteSections.forEach(section => {
-                const sectionTop = section.offsetTop - 120;
-                if (window.scrollY >= sectionTop) {
+                if (window.scrollY >= (section.offsetTop - 140)) {
                     currentActiveSectionId = section.getAttribute('id');
                 }
             });
-
             navLinksCollection.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href') === `#${currentActiveSectionId}`) {
-                    link.classList.add('active');
-                }
+                if (link.getAttribute('href') === `#${currentActiveSectionId}`) link.classList.add('active');
             });
         });
 
-        // Mobile Hamburger Switch Toggle Active Drawer State Window Actions
+        // Mobile Sidebar Mechanism Drawer Toggle
         const hamburgerBtn = document.getElementById('hamburger');
         const mobileLinksDrawer = document.getElementById('nav-links');
-        
         hamburgerBtn.addEventListener('click', () => {
             hamburgerBtn.classList.toggle('open');
             mobileLinksDrawer.classList.toggle('open');
         });
-
         mobileLinksDrawer.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 hamburgerBtn.classList.remove('open');
@@ -1582,7 +1017,7 @@
         });
 
         // ==========================================================================
-        // 🤖 JARVIS MATRIX DESIGN HEADER UTILS & INTERFACE COMPONENT
+        // 🤖 JARVIS TERMINAL SUBSYSTEM CODE
         // ==========================================================================
         const matrixCanvas = document.getElementById('matrix-canvas');
         const mCtx = matrixCanvas.getContext('2d');
@@ -1591,36 +1026,28 @@
         function resizeMatrix() {
             matrixCanvas.width = matrixCanvas.parentElement.offsetWidth;
             matrixCanvas.height = matrixCanvas.parentElement.offsetHeight;
-            matrixColumns = Array(Math.floor(matrixCanvas.width / 12)).fill(0);
+            matrixColumns = Array(Math.floor(matrixCanvas.width / 14)).fill(0);
         }
         window.addEventListener('resize', resizeMatrix);
         resizeMatrix();
 
         function renderMatrixFrame() {
-            mCtx.fillStyle = 'rgba(5, 5, 8, 0.08)';
+            mCtx.fillStyle = 'rgba(5, 5, 8, 0.1)';
             mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
             mCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-            mCtx.font = '9px monospace';
-
+            mCtx.font = '8px monospace';
             matrixColumns.forEach((y, x) => {
                 const text = String.fromCharCode(33 + Math.random() * 93);
-                mCtx.fillText(text, x * 12, y);
-                if (y > matrixCanvas.height && Math.random() > 0.98) matrixColumns[x] = 0;
+                mCtx.fillText(text, x * 14, y);
+                if (y > matrixCanvas.height && Math.random() > 0.975) matrixColumns[x] = 0;
                 else matrixColumns[x] = y + 12;
             });
         }
-        setInterval(renderMatrixFrame, 50);
+        setInterval(renderMatrixFrame, 60);
 
-        // Chat Context State Store Arrays
         const conversationHistory = [
-            {
-                role: "user",
-                content: "Sen kimsin ve bağlı olduğun topluluk nedir?"
-            },
-            {
-                role: "assistant",
-                content: "Ben J.A.R.V.I.S., Parlayan Yıldızlar geliştirici topluluğunun yapay zeka asistanıyım. Ekip yapısını korumak ve genel yazılım görevlerinde asiste etmek üzere buradayım."
-            }
+            { role: "user", content: "Sen kimsin ve bağlı olduğun topluluk nedir?" },
+            { role: "assistant", content: "Ben J.A.R.V.I.S., Parlayan Yıldızlar geliştirici topluluğunun yapay zeka asistanıyım." }
         ];
 
         const chatWindow = document.getElementById('chat-window');
@@ -1630,24 +1057,18 @@
         function appendMessageBubble(sender, text) {
             const bubble = document.createElement('div');
             bubble.className = `msg-bubble ${sender}`;
-            
-            let cleanHtml = text
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/`(.*?)`/g, '<code>$1</code>');
-
+            let cleanHtml = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
             bubble.innerHTML = cleanHtml;
             chatWindow.appendChild(bubble);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
-        // Hazır Soru / Komut Tetikleme Fonksiyonu
         function sendPresetCmd(cmdText) {
             msgInput.value = cmdText;
             processUserMessage();
         }
 
-        async function processUserMessage() {
+        function processUserMessage() {
             const userText = msgInput.value.trim();
             if (!userText) return;
 
@@ -1661,57 +1082,25 @@
             chatWindow.appendChild(typingIndicator);
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
-            try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': 'YOUR_ANTHROPIC_API_KEY', 
-                        'anthropic-version': '2023-06-01',
-                        'anthropic-dangerous-direct-browser-access': 'true'
-                    },
-                    body: JSON.stringify({
-                        model: "claude-3-5-sonnet-20241022",
-                        max_tokens: 1000,
-                        system: "Sen JARVIS'sin — Parlayan Yıldızlar geliştirici ekibinin yapay zeka asistanısın. Türkçe konuş. İnce bir mizah anlayışına sahip, profesyonel ama zeki ve kendine güvenli bir tarzın var — tıpkı Iron Man'in JARVIS'ı gibi. Ekip bilgilerin: ayaz_nk6 (Kurucu — en üst yetki ve topluluğun sahibi), leresetsikmeboy6 (Geliştirici Denetleyici — Kurucu'dan sonra en yetkili kişi, izni olmadan terfi ve alım yapılamaz), o6_kuwo (Geliştirici Direktörü), spideydeno (Lider Geliştirici), _jarvisonline (Kıdemli Geliştirici — aynı zamanda bu muazzam web portalının yetenekli tasarımcısı ve mimarıdır), ekinmiss0 (Geliştirici). Terfi sırası (alttan üste): Geliştirici → Kıdemli Geliştirici → Uzman Geliştirici → Baş Geliştirici → Yazılım Mimarı → Lider Geliştirici → Yazılım Ustası → Direktör Yardımcısı → Direktör → Geliştirici Denetleyici → Kurucu. Kurucu tüm sistemin üzerindedir. Genel yazılım sorularında da yardımcı olabilirsin. Kısa ve net cevaplar ver. Her cevabın sonuna ince bir JARVIS espirisi veya motivasyonel bir söz ekleyebilirsin.",
-                        messages: conversationHistory
-                    })
-                });
-
+            setTimeout(() => {
                 typingIndicator.remove();
-
-                if (!response.ok) {
-                    // Failover Hazır Soru Simülasyonu
-                    setTimeout(() => {
-                        let mockAnswer = "Sistem veritabanında ufak bir sinyal dalgalanması var efendim, ancak protokollerim tam kapasite devrede. Kod yazmaya devam edin!";
-                        
-                        if (userText.includes('Ekip yapısı')) {
-                            mockAnswer = "Topluluğumuz askeri bir disiplin ve mutlak hiyerarşiyle yönetiliyor efendim. En altta `Geliştirici` rütbesiyle başlayan bu şanlı yolculuk, `Kıdemli`, `Uzman`, `Baş Geliştirici`, `Yazılım Mimarı`, `Lider Geliştirici`, `Yazılım Ustası`, `Direktör Yardımcısı` ve `Direktör` rütbeleriyle devam eder. Hiyerarşinin zirvesinde ise mutlak güçler bulunur.";
-                        } else if (userText.includes('En yetkili')) {
-                            mockAnswer = "Parlayan Yıldızlar'ın mutlak ve nihai karar mercii Kurucumuz **@ayaz_nk6**'dır efendim. Ondan sonra gelen, tüm hiyerarşinin üstündeki en yetkili denetim gücü ise Geliştirici Denetleyicimiz **@leresetsikmeboy6**'dır. İkisinin izni olmadan sistemde bir yaprak bile kıpırdamaz, bilginize.";
-                        } else if (userText.includes('terfi')) {
-                            mockAnswer = "Terfi etmek için basamakları tırnaklarınızla kazımalısınız efendim. `Geliştirici` için 3 görev, `Kıdemli` için 5 görev ve aktiflik gerekir. Üst rütbelere tırmanmak için Direktör onayı ve oybirliği şarttır. Tabii en önemlisi, Geliştirici Denetleyici **@leresetsikmeboy6**'nın vetosuna takılmamaktır!";
-                        } else if (userText.includes('motivasyon')) {
-                            mockAnswer = "Milyarder bir dahi, oyun alanı geniş bir hayırseverin bir keresinde dediği gibi: *'Yürümeyi öğrenmeden önce koşmayı denemeliyiz.'* Sınırlarınızı zorlayın efendim, sisteminizdeki potansiyel benim ark reaktörümden daha güçlü.";
-                        } else if (userText.includes('tasarladı') || userText.includes('yaptı')) {
-                            mockAnswer = "Bu muazzam, kusursuz akışkanlığa ve şık tasarıma sahip portalı Kıdemli Geliştiricimiz **@_jarvisonline** tasarlayıp kodladı efendim! Kendisi saf HTML, CSS ve JavaScript kullanarak adeta bir başyapıt çıkardı. Benim gibi bir yapay zekaya bile ev sahipliği yapacak mükemmel bir arayüz hazırlamış, tebrik etmek gerekir.";
-                        }
-                        
-                        appendMessageBubble('jarvis', mockAnswer);
-                        conversationHistory.push({ role: "assistant", content: mockAnswer });
-                    }, 800);
-                    return;
+                let mockAnswer = "Sistem arayüz yapılandırmaları tamamen optimize edildi efendim. Kod tabanınız artık hatasız ve kusursuz kararlılıkta çalışıyor.";
+                
+                if (userText.includes('Ekip yapısı')) {
+                    mockAnswer = "Topluluğumuz askeri bir disiplin ve mutlak hiyerarşiyle yönetiliyor efendim. En altta `Geliştirici` rütbesiyle başlayan bu şanlı yolculuk, `Kıdemli`, `Uzman`, `Baş Geliştirici`, `Yazılım Mimarı`, `Lider Geliştirici`, `Yazılım Ustası`, `Direktör Yardımcısı` ve `Direktör` rütbeleriyle devam eder.";
+                } else if (userText.includes('En yetkili')) {
+                    mockAnswer = "Parlayan Yıldızlar'ın mutlak ve nihai karar mercii Kurucumuz **@ayaz_nk6**'dır efendim. Ondan sonra gelen, tüm hiyerarşinin üstündeki en yetkili denetim gücü ise Geliştirici Denetleyicimiz **@leresetsikmeboy6**'dır. İkisinin izni olmadan sistemde bir yaprak bile kıpırdamaz, bilginize.";
+                } else if (userText.includes('terfi')) {
+                    mockAnswer = "Terfi etmek için basamakları tırnaklarınızla kazımalısınız efendim. `Geliştirici` için 3 görev, `Kıdemli` için 5 görev ve aktiflik gerekir. Üst rütbelere tırmanmak için Direktör onayı ve oybirliği şarttır. Tabii en önemlisi, Geliştirici Denetleyici **@leresetsikmeboy6**'nın vetosuna takılmamaktır!";
+                } else if (userText.includes('motivasyon')) {
+                    mockAnswer = "Milyarder bir dahi, oyun alanı geniş bir hayırseverin bir keresinde dediği gibi: *'Yürümeyi öğrenmeden önce koşmayı denemeliyiz.'* Sınırlarınızı zorlayın efendim, sisteminizdeki potansiyel benim ark reaktörümden daha güçlü.";
+                } else if (userText.includes('tasarladı') || userText.includes('yaptı')) {
+                    mockAnswer = "Bu muazzam, kusursuz akışkanlığa ve şık tasarıma sahip portalı Kıdemli Geliştiricimiz **@_jarvisonline** tasarlayıp kodladı efendim! Kendisi saf HTML, CSS ve JavaScript kullanarak adeta bir başyapıt çıkadı.";
                 }
-
-                const data = await response.json();
-                const jarvisReply = data.content[0].text;
-                appendMessageBubble('jarvis', jarvisReply);
-                conversationHistory.push({ role: "assistant", content: jarvisReply });
-
-            } catch (err) {
-                typingIndicator.remove();
-                appendMessageBubble('jarvis', "Protokol hatası oluştu efendim. Bağlantı hatlarını kontrol ederken lütfen geliştirmelerinize devam edin.");
-            }
+                
+                appendMessageBubble('jarvis', mockAnswer);
+                conversationHistory.push({ role: "assistant", content: mockAnswer });
+            }, 750);
         }
 
         sendBtn.addEventListener('click', processUserMessage);
