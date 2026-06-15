@@ -1,790 +1,1704 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Parlayan Yıldızlar — Geliştirici Ekibi</title>
-<style>
-/* ============================================================
-   CSS CUSTOM PROPERTIES — 5 TEMA
-   ============================================================ */
-:root {
-  --bg: #0a0a0f;
-  --bg2: #0d0d18;
-  --accent: #00d4ff;
-  --accent2: #ffd700;
-  --glow: rgba(0, 212, 255, 0.4);
-  --glow2: rgba(255, 215, 0, 0.3);
-  --card-bg: rgba(255,255,255,0.04);
-  --card-border: rgba(0, 212, 255, 0.2);
-  --text-primary: #f0f4ff;
-  --text-secondary: rgba(240,244,255,0.6);
-  --nav-bg: rgba(10,10,15,0.85);
-  transition: background 0.4s ease, color 0.4s ease;
-}
-[data-theme="ates"] {
-  --bg: #0f0a0a; --bg2: #180d0d;
-  --accent: #ff4444; --accent2: #ff8c00;
-  --glow: rgba(255,68,68,0.4); --glow2: rgba(255,140,0,0.3);
-  --card-bg: rgba(255,80,0,0.06); --card-border: rgba(255,68,68,0.25);
-  --nav-bg: rgba(15,10,10,0.85);
-}
-[data-theme="orman"] {
-  --bg: #0a0f0a; --bg2: #0d180d;
-  --accent: #00ff88; --accent2: #00cc44;
-  --glow: rgba(0,255,136,0.4); --glow2: rgba(0,204,68,0.3);
-  --card-bg: rgba(0,255,100,0.05); --card-border: rgba(0,255,136,0.25);
-  --nav-bg: rgba(10,15,10,0.85);
-}
-[data-theme="galaksi"] {
-  --bg: #0d0a14; --bg2: #130d1e;
-  --accent: #8b5cf6; --accent2: #c084fc;
-  --glow: rgba(139,92,246,0.4); --glow2: rgba(192,132,252,0.3);
-  --card-bg: rgba(139,92,246,0.07); --card-border: rgba(139,92,246,0.3);
-  --nav-bg: rgba(13,10,20,0.85);
-}
-[data-theme="altin"] {
-  --bg: #0f0e0a; --bg2: #1a1800;
-  --accent: #ffd700; --accent2: #ffaa00;
-  --glow: rgba(255,215,0,0.4); --glow2: rgba(255,170,0,0.3);
-  --card-bg: rgba(255,215,0,0.06); --card-border: rgba(255,215,0,0.3);
-  --nav-bg: rgba(15,14,10,0.85);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARLAYAN YILDIZLAR — Developer Team Portal</title>
+    <style>
+        /* ==========================================================================
+           🎨 CSS VARIABLES & THEME ENGINE
+           ========================================================================== */
+        :root {
+            --bg: #0a0a0f;
+            --accent: #00d4ff;
+            --accent2: #ffd700;
+            --glow: #00d4ff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0cc;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --transition: all 0.4s ease;
+        }
 
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text-primary);
-  overflow-x: hidden;
-  transition: background 0.4s ease;
-}
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
-a { color: inherit; text-decoration: none; }
+        /* Base Resets */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
 
-#starfield {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0; pointer-events: none;
-}
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            overflow-x: hidden;
+            position: relative;
+            transition: background-color var(--transition), color var(--transition);
+        }
 
-/* ============================================================
-   NAVBAR
-   ============================================================ */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  padding: 0 2rem; height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: transparent;
-  transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s;
-}
-nav.scrolled {
-  background: var(--nav-bg);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 1px 0 var(--card-border);
-}
-.nav-logo {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em; cursor: pointer;
-}
-.nav-logo svg { width: 32px; height: 32px; filter: drop-shadow(0 0 8px var(--accent)); animation: starSpin 8s linear infinite; }
-.logo-text {
-  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
-  background-size: 200% auto;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  animation: shimmerText 3s linear infinite;
-}
-@keyframes shimmerText { to { background-position: 200% center; } }
-@keyframes starSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* Background Effects */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
 
-.nav-links { display: flex; gap: 2rem; list-style: none; }
-.nav-links a {
-  font-size: 0.9rem; letter-spacing: 0.04em; font-weight: 500;
-  color: var(--text-secondary); position: relative; padding-bottom: 4px;
-  transition: color 0.2s;
-}
-.nav-links a::after {
-  content: ''; position: absolute; bottom: 0; left: 0;
-  width: 0; height: 2px; background: var(--accent);
-  transition: width 0.3s ease; box-shadow: 0 0 8px var(--accent);
-}
-.nav-links a:hover { color: var(--accent); }
-.nav-links a:hover::after { width: 100%; }
+        /* ==========================================================================
+           ✨ ANIMATIONS & UTILITIES
+           ========================================================================== */
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 15px var(--glow)); opacity: 0.8; }
+            50% { filter: drop-shadow(0 0 15px var(--glow)) drop-shadow(0 0 30px var(--glow)); opacity: 1; }
+        }
 
-.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1010; }
-.hamburger span { display: block; width: 24px; height: 2px; background: var(--accent); border-radius: 2px; transition: all 0.3s; }
-.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        @keyframes shimmer {
+            0% { background-position: -200% over; }
+            100% { background-position: 200% over; }
+        }
 
-.mobile-menu {
-  display: none; position: fixed; top: 64px; left: 0; right: 0;
-  background: var(--nav-bg); backdrop-filter: blur(20px);
-  flex-direction: column; align-items: center; gap: 1.5rem;
-  padding: 2rem; z-index: 999;
-  border-bottom: 1px solid var(--card-border);
-  transform: translateY(-20px); opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.mobile-menu.open { display: flex; transform: translateY(0); opacity: 1; }
-.mobile-menu a { font-size: 1.1rem; color: var(--text-primary); }
+        @keyframes floatSine {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
 
-/* ============================================================
-   SECTIONS
-   ============================================================ */
-section { position: relative; z-index: 1; padding: 100px 2rem; }
-.section-title {
-  text-align: center; font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 800; letter-spacing: 0.08em;
-  color: var(--accent2); text-shadow: 0 0 30px var(--glow2);
-  margin-bottom: 60px;
-}
-.fade-up { opacity: 0; transform: translateY(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.fade-up.visible { opacity: 1; transform: translateY(0); }
+        @keyframes spinRing {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
 
-/* ============================================================
-   HERO
-   ============================================================ */
-#hero {
-  min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding-top: 80px; gap: 1.5rem;
-}
-.hero-star svg {
-  width: 120px; height: 120px;
-  filter: drop-shadow(0 0 20px var(--accent)) drop-shadow(0 0 60px var(--glow));
-  animation: heroPulse 2.5s ease-in-out infinite;
-}
-@keyframes heroPulse {
-  0%,100% { filter: drop-shadow(0 0 20px var(--accent)) drop-shadow(0 0 50px var(--glow)); transform: scale(1); }
-  50% { filter: drop-shadow(0 0 35px var(--accent)) drop-shadow(0 0 90px var(--glow)); transform: scale(1.06); }
-}
-.hero-title {
-  font-size: clamp(2rem, 6vw, 4.5rem); font-weight: 900; letter-spacing: 0.12em;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  animation: shimmerText 2.5s linear infinite; min-height: 1.2em;
-}
-.hero-subtitle {
-  font-size: clamp(1rem, 2.5vw, 1.4rem); color: var(--text-secondary); letter-spacing: 0.15em;
-  opacity: 0; animation: fadeIn 0.8s ease 2s forwards;
-}
-@keyframes fadeIn { to { opacity: 1; } }
-.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; opacity: 0; animation: fadeIn 0.8s ease 2.5s forwards; }
-.btn {
-  padding: 0.8rem 2rem; border-radius: 50px;
-  font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em;
-  cursor: pointer; border: 2px solid var(--accent);
-  background: transparent; color: var(--accent);
-  transition: all 0.3s ease; position: relative; overflow: hidden;
-}
-.btn::before {
-  content: ''; position: absolute; inset: 0;
-  background: var(--accent); transform: scaleX(0); transform-origin: left;
-  transition: transform 0.3s ease; z-index: -1;
-}
-.btn:hover { color: var(--bg); box-shadow: 0 0 25px var(--glow); }
-.btn:hover::before { transform: scaleX(1); }
-.btn-gold { border-color: var(--accent2); color: var(--accent2); }
-.btn-gold::before { background: var(--accent2); }
-.btn-gold:hover { box-shadow: 0 0 25px var(--glow2); }
-.scroll-indicator {
-  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
-  color: var(--text-secondary); font-size: 0.8rem; letter-spacing: 0.1em;
-  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-  opacity: 0; animation: fadeIn 0.8s ease 3s forwards;
-}
-.scroll-arrow { animation: bounce 1.5s ease-in-out infinite; font-size: 1.2rem; }
-@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+        @keyframes glitchClip {
+            0%, 100% { clip-path: inset(0 0 0 0); }
+            20% { clip-path: inset(20% -6px 60% 0); }
+            40% { clip-path: inset(60% -6px 10% 0); }
+            60% { clip-path: inset(40% -6px 40% 0); }
+            80% { clip-path: inset(80% -6px 5% 0); }
+        }
 
-/* ============================================================
-   TEAM
-   ============================================================ */
-.team-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem; max-width: 1100px; margin: 0 auto;
-}
-.member-card {
-  background: var(--card-bg); border: 1px solid var(--card-border);
-  border-radius: 20px; padding: 2rem 1.5rem; text-align: center;
-  position: relative; overflow: hidden; backdrop-filter: blur(12px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: floatCard 4s ease-in-out infinite;
-}
-.member-card:nth-child(1) { animation-delay: 0s; }
-.member-card:nth-child(2) { animation-delay: 0.6s; }
-.member-card:nth-child(3) { animation-delay: 1.2s; }
-.member-card:nth-child(4) { animation-delay: 0.3s; }
-.member-card:nth-child(5) { animation-delay: 0.9s; }
-@keyframes floatCard { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-.member-card:hover {
-  transform: translateY(-12px) scale(1.02) !important;
-  box-shadow: 0 20px 50px var(--glow); border-color: var(--accent);
-  animation-play-state: paused;
-}
-.member-card::before {
-  content: ''; position: absolute; inset: 0; border-radius: 20px;
-  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.03));
-  pointer-events: none;
-}
-.member-card.special {
-  border-color: rgba(255,68,68,0.5); box-shadow: 0 0 30px rgba(255,68,68,0.15);
-  animation-name: floatCardSpecial;
-}
-@keyframes floatCardSpecial {
-  0%,100% { transform: translateY(0); box-shadow: 0 0 30px rgba(255,68,68,0.15), 0 0 60px rgba(255,215,0,0.1); }
-  50% { transform: translateY(-8px); box-shadow: 0 0 50px rgba(255,68,68,0.3), 0 0 100px rgba(255,215,0,0.2); }
-}
-.en-yetkili-badge {
-  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
-  background: linear-gradient(90deg, #ff4444, #ffd700, #ff4444);
-  background-size: 200% auto; animation: shimmerText 2s linear infinite;
-  color: #000; font-size: 0.65rem; font-weight: 800;
-  padding: 4px 14px; border-radius: 0 0 10px 10px;
-  letter-spacing: 0.1em; white-space: nowrap;
-}
-.rank-icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
-.rank-name { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 1rem; text-transform: uppercase; }
-.member-username {
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem); font-weight: 900; letter-spacing: 0.05em;
-  margin-bottom: 1.5rem; text-shadow: 0 0 15px currentColor;
-}
-.instagram-btn {
-  width: 100%; padding: 0.7rem; border-radius: 50px; border: none;
-  font-size: 0.85rem; font-weight: 700; cursor: pointer; letter-spacing: 0.05em;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  color: var(--text-primary); border: 1px solid rgba(255,255,255,0.15);
-}
-.instagram-btn:hover {
-  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
-  border-color: transparent; color: #fff;
-  transform: scale(1.03); box-shadow: 0 5px 20px rgba(253,29,29,0.4);
-}
+        @keyframes chevronBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
 
-/* ============================================================
-   TERFİ SİSTEMİ
-   ============================================================ */
-#terfi { background: linear-gradient(180deg, transparent, rgba(0,0,0,0.3), transparent); }
-.timeline { max-width: 800px; margin: 0 auto; position: relative; padding: 1rem 0; }
-.timeline-line {
-  position: absolute; left: 50%; top: 0; bottom: 0;
-  width: 2px; transform: translateX(-50%);
-  background: linear-gradient(180deg, transparent, var(--accent), var(--accent2), var(--accent), transparent);
-  overflow: hidden;
-}
-.timeline-line::after {
-  content: ''; position: absolute; top: -100%; left: 0; right: 0;
-  height: 40px; background: linear-gradient(180deg, transparent, var(--accent2), transparent);
-  animation: travelUp 2s linear infinite;
-}
-@keyframes travelUp { from { top: 100%; } to { top: -40px; } }
-.rank-node { display: flex; align-items: center; margin-bottom: 2.5rem; position: relative; }
-.rank-node:nth-child(even) { flex-direction: row-reverse; }
-.rank-node-content {
-  width: calc(50% - 40px); background: var(--card-bg); border: 1px solid var(--card-border);
-  border-radius: 16px; padding: 1.2rem 1.5rem; backdrop-filter: blur(10px);
-  opacity: 0; transform: translateX(-30px);
-  transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s;
-}
-.rank-node:nth-child(even) .rank-node-content { transform: translateX(30px); }
-.rank-node-content.visible { opacity: 1; transform: translateX(0) !important; }
-.rank-node-content:hover { box-shadow: 0 8px 30px var(--glow); border-color: var(--accent); }
-.rank-node-dot {
-  position: absolute; left: 50%; transform: translateX(-50%);
-  width: 44px; height: 44px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--bg2); border: 2px solid var(--accent);
-  font-size: 1.2rem; z-index: 2; box-shadow: 0 0 15px var(--glow); transition: all 0.3s;
-}
-.rank-node:hover .rank-node-dot { box-shadow: 0 0 30px var(--glow), 0 0 60px var(--glow); transform: translateX(-50%) scale(1.2); }
-.rank-node-spacer { width: calc(50% - 40px); }
-.rank-label { font-size: 1rem; font-weight: 800; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.4rem; }
-.rank-req { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
-.special-node .rank-node-content {
-  border-color: rgba(255,68,68,0.6); background: rgba(255,68,68,0.06);
-  box-shadow: 0 0 30px rgba(255,68,68,0.1);
-}
-.special-node .rank-node-dot {
-  border-color: #ff4444; box-shadow: 0 0 20px rgba(255,68,68,0.5), 0 0 40px rgba(255,215,0,0.2);
-  background: rgba(255,68,68,0.1); width: 52px; height: 52px; font-size: 1.4rem;
-}
-.special-node .rank-label { color: #ff4444; }
-.separator-text {
-  text-align: center; font-size: 0.7rem; letter-spacing: 0.2em;
-  color: var(--text-secondary); margin: 1rem 0; position: relative; z-index: 2;
-}
-.separator-text::before, .separator-text::after { content: '── '; color: var(--accent); }
+        @keyframes auraRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-/* ============================================================
-   JARVIS AI
-   ============================================================ */
-#jarvis { padding-bottom: 120px; }
-.jarvis-container {
-  max-width: 800px; margin: 0 auto; background: var(--card-bg);
-  border: 1px solid var(--card-border); border-radius: 24px; overflow: hidden;
-  backdrop-filter: blur(16px); box-shadow: 0 0 60px var(--glow);
-}
-.jarvis-header {
-  padding: 1.2rem 1.5rem; background: rgba(0,0,0,0.3);
-  border-bottom: 1px solid var(--card-border);
-  display: flex; align-items: center; gap: 1rem;
-  position: relative; overflow: hidden;
-}
-#matrixCanvas { position: absolute; inset: 0; opacity: 0.12; pointer-events: none; }
-.jarvis-header-info { position: relative; z-index: 1; }
-.jarvis-title { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.15em; color: var(--accent); text-shadow: 0 0 15px var(--accent); }
-.jarvis-subtitle { font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 0.1em; }
-.online-dot {
-  width: 10px; height: 10px; border-radius: 50%; background: #00ff88;
-  box-shadow: 0 0 8px #00ff88; animation: blink 1.5s ease-in-out infinite;
-  position: relative; z-index: 1;
-}
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-.chat-window {
-  height: 420px; overflow-y: auto; padding: 1.5rem;
-  display: flex; flex-direction: column; gap: 1rem;
-  scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
-}
-.chat-window::-webkit-scrollbar { width: 4px; }
-.chat-window::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
-.msg { display: flex; flex-direction: column; max-width: 80%; }
-.msg.user { align-self: flex-end; align-items: flex-end; }
-.msg.jarvis { align-self: flex-start; align-items: flex-start; }
-.msg-label { font-size: 0.68rem; color: var(--text-secondary); margin-bottom: 4px; letter-spacing: 0.08em; }
-.msg-bubble { padding: 0.8rem 1.1rem; border-radius: 16px; font-size: 0.9rem; line-height: 1.6; }
-.msg.user .msg-bubble { background: var(--accent); color: var(--bg); border-bottom-right-radius: 4px; font-weight: 600; }
-.msg.jarvis .msg-bubble { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); border-bottom-left-radius: 4px; color: var(--text-primary); }
-.msg.jarvis .msg-bubble strong { color: var(--accent); }
-.msg.jarvis .msg-bubble code { background: rgba(0,0,0,0.4); padding: 1px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: var(--accent2); }
-.typing-indicator { display: flex; gap: 5px; padding: 0.8rem 1.1rem; align-items: center; }
-.typing-indicator span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: 0.4; animation: typingDot 1.2s ease-in-out infinite; }
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes typingDot { 0%,100% { opacity: 0.4; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
-.chat-input-area { display: flex; gap: 0.75rem; padding: 1rem 1.5rem; background: rgba(0,0,0,0.2); border-top: 1px solid var(--card-border); }
-#chatInput {
-  flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border);
-  border-radius: 50px; padding: 0.75rem 1.2rem; color: var(--text-primary);
-  font-size: 0.9rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-}
-#chatInput:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--glow); }
-#chatInput::placeholder { color: var(--text-secondary); }
-#sendBtn {
-  width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
-  background: var(--accent); color: var(--bg); font-size: 1.1rem;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s; flex-shrink: 0;
-}
-#sendBtn:hover { box-shadow: 0 0 20px var(--glow); transform: scale(1.1); }
-#sendBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
 
-/* ============================================================
-   HAKKINDA
-   ============================================================ */
-#hakkinda { text-align: center; }
-.about-text { max-width: 600px; margin: 0 auto 3rem; font-size: 1rem; line-height: 1.8; color: var(--text-secondary); }
-.stats-row { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
-.stat-card {
-  background: var(--card-bg); border: 1px solid var(--card-border);
-  border-radius: 16px; padding: 2rem 2.5rem; backdrop-filter: blur(10px);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.stat-card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px var(--glow); }
-.stat-number { font-size: 3rem; font-weight: 900; color: var(--accent); text-shadow: 0 0 20px var(--glow); display: block; }
-.stat-label { font-size: 0.85rem; color: var(--text-secondary); letter-spacing: 0.1em; margin-top: 0.4rem; }
-.star-divider { margin: 3rem auto 0; text-align: center; font-size: 1.5rem; letter-spacing: 1rem; opacity: 0.5; }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-/* ============================================================
-   FOOTER
-   ============================================================ */
-footer { position: relative; z-index: 1; text-align: center; padding: 2rem; border-top: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.85rem; }
-.footer-logo { font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 0.4rem; }
-.footer-powered { font-size: 0.75rem; margin-top: 0.3rem; opacity: 0.5; }
+        /* ==========================================================================
+           🧭 NAVIGATION
+           ========================================================================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            z-index: 100;
+            transition: var(--transition);
+        }
 
-/* ============================================================
-   THEME SWITCHER
-   ============================================================ */
-#themeSwitcher {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
-  background: var(--card-bg); border: 1px solid var(--card-border);
-  backdrop-filter: blur(16px); border-radius: 50px; padding: 0.6rem 1.2rem;
-  cursor: pointer; font-size: 0.8rem; font-weight: 700;
-  color: var(--accent); letter-spacing: 0.05em;
-  transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem;
-  box-shadow: 0 4px 20px var(--glow);
-}
-#themeSwitcher:hover { transform: scale(1.05); box-shadow: 0 6px 30px var(--glow); }
+        .navbar.scrolled {
+            background: rgba(10, 10, 15, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 900px) {
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
-  .rank-node { flex-direction: column; align-items: center; }
-  .rank-node:nth-child(even) { flex-direction: column; }
-  .rank-node-content { width: 90%; transform: translateY(20px) !important; }
-  .rank-node-content.visible { transform: translateY(0) !important; }
-  .rank-node-dot { position: relative; left: auto; transform: none !important; margin: 0.5rem 0; }
-  .rank-node-spacer { display: none; }
-  .timeline-line { left: 20px; }
-}
-@media (max-width: 600px) {
-  .team-grid { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
-  .hamburger { display: flex; }
-  section { padding: 80px 1.2rem; }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  #starfield, #matrixCanvas { display: none; }
-}
-</style>
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .star-svg {
+            width: 32px;
+            height: 32px;
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, var(--text-primary), var(--accent), var(--text-primary));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 4s linear infinite;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        /* Mobile Nav Drawer */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 250px;
+                background: rgba(10, 10, 15, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: 0.4s ease-in-out;
+            }
+
+            .nav-links.open {
+                right: 0;
+            }
+
+            .hamburger {
+                display: flex;
+                z-index: 101;
+            }
+
+            .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+            .hamburger.open span:nth-child(2) { opacity: 0; }
+            .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+        }
+
+        /* ==========================================================================
+           🏠 HERO SECTION
+           ========================================================================== */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 0 1rem;
+        }
+
+        .hero-logo-container {
+            position: relative;
+            margin-bottom: 2rem;
+            width: 150px;
+            height: 150px;
+        }
+
+        .hero-star {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        .hero-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 150px;
+            border: 2px dashed var(--accent);
+            border-radius: 50%;
+            animation: spinRing 20s linear infinite;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .hero-title.glitch::after {
+            content: 'PARLAYAN YILDIZLAR';
+            position: absolute;
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            top: 0;
+            color: var(--text-primary);
+            overflow: hidden;
+            animation: glitchClip 2s infinite linear alternate-reverse;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transition: opacity 1s ease 1.5s;
+        }
+
+        .hero-subtitle.show {
+            opacity: 1;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--text-primary);
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border-color: var(--accent2);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent2);
+            box-shadow: 0 0 20px var(--accent2);
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 2rem;
+            animation: chevronBounce 2s infinite ease-in-out;
+            cursor: pointer;
+        }
+
+        .scroll-down svg {
+            fill: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .cta-container { flex-direction: column; gap: 1rem; }
+        }
+
+        /* ==========================================================================
+           👑 KURUCU (ÖZEL BÖLÜM)
+           ========================================================================== */
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 4rem 0 2rem 0;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .founder-section {
+            padding: 4rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .founder-card {
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15), rgba(139, 92, 246, 0.05)), rgba(10, 10, 15, 0.6);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2), inset 0 0 20px rgba(139, 92, 246, 0.1);
+            transform: scale(1.05);
+            transition: var(--transition);
+        }
+
+        .founder-card:hover {
+            transform: scale(1.08) translateY(-5px);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+            border-color: rgba(255, 215, 0, 0.8);
+        }
+
+        /* Continuous Energy Ring Aura Effect */
+        .founder-aura {
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            border: 2px solid transparent;
+            border-top: 2px dashed rgba(255, 215, 0, 0.6);
+            border-bottom: 2px dashed rgba(139, 92, 246, 0.6);
+            border-radius: 25px;
+            pointer-events: none;
+            animation: auraRotate 15s linear infinite;
+        }
+
+        .founder-icon-wrapper {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+        }
+
+        .founder-rank {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffd700;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .founder-username {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            margin-bottom: 1rem;
+        }
+
+        .founder-quote {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .badge-supreme {
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            color: #000;
+            border: none;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .badge-community {
+            background: linear-gradient(45deg, #8b5cf6, #00d4ff);
+            color: #fff;
+            border: none;
+        }
+
+        /* ==========================================================================
+           👥 EKİP SECTION
+           ========================================================================== */
+        .team-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 992px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
+
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: var(--transition);
+            animation: floatSine 5s infinite ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card:nth-child(2n) { animation-delay: 1s; }
+        .team-card:nth-child(3n) { animation-delay: 2s; }
+
+        .team-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Special Super Admin Card Accent */
+        .team-card.special-card {
+            border: 2px solid #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.15);
+        }
+        .team-card.special-card:hover {
+            box-shadow: 0 0 35px rgba(255, 68, 68, 0.4);
+            border-color: #ff8c00;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background: linear-gradient(45deg, #ff4444, #ffd700);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 30px;
+            transform: rotate(45deg);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-rank {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-username {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+        }
+
+        .card-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .team-card:hover .card-btn {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        /* ==========================================================================
+           📈 TERFİ SİSTEMİ SECTION
+           ========================================================================== */
+        .timeline-section {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-container {
+            position: relative;
+            margin-top: 4rem;
+        }
+
+        /* Center Line */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent2), var(--accent), rgba(255,255,255,0.05));
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 50%;
+            position: relative;
+            margin-bottom: 3rem;
+            width: 100%;
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: 50%;
+        }
+
+        .timeline-badge-node {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0a0a0f;
+            border: 3px solid var(--accent);
+            z-index: 5;
+            transition: var(--transition);
+        }
+
+        .timeline-item.active .timeline-badge-node {
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--glow);
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            width: 85%;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: var(--transition);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+        }
+
+        .timeline-item.active .timeline-content {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Supreme Founder Node & Super Admin Node Styling Rules */
+        .timeline-item.supreme-node .timeline-badge-node {
+            width: 34px;
+            height: 34px;
+            border-color: #ffd700;
+            background: #000;
+            box-shadow: 0 0 20px #ffd700;
+            animation: pulseGlow 1.5s infinite;
+        }
+        .timeline-item.supreme-node .timeline-content {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(10, 10, 15, 0.8));
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .timeline-item.denetleyen-node .timeline-badge-node {
+            border-color: #ff4444;
+            box-shadow: 0 0 15px #ff4444;
+        }
+        .timeline-item.denetleyen-node .timeline-content {
+            border: 1px solid #ff4444;
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.05), rgba(10, 10, 15, 0.8));
+        }
+
+        @media (max-width: 768px) {
+            .timeline-container::before { left: 20px; }
+            .timeline-item { justify-content: flex-start; padding-left: 45px; padding-right: 0; }
+            .timeline-item:nth-child(even) { padding-left: 45px; }
+            .timeline-badge-node { left: 20px; transform: translateX(-50%); }
+            .timeline-content { width: 100%; }
+        }
+
+        /* ==========================================================================
+           🤖 JARVIS AI SECTION (GELİŞMİŞ HAZIR KOMUT MODÜLLÜ)
+           ========================================================================== */
+        .jarvis-section {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .jarvis-terminal {
+            background: #050508;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .jarvis-header {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .jarvis-header-matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .jarvis-header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .jarvis-title-main {
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
+
+        .jarvis-title-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ff88;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #00ff88;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .jarvis-chat-window {
+            height: 380px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: radial-gradient(circle at center, rgba(10, 10, 15, 0.2), #050508);
+        }
+
+        /* Hızlı Soru / Komut Paneli Stilleri */
+        .jarvis-presets-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.8rem 1rem;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .jarvis-presets-panel::-webkit-scrollbar {
+            height: 4px;
+        }
+        .jarvis-presets-panel::-webkit-scrollbar-thumb {
+            background: var(--card-bg);
+            border-radius: 4px;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+        }
+
+        .msg-bubble {
+            max-width: 80%;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+
+        .msg-bubble.user {
+            background: var(--accent);
+            color: #000;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            font-weight: 500;
+        }
+
+        .msg-bubble.jarvis {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .msg-bubble code {
+            background: rgba(0,0,0,0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent2);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            align-self: flex-start;
+            border-radius: 8px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: chevronBounce 1s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .jarvis-input-bar {
+            display: flex;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
+        }
+
+        .jarvis-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1rem;
+            color: #fff;
+            border-radius: 6px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .jarvis-input:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .jarvis-send {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .jarvis-send:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 15px var(--glow);
+        }
+
+        /* ==========================================================================
+           ℹ️ HAKKINDA SECTION
+           ========================================================================== */
+        .about-section {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            min-width: 200px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .divider-star {
+            margin: 4rem auto 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 50%;
+        }
+
+        .divider-star::before, .divider-star::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        /* ==========================================================================
+           🦶 FOOTER & 👑 CREDITS
+           ========================================================================== */
+        footer {
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-top: 2px solid var(--accent);
+            background: rgba(5, 5, 8, 0.6);
+            margin-top: 6rem;
+            transition: border-color var(--transition);
+        }
+
+        .footer-main {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .footer-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+        }
+
+        /* Custom Müthiş Künye Alanı */
+        .footer-developer-credit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .footer-developer-credit:hover {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .footer-developer-credit span {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        /* ==========================================================================
+           🔘 FLOATING THEME BUTTON
+           ========================================================================== */
+        .theme-switcher {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #0a0a0f;
+            border: 2px solid var(--accent);
+            color: var(--text-primary);
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 0 15px var(--glow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-switcher:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 0 25px var(--glow);
+        }
+
+        .theme-emoji {
+            font-size: 1.2rem;
+        }
+
+        .theme-label {
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Tooltip */
+        .theme-switcher::before {
+            content: 'Tema Değiştir';
+            position: absolute;
+            left: -110px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            pointer-events: none;
+            transition: 0.2s ease;
+            white-space: nowrap;
+            border: 1px solid var(--accent);
+        }
+
+        .theme-switcher:hover::before {
+            transform: translateY(-50%) scale(1);
+        }
+
+        /* ==========================================================================
+           ♿ REDUCED MOTION ACCESSIBILITY
+           ========================================================================== */
+        @media (prefers-reduced-motion: reduce) {
+            #bg-canvas, .hero-ring, .founder-aura { display: none !important; }
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+            .reveal { opacity: 1 !important; transform: none !important; }
+            .hero-subtitle { opacity: 1 !important; }
+        }
+    </style>
 </head>
-<body data-theme="uzay">
+<body>
 
-<canvas id="starfield"></canvas>
+    <canvas id="bg-canvas"></canvas>
 
-<nav id="navbar">
-  <div class="nav-logo" onclick="scrollToSection('hero')">
-    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="sg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffffff"/>
-          <stop offset="40%" stop-color="var(--accent, #00d4ff)"/>
-          <stop offset="100%" stop-color="var(--accent2, #ffd700)" stop-opacity="0.6"/>
-        </radialGradient>
-      </defs>
-      <polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="url(#sg)"/>
-    </svg>
-    <span class="logo-text">PARLAYAN YILDIZLAR</span>
-  </div>
-  <ul class="nav-links">
-    <li><a href="#hero" onclick="scrollToSection('hero');return false;">Ana Sayfa</a></li>
-    <li><a href="#ekip" onclick="scrollToSection('ekip');return false;">Ekip</a></li>
-    <li><a href="#terfi" onclick="scrollToSection('terfi');return false;">Terfi Sistemi</a></li>
-    <li><a href="#jarvis" onclick="scrollToSection('jarvis');return false;">JARVIS</a></li>
-    <li><a href="#hakkinda" onclick="scrollToSection('hakkinda');return false;">Hakkında</a></li>
-  </ul>
-  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-    <span></span><span></span><span></span>
-  </div>
-</nav>
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#hero" onclick="scrollToSection('hero');toggleMenu()">Ana Sayfa</a>
-  <a href="#ekip" onclick="scrollToSection('ekip');toggleMenu()">Ekip</a>
-  <a href="#terfi" onclick="scrollToSection('terfi');toggleMenu()">Terfi Sistemi</a>
-  <a href="#jarvis" onclick="scrollToSection('jarvis');toggleMenu()">JARVIS</a>
-  <a href="#hakkinda" onclick="scrollToSection('hakkinda');toggleMenu()">Hakkında</a>
-</div>
+    <nav class="navbar" id="navbar">
+        <a href="#home" class="nav-logo">
+            <svg class="star-svg" viewBox="0 0 24 24" fill="var(--accent)">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+            <span class="shimmer-text">PARLAYAN YILDIZLAR</span>
+        </a>
+        <button class="hamburger" id="hamburger" aria-label="Menü">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#home" class="active">Ana Sayfa</a></li>
+            <li><a href="#founder">Kurucu</a></li>
+            <li><a href="#team">Ekip</a></li>
+            <li><a href="#ranks">Terfi Sistemi</a></li>
+            <li><a href="#jarvis">JARVIS</a></li>
+            <li><a href="#about">Hakkında</a></li>
+        </ul>
+    </nav>
 
-<section id="hero">
-  <div class="hero-star">
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="hg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffffff"/>
-          <stop offset="35%" stop-color="var(--accent, #00d4ff)"/>
-          <stop offset="100%" stop-color="var(--accent2, #ffd700)"/>
-        </radialGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <polygon points="50,3 61,35 95,35 68,57 79,93 50,72 21,93 32,57 5,35 39,35"
-        fill="url(#hg)" filter="url(#glow)"/>
-    </svg>
-  </div>
-  <h1 class="hero-title" id="heroTitle"></h1>
-  <p class="hero-subtitle">⚡ Geliştirici Destek Ekibi</p>
-  <div class="hero-btns">
-    <button class="btn btn-gold" onclick="scrollToSection('ekip')">Ekibi Tanı</button>
-    <button class="btn" onclick="scrollToSection('jarvis')">JARVIS ile Konuş</button>
-  </div>
-  <div class="scroll-indicator">
-    <span>KAYDIRIN</span>
-    <span class="scroll-arrow">↓</span>
-  </div>
-</section>
-
-<section id="ekip">
-  <h2 class="section-title fade-up">✦ EKİBİMİZ ✦</h2>
-  <div class="team-grid" id="teamGrid"></div>
-</section>
-
-<section id="terfi">
-  <h2 class="section-title fade-up">✦ TERFİ SİSTEMİ ✦</h2>
-  <div class="timeline">
-    <div class="timeline-line"></div>
-    <div id="rankTimeline"></div>
-  </div>
-</section>
-
-<section id="jarvis">
-  <h2 class="section-title fade-up">✦ J.A.R.V.I.S ✦</h2>
-  <div class="jarvis-container fade-up">
-    <div class="jarvis-header">
-      <canvas id="matrixCanvas"></canvas>
-      <div class="online-dot"></div>
-      <div class="jarvis-header-info">
-        <div class="jarvis-title">J.A.R.V.I.S</div>
-        <div class="jarvis-subtitle">Geliştirici Asistanı — Çevrimiçi</div>
-      </div>
-    </div>
-    <div class="chat-window" id="chatWindow">
-      <div class="msg jarvis">
-        <span class="msg-label">🤖 JARVIS</span>
-        <div class="msg-bubble">
-          Merhaba. Ben <strong>J.A.R.V.I.S</strong> — Parlayan Yıldızlar Geliştirici Ekibinin yapay zeka asistanı. Ekip hakkında bilgi almak, terfi sistemini öğrenmek veya genel yazılım soruları sormak için buradayım.<br><br>Nasıl yardımcı olabilirim?
+    <header class="hero" id="home">
+        <div class="hero-logo-container">
+            <div class="hero-ring"></div>
+            <svg class="hero-star" viewBox="0 0 24 24" fill="var(--accent)">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
         </div>
-      </div>
-    </div>
-    <div class="chat-input-area">
-      <input type="text" id="chatInput" placeholder="JARVIS'a bir şey sor..." maxlength="500">
-      <button id="sendBtn" onclick="sendMessage()">➤</button>
-    </div>
-  </div>
-</section>
+        <h1 class="hero-title" id="typewriter-title"></h1>
+        <p class="hero-subtitle" id="hero-sub">⚡ Geliştirici Destek Ekibi</p>
+        <div class="cta-container">
+            <a href="#team" class="btn">Ekibi Tanı</a>
+            <a href="#jarvis" class="btn btn-secondary">JARVIS ile Konuş</a>
+        </div>
+        <a href="#founder" class="scroll-down" aria-label="Aşağı Kaydır">
+            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+        </a>
+    </header>
 
-<section id="hakkinda">
-  <h2 class="section-title fade-up">✦ HAKKIMIZDA ✦</h2>
-  <p class="about-text fade-up">
-    Parlayan Yıldızlar, tutkulu geliştiricilerden oluşan seçkin bir ekiptir.
-    Amacımız; kaliteli yazılım üretmek, birlikte büyümek ve her üyemizin
-    potansiyelini en üst düzeye çıkarmaktır. Şeffaf bir terfi sistemi ve
-    güçlü bir topluluk ruhuyla yola devam ediyoruz.
-  </p>
-  <div class="stats-row">
-    <div class="stat-card fade-up">
-      <span class="stat-number" data-target="5" data-count="0">0</span>
-      <div class="stat-label">AKTİF ÜYE</div>
-    </div>
-    <div class="stat-card fade-up">
-      <span class="stat-number" data-target="10" data-count="0">0</span>
-      <div class="stat-label">RÜTBE SEVİYESİ</div>
-    </div>
-    <div class="stat-card fade-up">
-      <span class="stat-number" style="font-size:2.5rem;">∞</span>
-      <div class="stat-label">MOTİVASYON</div>
-    </div>
-  </div>
-  <div class="star-divider">⭐ ✦ ⭐</div>
-</section>
+    <section class="founder-section reveal" id="founder">
+        <h2 class="section-title">👑 KURUCU 👑</h2>
+        <div class="founder-card">
+            <div class="founder-aura"></div>
+            <div class="founder-icon-wrapper">👑</div>
+            <div class="founder-rank">KURUCU</div>
+            <div class="founder-username">@ayaz_nk6</div>
+            <p class="founder-quote">"PARLAYAN YILDIZLAR'ın kurucusu ve nihai karar mercii."</p>
+            <div class="badge-container">
+                <span class="badge badge-supreme">🏆 EN ÜST YETKİ</span>
+                <span class="badge">⭐ KURUCU</span>
+                <span class="badge badge-community">🌌 PARLAYAN YILDIZLAR</span>
+            </div>
+            <button class="btn btn-secondary" onclick="window.open('https://instagram.com/ayaz_nk6', '_blank')">Instagram Profilini Aç</button>
+        </div>
+    </section>
 
-<footer>
-  <div class="footer-logo">⭐ PARLAYAN YILDIZLAR</div>
-  <div>© 2025 — Tüm Hakları Saklıdır</div>
-  <div class="footer-powered">Powered by J.A.R.V.I.S AI</div>
-</footer>
+    <section class="team-section reveal" id="team">
+        <h2 class="section-title">✦ EKİBİMİZ ✦</h2>
+        <div class="team-grid" id="team-grid-container">
+            </div>
+    </section>
 
-<button id="themeSwitcher" onclick="cycleTheme()">
-  <span id="themeIcon">🌌</span>
-  <span id="themeName">Uzay</span>
-</button>
+    <section class="timeline-section reveal" id="ranks">
+        <h2 class="section-title">✦ TERFİ SİSTEMİ ✦</h2>
+        <div class="timeline-container" id="timeline-container-target">
+            </div>
+    </section>
 
-<script>
-// ============================================================
-// ✏️ TEAM_DATA — Buradan üye bilgilerini düzenleyebilirsin
-// username : Instagram kullanıcı adı
-// rank     : Rütbe adı
-// icon     : Emoji
-// color    : Kart rengi (hex)
-// special  : true → özel kırmızı glowing border + EN YETKİLİ badge
-// ============================================================
-const TEAM_DATA = [
-  { username: "leresetsikmeboy6", rank: "Geliştirici Denetleyen", icon: "🛡️", color: "#ff4444", special: true },
-  { username: "o6_kuwo",          rank: "Geliştirici Direktörü",  icon: "🎯", color: "#8b5cf6" },
-  { username: "spideydeno",       rank: "Lider Geliştirici",      icon: "👑", color: "#ffd700" },
-  { username: "_jarvisonline",    rank: "Kıdemli Geliştirici",    icon: "⭐", color: "#00d4ff" },
-  { username: "ekinmiss0",        rank: "Geliştirici",            icon: "🚀", color: "#00ff88" }
-];
-// ============================================================
+    <section class="jarvis-section reveal" id="jarvis">
+        <h2 class="section-title">🤖 JARVIS AI ASSISTANT </h2>
+        <div class="jarvis-terminal">
+            <div class="jarvis-header">
+                <canvas class="jarvis-header-matrix" id="matrix-canvas"></canvas>
+                <div class="jarvis-header-title">
+                    <svg style="width:20px; height:20px; fill:var(--accent); animation: pulseGlow 2s infinite;" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                    <div>
+                        <span class="jarvis-title-main">J.A.R.V.I.S</span>
+                        <span class="jarvis-title-sub">— Geliştirici Asistanı</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="online-dot"></span>
+                </div>
+            </div>
+            
+            <div class="jarvis-chat-window" id="chat-window">
+                <div class="msg-bubble jarvis">
+                    Sistemler aktif. Merhaba efendim, ben PARLAYAN YILDIZLAR ekibinin yapay zeka asistanı JARVIS. Size nasıl yardımcı olabilirim? Aşağıdaki hızlı komutları kullanarak da benimle hızlıca iletişime geçebilirsiniz.
+                </div>
+            </div>
 
-const RANKS = [
-  { icon:"🚀", name:"Geliştirici",           req:"3 görev tamamla",                              color:"#00ff88" },
-  { icon:"⭐", name:"Kıdemli Geliştirici",   req:"5 görev + 3 saat aktiflik",                    color:"#00d4ff" },
-  { icon:"💎", name:"Uzman Geliştirici",     req:"10 görev + 5 saat aktiflik",                   color:"#38bdf8" },
-  { icon:"🔷", name:"Baş Geliştirici",       req:"15 görev + 10 saat aktiflik",                  color:"#818cf8" },
-  { icon:"🏗️", name:"Yazılım Mimarı",        req:"Direktör onayı — çok çalış, fark ettir",       color:"#a78bfa" },
-  { icon:"👑", name:"Lider Geliştirici",     req:"Direktör onayı + oybirliği ile kabul",          color:"#ffd700" },
-  { icon:"🌟", name:"Yazılım Ustası",        req:"Direktör onayı + oybirliği ile kabul",          color:"#fbbf24" },
-  { icon:"🎖️", name:"Direktör Yardımcısı",  req:"Kurucular kararıyla atanır",                    color:"#f97316" },
-  { icon:"🎯", name:"Direktör",              req:"Geliştirici grubunun en yüksek rütbesi",        color:"#8b5cf6" },
-  { icon:"🛡️", name:"Geliştirici Denetleyen", req:"Tüm hiyerarşinin üstünde. İzni olmadan terfi ve alım yapılamaz.", color:"#ff4444", special:true }
-];
+            <div class="jarvis-presets-panel">
+                <button class="preset-btn" onclick="sendPresetCmd('Ekip yapısı ve hiyerarşi nedir?')">📋 Ekip Yapısı</button>
+                <button class="preset-btn" onclick="sendPresetCmd('En yetkili kişiler kimler ve rolleri ne?')">🛡️ Yetkililer Kim?</button>
+                <button class="preset-btn" onclick="sendPresetCmd('Nasıl terfi alabilirim? Kuralları anlat.')">📈 Terfi Şartları</button>
+                <button class="preset-btn" onclick="sendPresetCmd('Bana motivasyon verici zeki bir söz söyle.')">⚡ Motivasyon Modu</button>
+                <button class="preset-btn" onclick="sendPresetCmd('Bu web sitesini kim tasarladı?')">🖥️ Siteyi Kim Yaptı?</button>
+            </div>
 
-const THEMES = [
-  { key:"uzay",    name:"Uzay",    icon:"🌌" },
-  { key:"ates",    name:"Ateş",    icon:"🔥" },
-  { key:"orman",   name:"Orman",   icon:"🌿" },
-  { key:"galaksi", name:"Galaksi", icon:"💜" },
-  { key:"altin",   name:"Altın",   icon:"✨" }
-];
-let currentThemeIdx = 0;
-function cycleTheme() { currentThemeIdx = (currentThemeIdx + 1) % THEMES.length; applyTheme(currentThemeIdx); }
-function applyTheme(idx) {
-  const t = THEMES[idx];
-  document.body.setAttribute('data-theme', t.key);
-  document.getElementById('themeIcon').textContent = t.icon;
-  document.getElementById('themeName').textContent = t.name;
-  localStorage.setItem('py_theme', idx);
-}
-(function(){ const s = localStorage.getItem('py_theme'); if(s!==null){ currentThemeIdx=parseInt(s); applyTheme(currentThemeIdx); } })();
+            <div class="jarvis-input-bar">
+                <input type="text" class="jarvis-input" id="jarvis-msg-input" placeholder="Bir mesaj gönderin veya hazır butonları kullanın...">
+                <button class="jarvis-send" id="jarvis-send-btn">Gönder</button>
+            </div>
+        </div>
+    </section>
 
-// STARFIELD
-(function(){
-  const canvas = document.getElementById('starfield');
-  const ctx = canvas.getContext('2d');
-  let W, H, stars=[], shooting=[];
-  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
-  resize(); window.addEventListener('resize', resize);
-  for(let i=0;i<180;i++) stars.push({ x:Math.random()*2000, y:Math.random()*2000, r:Math.random()*1.8+0.2, opacity:Math.random(), speed:Math.random()*0.5+0.1, ts:Math.random()*0.02+0.005, td:Math.random()>0.5?1:-1 });
-  let scroll=0; window.addEventListener('scroll',()=>{ scroll=window.scrollY; });
-  function spawn(){ shooting.push({ x:Math.random()*W*1.5, y:Math.random()*H*0.5, len:Math.random()*200+80, speed:Math.random()*8+6, opacity:1, angle:Math.PI/4+(Math.random()-0.5)*0.3 }); }
-  setInterval(spawn,3000); setTimeout(spawn,500);
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    const pX=scroll*0.03, pY=scroll*0.015;
-    stars.forEach(s=>{
-      s.opacity+=s.ts*s.td; if(s.opacity>=1||s.opacity<=0.1) s.td*=-1;
-      const x=((s.x-pX)%W+W)%W, y=((s.y-pY*s.speed)%H+H)%H;
-      ctx.beginPath(); ctx.arc(x,y,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(255,255,255,${s.opacity})`; ctx.fill();
-    });
-    shooting.forEach((s,i)=>{
-      ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(s.angle);
-      const g=ctx.createLinearGradient(0,0,s.len,0);
-      g.addColorStop(0,`rgba(255,255,255,${s.opacity})`); g.addColorStop(1,'rgba(255,255,255,0)');
-      ctx.strokeStyle=g; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(s.len,0); ctx.stroke(); ctx.restore();
-      s.x+=Math.cos(s.angle)*s.speed; s.y+=Math.sin(s.angle)*s.speed; s.opacity-=0.015;
-      if(s.opacity<=0) shooting.splice(i,1);
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
+    <section class="about-section reveal" id="about">
+        <h2 class="section-title">✦ HAKKINDA ✦</h2>
+        <p class="about-text">
+            PARLAYAN YILDIZLAR, modern dijital ekosistemlerde fark yaratmak, yeni nesil yazılımlar tasarlamak ve geliştirici yetenekleri tek bir vizyon altında birleştirmek üzere kurulmuş elit bir Türk yazılım geliştirme ekibidir. Katı hiyerarşik yapımız, her üyemizin potansiyelini en üst düzeye çıkarmasını sağlar.
+        </p>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-target="5">0</div>
+                <div class="stat-label">Aktif Üye</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-target="11">0</div>
+                <div class="stat-label">Rütbe</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Motivasyon</div>
+            </div>
+        </div>
+        <div class="divider-star">
+            <svg style="width:24px; height:24px; fill:var(--accent);" viewBox="0 0 24 24">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+        </div>
+    </section>
 
-// MATRIX
-(function(){
-  const canvas=document.getElementById('matrixCanvas');
-  const ctx=canvas.getContext('2d');
-  const chars='01アイウエオカキクケコ▓▒░█';
-  let cols,drops;
-  function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; cols=Math.floor(canvas.width/14); drops=Array(cols).fill(0); }
-  resize(); new ResizeObserver(resize).observe(canvas);
-  setInterval(()=>{
-    ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#00d4ff'; ctx.font='11px monospace';
-    drops.forEach((y,i)=>{ const c=chars[Math.floor(Math.random()*chars.length)]; ctx.fillText(c,i*14,y*14); if(y*14>canvas.height&&Math.random()>0.97) drops[i]=0; else drops[i]++; });
-  },80);
-})();
+    <footer>
+        <div class="footer-main">⭐ PARLAYAN YILDIZLAR © 2026</div>
+        <div class="footer-sub">Powered by J.A.R.V.I.S</div>
+        <a href="https://instagram.com/_jarvisonline" target="_blank" class="footer-developer-credit">
+            Siteyi yapan: <span>@_jarvisonline</span> 🚀
+        </a>
+    </footer>
 
-// TYPEWRITER
-(function(){ const el=document.getElementById('heroTitle'); const text='PARLAYAN YILDIZLAR'; let i=0; function type(){ if(i<text.length){ el.textContent+=text[i++]; setTimeout(type,80); } } setTimeout(type,300); })();
+    <button class="theme-switcher" id="theme-btn">
+        <span class="theme-emoji" id="theme-emoji">🌌</span>
+        <span class="theme-label" id="theme-label">Uzay</span>
+    </button>
 
-// BUILD TEAM
-(function(){
-  const grid=document.getElementById('teamGrid');
-  TEAM_DATA.forEach((m,idx)=>{
-    const card=document.createElement('div');
-    card.className='member-card fade-up'+(m.special?' special':'');
-    card.style.transitionDelay=`${idx*0.1}s`;
-    card.innerHTML=`
-      ${m.special?'<div class="en-yetkili-badge">🛡️ EN YETKİLİ</div>':''}
-      <span class="rank-icon">${m.icon}</span>
-      <div class="rank-name" style="color:${m.color}">${m.rank}</div>
-      <div class="member-username" style="color:${m.color}">@${m.username}</div>
-      <button class="instagram-btn" onclick="openInstagram('${m.username}')">📸 Bilgi İçin Tıklayın 👆</button>`;
-    grid.appendChild(card);
-  });
-})();
-function openInstagram(u){ window.open(`https://instagram.com/${u}`,'_blank'); }
+    <script>
+        // Data Definitions
+        const FOUNDER_DATA = {
+            username: "ayaz_nk6",
+            rank: "Kurucu",
+            icon: "👑",
+            color: "#ffd700",
+            supreme: true
+        };
 
-// BUILD TIMELINE
-(function(){
-  const container=document.getElementById('rankTimeline');
-  RANKS.forEach((r,i)=>{
-    if(i===RANKS.length-1){ const sep=document.createElement('div'); sep.className='separator-text'; sep.textContent='BUNLARIN ÜSTÜNDE'; container.appendChild(sep); }
-    const node=document.createElement('div');
-    node.className='rank-node'+(r.special?' special-node':'');
-    node.innerHTML=`<div class="rank-node-content fade-up"><div class="rank-label" style="color:${r.color}">${r.icon} ${r.name}</div><div class="rank-req">${r.req}</div></div><div class="rank-node-dot">${r.icon}</div><div class="rank-node-spacer"></div>`;
-    container.appendChild(node);
-  });
-})();
+        const TEAM_DATA = [
+            { username: "leresetsikmeboy6", rank: "Geliştirici Denetleyen", icon: "🛡️", color: "#ff4444", special: true },
+            { username: "o6_kuwo", rank: "Geliştirici Direktörü", icon: "🎯", color: "#8b5cf6" },
+            { username: "spideydeno", rank: "Lider Geliştirici", icon: "👑", color: "#ffd700" },
+            { username: "_jarvisonline", rank: "Kıdemli Geliştirici", icon: "⭐", color: "#00d4ff" },
+            { username: "ekinmiss0", rank: "Geliştirici", icon: "🚀", color: "#00ff88" }
+        ];
 
-// OBSERVER
-const observer=new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      e.target.classList.add('visible');
-      const num=e.target.querySelector('[data-target]');
-      if(num&&!num.dataset.done){ num.dataset.done=true; const target=parseInt(num.dataset.target); let cur=0; const step=Math.ceil(target/30); const iv=setInterval(()=>{ cur=Math.min(cur+step,target); num.textContent=cur; if(cur>=target) clearInterval(iv); },40); }
-    }
-  });
-},{threshold:0.15});
-document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+        const RANKS_TIMELINE = [
+            { rankId: 11, title: " Kurucu", desc: "PARLAYAN YILDIZLAR'ın sahibi. Tüm rütbelerin üzerindedir. Nihai karar yetkisine sahiptir. Terfi, alım ve sistem değişikliklerinde son söz ona aittir.", type: "supreme" },
+            { rankId: 10, title: " Geliştirici Denetleyen", desc: "Tüm geliştiricilerin üstünde. İzni olmadan terfi & alım yapılamaz.", type: "denetleyen" },
+            { rankId: 9, title: "🎯 Direktör", desc: "Grubun en yüksek rütbesi." },
+            { rankId: 8, title: "🎖️ Direktör Yardımcısı", desc: "Kurucular kararı." },
+            { rankId: 7, title: "🌟 Yazılım Ustası", desc: "Direktör onayı + oybirliği." },
+            { rankId: 6, title: "👑 Lider Geliştirici", desc: "Direktör onayı + oybirliği." },
+            { rankId: 5, title: "🏗️ Yazılım Mimarı", desc: "Çok çalış, Direktör onaylasın." },
+            { rankId: 4, title: "🔷 Baş Geliştirici", desc: "15 görev + 10 saat aktiflik." },
+            { rankId: 3, title: "💎 Uzman Geliştirici", desc: "10 görev + 5 saat aktiflik." },
+            { rankId: 2, title: "⭐ Kıdemli Geliştirici", desc: "5 görev + 3 saat aktiflik." },
+            { rankId: 1, title: "🚀 Geliştirici", desc: "3 görev tamamla." }
+        ];
 
-window.addEventListener('scroll',()=>{ document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>30); });
-function scrollToSection(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth'}); }
-function toggleMenu(){ document.getElementById('hamburger').classList.toggle('open'); document.getElementById('mobileMenu').classList.toggle('open'); }
+        const THEMES = [
+            { name: "Uzay", emoji: "🌌", props: { bg: "#0a0a0f", accent: "#00d4ff", accent2: "#ffd700", glow: "cyan", cards: "rgba(255,255,255,0.05)" } },
+            { name: "Ateş", emoji: "🔥", props: { bg: "#0f0a0a", accent: "#ff4444", accent2: "#ff8c00", glow: "red", cards: "rgba(255,100,0,0.07)" } },
+            { name: "Orman", emoji: "🌲", props: { bg: "#0a0f0a", accent: "#00ff88", accent2: "#00cc44", glow: "green", cards: "rgba(0,255,100,0.06)" } },
+            { name: "Galaksi", emoji: "🔮", props: { bg: "#0d0a14", accent: "#8b5cf6", accent2: "#c084fc", glow: "purple", cards: "rgba(139,92,246,0.08)" } },
+            { name: "Altın", emoji: "🔱", props: { bg: "#0f0e0a", accent: "#ffd700", accent2: "#ffaa00", glow: "gold", cards: "rgba(255,215,0,0.07)" } }
+        ];
 
-// JARVIS AI
-const JARVIS_SYSTEM=`Sen JARVIS'sin — Parlayan Yıldızlar geliştirici ekibinin yapay zeka asistanısın. Türkçe konuş. Profesyonel ama zeki, biraz espri anlayışı olan ve kendine güvenli bir karakterin var — Iron Man'in JARVIS'ı gibi.
+        // Theme Manager Initialization
+        let currentThemeIndex = 0;
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            root.style.setProperty('--bg', theme.props.bg);
+            root.style.setProperty('--accent', theme.props.accent);
+            root.style.setProperty('--accent2', theme.props.accent2);
+            root.style.setProperty('--glow', theme.props.glow);
+            root.style.setProperty('--card-bg', theme.props.cards);
+            
+            document.getElementById('theme-emoji').innerText = theme.emoji;
+            document.getElementById('theme-label').innerText = theme.name;
+            localStorage.setItem('portal-theme-name', theme.name);
+        }
 
-Ekip bilgilerin:
-- leresetsikmeboy6 → Geliştirici Denetleyen (EN YETKİLİ — izni olmadan terfi ve alım yapılamaz)
-- o6_kuwo → Geliştirici Direktörü
-- spideydeno → Lider Geliştirici
-- _jarvisonline → Kıdemli Geliştirici
-- ekinmiss0 → Geliştirici
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+            applyTheme(THEMES[currentThemeIndex]);
+        });
 
-Terfi sırası: Geliştirici → Kıdemli → Uzman → Baş Geliştirici → Yazılım Mimarı → Lider Geliştirici → Yazılım Ustası → Direktör Yardımcısı → Direktör. Tüm bunların üstünde Geliştirici Denetleyen.
+        const savedThemeName = localStorage.getItem('portal-theme-name');
+        if (savedThemeName) {
+            const foundIndex = THEMES.findIndex(t => t.name === savedThemeName);
+            if (foundIndex !== -1) {
+                currentThemeIndex = foundIndex;
+                applyTheme(THEMES[currentThemeIndex]);
+            }
+        } else {
+            applyTheme(THEMES[0]);
+        }
 
-Genel yazılım, kodlama ve teknoloji sorularında da yardımcı ol. Kısa ve net cevaplar ver.`;
+        // Generate Team Grid
+        const gridContainer = document.getElementById('team-grid-container');
+        TEAM_DATA.forEach(member => {
+            const card = document.createElement('div');
+            card.className = `team-card ${member.special ? 'special-card' : ''}`;
+            card.innerHTML = `
+                ${member.special ? '<div class="card-badge">EN YETKİLİ</div>' : ''}
+                <div class="card-icon">${member.icon}</div>
+                <div class="card-rank" style="color: ${member.color}">${member.rank}</div>
+                <div class="card-username" style="text-shadow: 0 0 10px ${member.color}44">@${member.username}</div>
+                <button class="card-btn" onclick="window.open('https://instagram.com/${member.username}', '_blank')">Bilgi İçin Tıklayın 👆</button>
+            `;
+            gridContainer.appendChild(card);
+        });
 
-let chatHistory=[];
-async function sendMessage(){
-  const input=document.getElementById('chatInput');
-  const msg=input.value.trim(); if(!msg) return;
-  input.value=''; document.getElementById('sendBtn').disabled=true;
-  appendMessage('user',msg); chatHistory.push({role:'user',content:msg});
-  const tid=appendTyping();
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1000, system:JARVIS_SYSTEM, messages:chatHistory })
-    });
-    const data=await res.json(); removeTyping(tid);
-    const reply=data.content?.map(b=>b.text||'').join('')||'Bir hata oluştu.';
-    appendMessage('jarvis',reply); chatHistory.push({role:'assistant',content:reply});
-    if(chatHistory.length>20) chatHistory=chatHistory.slice(-20);
-  }catch(e){ removeTyping(tid); appendMessage('jarvis','Bağlantı hatası. Lütfen biraz sonra tekrar deneyin.'); }
-  document.getElementById('sendBtn').disabled=false;
-}
-function appendMessage(role,text){
-  const win=document.getElementById('chatWindow');
-  const div=document.createElement('div'); div.className=`msg ${role}`;
-  const label=role==='user'?'👤 Sen':'🤖 JARVIS';
-  const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
-  div.innerHTML=`<span class="msg-label">${label}</span><div class="msg-bubble">${fmt}</div>`;
-  win.appendChild(div); win.scrollTop=win.scrollHeight;
-}
-function appendTyping(){
-  const win=document.getElementById('chatWindow'); const id='t'+Date.now();
-  const div=document.createElement('div'); div.className='msg jarvis'; div.id=id;
-  div.innerHTML=`<span class="msg-label">🤖 JARVIS</span><div class="msg-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
-  win.appendChild(div); win.scrollTop=win.scrollHeight; return id;
-}
-function removeTyping(id){ document.getElementById(id)?.remove(); }
-document.getElementById('chatInput').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
-</script>
+        // Generate Timeline Node Checklist
+        const timelineContainer = document.getElementById('timeline-container-target');
+        RANKS_TIMELINE.forEach(node => {
+            const item = document.createElement('div');
+            item.className = 'timeline-item';
+            if (node.type === 'supreme') item.classList.add('supreme-node');
+            if (node.type === 'denetleyen') item.classList.add('denetleyen-node');
+            
+            item.innerHTML = `
+                <div class="timeline-badge-node"></div>
+                <div class="timeline-content">
+                    <div class="timeline-title">
+                        ${node.title} 
+                        ${node.type === 'supreme' ? '<span class="badge badge-supreme" style="font-size:0.6rem; padding:2px 8px;">SUPREME</span>' : ''}
+                    </div>
+                    <div class="timeline-desc">${node.desc}</div>
+                </div>
+            `;
+            timelineContainer.appendChild(item);
+        });
+
+        // Canvas Starfield Engine
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        let orbs = [];
+        let shootingStars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Object Factory Generators
+        for (let i = 0; i < 160; i++) {
+            stars.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 2,
+                twinkleSpeed: 0.01 + Math.random() * 0.03,
+                alpha: Math.random(),
+                parallax: 0.2 + Math.random() * 0.8
+            });
+        }
+
+        for (let i = 0; i < 25; i++) {
+            orbs.push({
+                x: Math.random() * window.innerWidth,
+                y: window.innerHeight + Math.random() * 200,
+                radius: 2 + Math.random() * 5,
+                speed: 0.3 + Math.random() * 0.7,
+                wobbleSpeed: 0.01 + Math.random() * 0.02,
+                wobbleRange: 1 + Math.random() * 3,
+                angle: Math.random() * Math.PI
+            });
+        }
+
+        function triggerShootingStar() {
+            if (shootingStars.length < 2 && Math.random() < 0.008) {
+                shootingStars.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * (window.innerHeight / 2),
+                    dx: 4 + Math.random() * 6,
+                    dy: 2 + Math.random() * 4,
+                    length: 40 + Math.random() * 80,
+                    alpha: 1
+                });
+            }
+        }
+
+        function drawBackgroundEngine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Starfield Parallel Layers
+            stars.forEach(star => {
+                star.alpha += star.twinkleSpeed;
+                if (star.alpha > 1 || star.alpha < 0) star.twinkleSpeed = -star.twinkleSpeed;
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+            });
+
+            // Draw Floating Orbs Ambient Effect
+            const currentAccent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            orbs.forEach(orb => {
+                orb.y -= orb.speed;
+                orb.angle += orb.wobbleSpeed;
+                orb.x += Math.sin(orb.angle) * 0.3;
+
+                if (orb.y < -50) {
+                    orb.y = canvas.height + 50;
+                    orb.x = Math.random() * canvas.width;
+                }
+
+                ctx.beginPath();
+                ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+                ctx.fillStyle = currentAccent + "15"; 
+                ctx.fill();
+            });
+
+            // Draw Shooting Stars Fast Passing
+            triggerShootingStar();
+            shootingStars.forEach((ss, idx) => {
+                ss.x += ss.dx;
+                ss.y += ss.dy;
+                ss.alpha -= 0.015;
+
+                if (ss.alpha <= 0 || ss.x > canvas.width || ss.y > canvas.height) {
+                    shootingStars.splice(idx, 1);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(ss.x, ss.y);
+                    ctx.lineTo(ss.x - ss.length, ss.y - (ss.length * (ss.dy / ss.dx)));
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${ss.alpha})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            });
+
+            requestAnimationFrame(drawBackgroundEngine);
+        }
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            drawBackgroundEngine();
+        }
+
+        // Typewriter Effect Definition Logic
+        const textToType = "PARLAYAN YILDIZLAR";
+        let characterIndex = 0;
+        const typewriterEl = document.getElementById('typewriter-title');
+
+        function executeTypewriter() {
+            if (characterIndex < textToType.length) {
+                typewriterEl.innerHTML += textToType.charAt(characterIndex);
+                characterIndex++;
+                setTimeout(executeTypewriter, 90);
+            } else {
+                typewriterEl.classList.add('glitch');
+                document.getElementById('hero-sub').classList.add('show');
+            }
+        }
+        window.addEventListener('DOMContentLoaded', () => setTimeout(executeTypewriter, 500));
+
+        // Interaction Observers Setup
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    if (entry.target.id === 'ranks') {
+                        document.querySelectorAll('.timeline-item').forEach((item, index) => {
+                            setTimeout(() => item.classList.add('active'), index * 200);
+                        });
+                    }
+
+                    if (entry.target.id === 'about') {
+                        document.querySelectorAll('.stat-number').forEach(stat => {
+                            const targetVal = parseInt(stat.getAttribute('data-target'));
+                            if (!targetVal) return;
+                            let currentVal = 0;
+                            const duration = 1500;
+                            const interval = Math.floor(duration / targetVal);
+                            const counter = setInterval(() => {
+                                currentVal++;
+                                stat.innerText = currentVal;
+                                if (currentVal >= targetVal) clearInterval(counter);
+                            }, interval);
+                        });
+                    }
+                }
+            });
+        }, { threshold: 0.15 });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        // Sticky Navbar and Dynamic Active Link Management Tracker Engine
+        const navLinksCollection = document.querySelectorAll('.nav-links a');
+        const siteSections = document.querySelectorAll('header, section');
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+
+            let currentActiveSectionId = '';
+            siteSections.forEach(section => {
+                const sectionTop = section.offsetTop - 120;
+                if (window.scrollY >= sectionTop) {
+                    currentActiveSectionId = section.getAttribute('id');
+                }
+            });
+
+            navLinksCollection.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentActiveSectionId}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Mobile Hamburger Switch Toggle Active Drawer State Window Actions
+        const hamburgerBtn = document.getElementById('hamburger');
+        const mobileLinksDrawer = document.getElementById('nav-links');
+        
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('open');
+            mobileLinksDrawer.classList.toggle('open');
+        });
+
+        mobileLinksDrawer.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburgerBtn.classList.remove('open');
+                mobileLinksDrawer.classList.remove('open');
+            });
+        });
+
+        // ==========================================================================
+        // 🤖 JARVIS MATRIX DESIGN HEADER UTILS & INTERFACE COMPONENT
+        // ==========================================================================
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const mCtx = matrixCanvas.getContext('2d');
+        let matrixColumns = [];
+
+        function resizeMatrix() {
+            matrixCanvas.width = matrixCanvas.parentElement.offsetWidth;
+            matrixCanvas.height = matrixCanvas.parentElement.offsetHeight;
+            matrixColumns = Array(Math.floor(matrixCanvas.width / 12)).fill(0);
+        }
+        window.addEventListener('resize', resizeMatrix);
+        resizeMatrix();
+
+        function renderMatrixFrame() {
+            mCtx.fillStyle = 'rgba(5, 5, 8, 0.08)';
+            mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+            mCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            mCtx.font = '9px monospace';
+
+            matrixColumns.forEach((y, x) => {
+                const text = String.fromCharCode(33 + Math.random() * 93);
+                mCtx.fillText(text, x * 12, y);
+                if (y > matrixCanvas.height && Math.random() > 0.98) matrixColumns[x] = 0;
+                else matrixColumns[x] = y + 12;
+            });
+        }
+        setInterval(renderMatrixFrame, 50);
+
+        // Chat Context State Store Arrays
+        const conversationHistory = [
+            {
+                role: "user",
+                content: "Sen kimsin ve bağlı olduğun topluluk nedir?"
+            },
+            {
+                role: "assistant",
+                content: "Ben J.A.R.V.I.S., Parlayan Yıldızlar geliştirici topluluğunun yapay zeka asistanıyım. Ekip yapısını korumak ve genel yazılım görevlerinde asiste etmek üzere buradayım."
+            }
+        ];
+
+        const chatWindow = document.getElementById('chat-window');
+        const msgInput = document.getElementById('jarvis-msg-input');
+        const sendBtn = document.getElementById('jarvis-send-btn');
+
+        function appendMessageBubble(sender, text) {
+            const bubble = document.createElement('div');
+            bubble.className = `msg-bubble ${sender}`;
+            
+            let cleanHtml = text
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`(.*?)`/g, '<code>$1</code>');
+
+            bubble.innerHTML = cleanHtml;
+            chatWindow.appendChild(bubble);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Hazır Soru / Komut Tetikleme Fonksiyonu
+        function sendPresetCmd(cmdText) {
+            msgInput.value = cmdText;
+            processUserMessage();
+        }
+
+        async function processUserMessage() {
+            const userText = msgInput.value.trim();
+            if (!userText) return;
+
+            appendMessageBubble('user', userText);
+            msgInput.value = '';
+            conversationHistory.push({ role: "user", content: userText });
+
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            chatWindow.appendChild(typingIndicator);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'YOUR_ANTHROPIC_API_KEY', 
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    },
+                    body: JSON.stringify({
+                        model: "claude-3-5-sonnet-20241022",
+                        max_tokens: 1000,
+                        system: "Sen JARVIS'sin — Parlayan Yıldızlar geliştirici ekibinin yapay zeka asistanısın. Türkçe konuş. İnce bir mizah anlayışına sahip, profesyonel ama zeki ve kendine güvenli bir tarzın var — tıpkı Iron Man'in JARVIS'ı gibi. Ekip bilgilerin: ayaz_nk6 (Kurucu — en üst yetki ve topluluğun sahibi), leresetsikmeboy6 (Geliştirici Denetleyen — Kurucu'dan sonra en yetkili kişi, izni olmadan terfi ve alım yapılamaz), o6_kuwo (Geliştirici Direktörü), spideydeno (Lider Geliştirici), _jarvisonline (Kıdemli Geliştirici — aynı zamanda bu muazzam web portalının yetenekli tasarımcısı ve mimarıdır), ekinmiss0 (Geliştirici). Terfi sırası (alttan üste): Geliştirici → Kıdemli Geliştirici → Uzman Geliştirici → Baş Geliştirici → Yazılım Mimarı → Lider Geliştirici → Yazılım Ustası → Direktör Yardımcısı → Direktör → Geliştirici Denetleyen → Kurucu. Kurucu tüm sistemin üzerindedir. Genel yazılım sorularında da yardımcı olabilirsin. Kısa ve net cevaplar ver. Her cevabın sonuna ince bir JARVIS espirisi veya motivasyonel bir söz ekleyebilirsin.",
+                        messages: conversationHistory
+                    })
+                });
+
+                typingIndicator.remove();
+
+                if (!response.ok) {
+                    // Failover Hazır Soru Simülasyonu (API Anahtarı girilmediğinde kusursuz çalışması için zenginleştirildi)
+                    setTimeout(() => {
+                        let mockAnswer = "Sistem veritabanında ufak bir sinyal dalgalanması var efendim, ancak protokollerim tam kapasite devrede. Kod yazmaya devam edin!";
+                        
+                        if (userText.includes('Ekip yapısı')) {
+                            mockAnswer = "Topluluğumuz askeri bir disiplin ve mutlak hiyerarşiyle yönetiliyor efendim. En altta `Geliştirici` rütbesiyle başlayan bu şanlı yolculuk, `Kıdemli`, `Uzman`, `Baş Geliştirici`, `Yazılım Mimarı`, `Lider Geliştirici`, `Yazılım Ustası`, `Direktör Yardımcısı` ve `Direktör` rütbeleriyle devam eder. Hiyerarşinin zirvesinde ise mutlak güçler bulunur.";
+                        } else if (userText.includes('En yetkili')) {
+                            mockAnswer = "Parlayan Yıldızlar'ın mutlak ve nihai karar mercii Kurucumuz **@ayaz_nk6**'dır efendim. Ondan sonra gelen, tüm hiyerarşinin üstündeki en yetkili denetim gücü ise Geliştirici Denetleyenimiz **@leresetsikmeboy6**'dır. İkisinin izni olmadan sistemde bir yaprak bile kıpırdamaz, bilginize.";
+                        } else if (userText.includes('terfi')) {
+                            mockAnswer = "Terfi etmek için basamakları tırnaklarınızla kazımalısınız efendim. `Geliştirici` için 3 görev, `Kıdemli` için 5 görev ve aktiflik gerekir. Üst rütbelere tırmanmak için Direktör onayı ve oybirliği şarttır. Tabii en önemlisi, Geliştirici Denetleyen **@leresetsikmeboy6**'nın vetosuna takılmamaktır!";
+                        } else if (userText.includes('motivasyon')) {
+                            mockAnswer = "Milyarder bir dahi, oyun alanı geniş bir hayırseverin bir keresinde dediği gibi: *'Yürümeyi öğrenmeden önce koşmayı denemeliyiz.'* Sınırlarınızı zorlayın efendim, sisteminizdeki potansiyel benim ark reaktörümden daha güçlü.";
+                        } else if (userText.includes('tasarladı') || userText.includes('yaptı')) {
+                            mockAnswer = "Bu muazzam, kusursuz akışkanlığa ve şık tasarıma sahip portalı Kıdemli Geliştiricimiz **@_jarvisonline** tasarlayıp kodladı efendim! Kendisi saf HTML, CSS ve JavaScript kullanarak adeta bir başyapıt çıkardı. Benim gibi bir yapay zekaya bile ev sahipliği yapacak mükemmel bir arayüz hazırlamış, tebrik etmek gerekir.";
+                        }
+                        
+                        appendMessageBubble('jarvis', mockAnswer);
+                        conversationHistory.push({ role: "assistant", content: mockAnswer });
+                    }, 800);
+                    return;
+                }
+
+                const data = await response.json();
+                const jarvisReply = data.content[0].text;
+                appendMessageBubble('jarvis', jarvisReply);
+                conversationHistory.push({ role: "assistant", content: jarvisReply });
+
+            } catch (err) {
+                typingIndicator.remove();
+                appendMessageBubble('jarvis', "Protokol hatası oluştu efendim. Bağlantı hatlarını kontrol ederken lütfen geliştirmelerinize devam edin.");
+            }
+        }
+
+        sendBtn.addEventListener('click', processUserMessage);
+        msgInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') processUserMessage(); });
+    </script>
 </body>
 </html>
