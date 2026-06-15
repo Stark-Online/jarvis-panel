@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. Mark-II Interface</title>
+    <style>
+        /* --- TEMA RENK DEĞİŞKENLERİ --- */
+        :root {
+            --bg-color: #040814;
+            --panel-bg: rgba(10, 20, 42, 0.85);
+            --primary-color: #00f0ff;
+            --primary-glow: rgba(0, 240, 255, 0.4);
+            --text-color: #8ae4ff;
+            --user-bg: rgba(26, 39, 76, 0.6);
+            --user-border: #00f0ff;
+            --grid-opacity: 0.03;
+            --font-size: 14px;
+        }
+
+        /* 1. F.R.I.D.A.Y. Teması (Kırmızı) */
+        [data-theme="friday"] {
+            --bg-color: #0d0303;
+            --panel-bg: rgba(31, 10, 10, 0.85);
+            --primary-color: #ff3b3b;
+            --primary-glow: rgba(255, 59, 59, 0.4);
+            --text-color: #ffb3b3;
+            --user-bg: rgba(64, 20, 20, 0.6);
+            --user-border: #ff3b3b;
+            --grid-opacity: 0.04;
+        }
+
+        /* 2. STARK INDUSTRIES Teması (Altın/Lüks) */
+        [data-theme="stark"] {
+            --bg-color: #0a0905;
+            --panel-bg: rgba(26, 23, 14, 0.85);
+            --primary-color: #ffcc00;
+            --primary-glow: rgba(255, 204, 0, 0.4);
+            --text-color: #ffe680;
+            --user-bg: rgba(51, 44, 23, 0.6);
+            --user-border: #ffcc00;
+            --grid-opacity: 0.03;
+        }
+
+        /* 3. STEALTH MODE Teması (Koyu Karbon) */
+        [data-theme="stealth"] {
+            --bg-color: #080808;
+            --panel-bg: rgba(20, 20, 20, 0.9);
+            --primary-color: #7a8a99;
+            --primary-glow: rgba(122, 138, 153, 0.3);
+            --text-color: #cccccc;
+            --user-bg: rgba(40, 40, 40, 0.6);
+            --user-border: #7a8a99;
+            --grid-opacity: 0.02;
+        }
+
+        /* 4. ÖYKÜ SYSTEM Teması (Neon Pembe/Mor) */
+        [data-theme="oyku"] {
+            --bg-color: #0c020b;
+            --panel-bg: rgba(28, 9, 26, 0.85);
+            --primary-color: #ff00ea;
+            --primary-glow: rgba(255, 0, 234, 0.4);
+            --text-color: #ffb8fa;
+            --user-bg: rgba(59, 15, 55, 0.6);
+            --user-border: #ff00ea;
+            --grid-opacity: 0.04;
+        }
+
+        /* --- ANA TASARIM --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease; }
+        
+        body { 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Dinamik Izgara Arka Planı */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 240, 255, var(--grid-opacity)) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 240, 255, var(--grid-opacity)) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Üst Kontrol Paneli */
+        header {
+            background: var(--panel-bg); 
+            padding: 12px 20px; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--primary-color); 
+            box-shadow: 0 0 20px var(--primary-glow);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .brand-zone { display: flex; align-items: center; gap: 15px; }
+
+        .arc-reactor {
+            width: 38px; height: 38px;
+            border: 3px dashed var(--primary-color);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--primary-color);
+            animation: spin 6s linear infinite;
+            position: relative;
+        }
+        .arc-reactor::after {
+            content: ''; position: absolute;
+            top: 25%; left: 25%; width: 50%; height: 50%;
+            background: var(--primary-color); border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        header h1 { 
+            font-size: 18px; 
+            font-weight: bold;
+            letter-spacing: 3px; 
+            color: var(--primary-color); 
+            text-shadow: 0 0 10px var(--primary-glow); 
+        }
+        
+        .status-container { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+        .pulse-dot {
+            width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-color); animation: pulse 1.5s infinite;
+        }
+
+        /* --- KONTROL ÖZELLİKLERİ (TEMA & FONT) --- */
+        .controls { display: flex; align-items: center; gap: 15px; }
+        
+        .theme-selector {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .font-controls { display: flex; gap: 5px; }
+        .font-btn {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        .font-btn:hover { background: var(--primary-color); color: var(--bg-color); }
+
+        /* Mesaj Penceresi */
+        #chat-container { 
+            flex: 1; overflow-y: auto; padding: 25px; 
+            display: flex; flex-direction: column; gap: 20px;
+            z-index: 5;
+            scroll-behavior: smooth;
+        }
+
+        #chat-container::-webkit-scrollbar { width: 5px; }
+        #chat-container::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+
+        .message { 
+            max-width: 80%; padding: 15px 20px; border-radius: 4px; 
+            line-height: 1.6; font-size: var(--font-size); position: relative;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .user { 
+            background: var(--user-bg); 
+            color: #ffffff; 
+            align-self: flex-end; 
+            border-right: 3px solid var(--user-border);
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .jarvis { 
+            background: var(--panel-bg); 
+            color: var(--primary-color); 
+            align-self: flex-start; 
+            border-left: 3px solid var(--primary-color); 
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Alt Mesaj Yazma Alanı */
+        #input-area { 
+            background: var(--panel-bg); 
+            padding: 20px; display: flex; gap: 15px; align-items: center;
+            border-top: 1px solid rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        textarea { 
+            flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--primary-color); border-radius: 6px;
+            color: #fff; padding: 14px; resize: none; height: 50px; font-size: 14px; outline: none;
+            font-family: inherit; transition: 0.3s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        textarea:focus { box-shadow: 0 0 12px var(--primary-glow); }
+
+        button { 
+            background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); 
+            padding: 0 25px; height: 50px; border-radius: 6px; font-weight: bold; 
+            font-family: inherit; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        button:hover:not(:disabled) { background: var(--primary-color); color: var(--bg-color); box-shadow: 0 0 20px var(--primary-color); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Yüklenme Dalgası */
+        .thinking-waves { display: flex; gap: 5px; align-items: center; height: 20px; margin-top: 5px; }
+        .wave { width: 3px; height: 100%; background: var(--primary-color); animation: bounce 1s ease-in-out infinite; }
+        .wave:nth-child(2) { animation-delay: 0.2s; }
+        .wave:nth-child(3) { animation-delay: 0.4s; }
+        .wave:nth-child(4) { animation-delay: 0.6s; }
+
+        /* --- ANIMASYONLAR --- */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand-zone">
+        <div class="arc-reactor"></div>
+        <div>
+            <h1>J.A.R.V.I.S.</h1>
+            <div class="status-container">
+                <div class="pulse-dot"></div>
+                <span id="status-text">SYSTEM ONLINE</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <select class="theme-selector" id="themeSelect" onchange="temaDegistir()">
+            <option value="jarvis">M1: J.A.R.V.I.S.</option>
+            <option value="friday">M2: F.R.I.D.A.Y.</option>
+            <option value="stark">M3: STARK IND.</option>
+            <option value="oyku">M4: ÖYKÜ SYS</option>
+            <option value="stealth">M5: STEALTH</option>
+        </select>
+        
+        <div class="font-controls">
+            <div class="font-btn" onclick="fontDegistir(1)">A+</div>
+            <div class="font-btn" onclick="fontDegistir(-1)">A-</div>
+        </div>
+    </div>
+</header>
+
+<div id="chat-container">
+    <div class="message jarvis" id="welcome-msg"></div>
+</div>
+
+<div id="input-area">
+    <textarea id="user-input" placeholder="Sistem protokol komutu girin..."></textarea>
+    <button id="send-btn" onclick="mesajGonder()">Bağlan</button>
+</div>
+
+<script>
+    const chatContainer = document.getElementById('chat-container');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const statusText = document.getElementById('status-text');
+    let currentFontSize = 14;
+
+    window.onload = () => {
+        typeWriter("Ana arayüz protokolleri aktif. İsteklerinizi analiz etmeye hazırım efendim.", "welcome-msg");
+    };
+
+    // Tema Değiştirme Fonksiyonu
+    function temaDegistir() {
+        const selectedTheme = document.getElementById('themeSelect').value;
+        if (selectedTheme === 'jarvis') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', selectedTheme);
+        }
+    }
+
+    // Font Boyutu Değiştirme Fonksiyonu
+    function fontDegistir(deger) {
+        currentFontSize += deger;
+        if (currentFontSize < 12) currentFontSize = 12;
+        if (currentFontSize > 22) currentFontSize = 22;
+        document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
+    }
+
+    // Akıcı Typewriter Efekti
+    function typeWriter(text, elementId, speed = 20) {
+        let i = 0;
+        const elem = document.getElementById(elementId);
+        elem.innerHTML = "";
+        function write() {
+            if (i < text.length) {
+                elem.innerHTML += text.charAt(i);
+                i++;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                setTimeout(write, speed);
+            }
+        }
+        write();
+    }
+
+    async function mesajGonder() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        ekranaYaz(text, 'user');
+        userInput.value = '';
+        
+        sendBtn.disabled = true;
+        statusText.innerText = "ANALYZING DATA";
+
+        const jarvisGeciciId = 'jarvis-' + Date.now();
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message jarvis`;
+        msgDiv.innerHTML = `
+            <div class="thinking-waves">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+        `;
+        msgDiv.id = jarvisGeciciId;
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: text })
+            });
+
+            const data = await response.json();
+            const targetElement = document.getElementById(jarvisGeciciId);
+
+            if (data.reply) {
+                targetElement.innerHTML = ""; 
+                typeWriter(data.reply, jarvisGeciciId);
+            } else {
+                targetElement.innerText = "Protokol hatası: Veri akışı kesildi.";
+            }
+        } catch (error) {
+            document.getElementById(jarvisGeciciId).innerText = "Bağlantı koptu. Sunucu hatası.";
+        } finally {
+            sendBtn.disabled = false;
+            statusText.innerText = "SYSTEM ONLINE";
+        }
+    }
+
+    function ekranaYaz(mesaj, kim) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${kim}`;
+        msgDiv.innerText = mesaj;
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            mesajGonder();
+        }
+    });
+</script>
+
+</body>
+  </html>
+
