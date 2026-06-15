@@ -562,12 +562,26 @@
         .online-dot { width: 7px; height: 7px; background-color: #00ff88; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #00ff88; }
         .jarvis-chat-window { height: 340px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; background: radial-gradient(circle at center, rgba(10, 10, 15, 0.2), #050508); }
 
-        .jarvis-presets-panel { background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 0.7rem; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .jarvis-presets-panel { background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 0.7rem; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; align-items: center; }
         .jarvis-presets-panel::-webkit-scrollbar { height: 3px; }
         .jarvis-presets-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
         .preset-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-secondary); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: var(--transition); }
         .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 212, 255, 0.04); }
+
+        /* 🤖 Yeni eklenen harici link butonu stili */
+        .preset-btn-link {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.15), rgba(255, 215, 0, 0.05));
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .preset-btn-link:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 10px var(--glow);
+        }
 
         .msg-bubble { max-width: 85%; padding: 0.75rem 1.1rem; border-radius: 8px; line-height: 1.5; font-size: 0.9rem; word-wrap: break-word; }
         .msg-bubble.user { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 500; }
@@ -624,12 +638,9 @@
 </head>
 <body>
 
-    <!-- Canvas Particles -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- 🧭 NAVIGATION WRAPPER -->
     <nav class="navbar" id="navbar">
-        <!-- 🔘 THEME CONTROL -->
         <div class="nav-left-container">
             <button class="theme-switcher" id="theme-btn" title="Görünüm Temasını Değiştir">
                 <span class="theme-emoji" id="theme-emoji">🌌</span>
@@ -662,7 +673,6 @@
         </div>
     </nav>
 
-    <!-- 🏠 HERO SECTION -->
     <header class="hero" id="home">
         <div class="hero-logo-container">
             <div class="hero-ring"></div>
@@ -681,7 +691,6 @@
         </a>
     </header>
 
-    <!-- 👑 KURUCU SECTION -->
     <section class="founder-section reveal" id="founder">
         <h2 class="section-title">👑 KURUCU 👑</h2>
         <div class="founder-card">
@@ -699,19 +708,16 @@
         </div>
     </section>
 
-    <!-- 👥 EKİP SECTION -->
     <section class="team-section reveal" id="team">
         <h2 class="section-title">✦ EKİBİMİZ ✦</h2>
         <div class="team-grid" id="team-grid-container"></div>
     </section>
 
-    <!-- 📈 TERFİ SİSTEMİ SECTION -->
     <section class="timeline-section reveal" id="ranks">
         <h2 class="section-title">✦ TERFİ SİSTEMİ ✦</h2>
         <div class="timeline-container" id="timeline-container-target"></div>
     </section>
 
-    <!-- 🤖 JARVIS AI SECTION -->
     <section class="jarvis-section reveal" id="jarvis">
         <h2 class="section-title">🤖 JARVIS AI ASSISTANT</h2>
         <div class="jarvis-terminal">
@@ -741,6 +747,7 @@
                 <button class="preset-btn" onclick="sendPresetCmd('Nasıl terfi alabilirim? Kuralları anlat.')">📈 Terfi Şartları</button>
                 <button class="preset-btn" onclick="sendPresetCmd('Bana motivasyon verici zeki bir söz söyle.')">⚡ Motivasyon Modu</button>
                 <button class="preset-btn" onclick="sendPresetCmd('Bu web sitesini kim tasarladı?')">🖥️ Siteyi Kim Yaptı?</button>
+                <a href="https://jarvis-panel-ten.vercel.app/jarvis-2.html" class="preset-btn preset-btn-link">🤖 Jarvis ile konuş</a>
             </div>
 
             <div class="jarvis-input-bar">
@@ -750,7 +757,6 @@
         </div>
     </section>
 
-    <!-- ℹ️ HAKKINDA SECTION -->
     <section class="about-section reveal" id="about">
         <h2 class="section-title">✦ HAKKINDA ✦</h2>
         <p class="about-text">
@@ -777,7 +783,6 @@
         </div>
     </section>
 
-    <!-- 🦶 FOOTER -->
     <footer>
         <div class="footer-main">⭐ PARLAYAN YILDIZLAR © 2026</div>
         <div class="footer-sub">Powered by J.A.R.V.I.S</div>
@@ -786,9 +791,6 @@
         </a>
     </footer>
 
-    <!-- ==========================================================================
-       ⚙️ JAVASCRIPT CORE SYSTEM
-       ========================================================================== */ -->
     <script>
         // Data Definitions
         const TEAM_DATA = [
@@ -883,7 +885,7 @@
             item.className = 'timeline-item';
             if (node.type === 'supreme') item.classList.add('supreme-node');
             if (node.type === 'denetleyici') item.classList.add('denetleyici-node');
-            if (node.type === 'direktor') item.classList.add('direktor-node'); // Sadece ana direktöre özel stil düğümü
+            if (node.type === 'direktor') item.classList.add('direktor-node'); 
             
             item.innerHTML = `
                 <div class="timeline-badge-node"></div>
@@ -1080,7 +1082,7 @@
         function appendMessageBubble(sender, text) {
             const bubble = document.createElement('div');
             bubble.className = `msg-bubble ${sender}`;
-            let cleanHtml = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+            let cleanHtml = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\*\*(.*?)\*\"/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
             bubble.innerHTML = cleanHtml;
             chatWindow.appendChild(bubble);
             chatWindow.scrollTop = chatWindow.scrollHeight;
