@@ -471,7 +471,7 @@
         .team-card.special-card { border: 2px solid #ff4444; box-shadow: 0 0 15px rgba(255, 68, 68, 0.1); }
         .team-card.special-card:hover { box-shadow: 0 0 25px rgba(255, 68, 68, 0.3); border-color: #ff6666; }
 
-        /* 👑 Özel İstek: o6_kuwo Şekilli Parlayan Kutu Stili */
+        /* 👑 Kırmızı Parlayan Kutu Stili (Sadece Ana Direktörler İçin Aktif) */
         .team-card.kuwo-card {
             border: 2px solid #ff0044;
             background: radial-gradient(circle at top, rgba(255, 0, 68, 0.1), var(--card-bg));
@@ -535,6 +535,10 @@
         .timeline-item.supreme-node .timeline-content { background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(10, 10, 15, 0.8)); border: 2px solid #ffd700; }
         .timeline-item.denetleyici-node .timeline-badge-node { border-color: #ff4444; box-shadow: 0 0 12px #ff4444; }
         .timeline-item.denetleyici-node .timeline-content { border: 1px solid #ff4444; background: linear-gradient(135deg, rgba(255, 68, 68, 0.04), rgba(10, 10, 15, 0.8)); }
+        
+        /* Terfi listesindeki direktör ve direktör yardımcısını birbirinden ayıran görsel stiller */
+        .timeline-item.direktor-node .timeline-badge-node { border-color: #ff0044; box-shadow: 0 0 12px #ff0044; }
+        .timeline-item.direktor-node .timeline-content { border: 1.5px solid #ff0044; background: linear-gradient(135deg, rgba(255, 0, 68, 0.05), rgba(10, 10, 15, 0.85)); }
 
         @media (max-width: 768px) {
             .timeline-container::before { left: 15px; }
@@ -620,9 +624,12 @@
 </head>
 <body>
 
+    <!-- Canvas Particles -->
     <canvas id="bg-canvas"></canvas>
 
+    <!-- 🧭 NAVIGATION WRAPPER -->
     <nav class="navbar" id="navbar">
+        <!-- 🔘 THEME CONTROL -->
         <div class="nav-left-container">
             <button class="theme-switcher" id="theme-btn" title="Görünüm Temasını Değiştir">
                 <span class="theme-emoji" id="theme-emoji">🌌</span>
@@ -655,6 +662,7 @@
         </div>
     </nav>
 
+    <!-- 🏠 HERO SECTION -->
     <header class="hero" id="home">
         <div class="hero-logo-container">
             <div class="hero-ring"></div>
@@ -673,6 +681,7 @@
         </a>
     </header>
 
+    <!-- 👑 KURUCU SECTION -->
     <section class="founder-section reveal" id="founder">
         <h2 class="section-title">👑 KURUCU 👑</h2>
         <div class="founder-card">
@@ -690,16 +699,19 @@
         </div>
     </section>
 
+    <!-- 👥 EKİP SECTION -->
     <section class="team-section reveal" id="team">
         <h2 class="section-title">✦ EKİBİMİZ ✦</h2>
         <div class="team-grid" id="team-grid-container"></div>
     </section>
 
+    <!-- 📈 TERFİ SİSTEMİ SECTION -->
     <section class="timeline-section reveal" id="ranks">
         <h2 class="section-title">✦ TERFİ SİSTEMİ ✦</h2>
         <div class="timeline-container" id="timeline-container-target"></div>
     </section>
 
+    <!-- 🤖 JARVIS AI SECTION -->
     <section class="jarvis-section reveal" id="jarvis">
         <h2 class="section-title">🤖 JARVIS AI ASSISTANT</h2>
         <div class="jarvis-terminal">
@@ -738,6 +750,7 @@
         </div>
     </section>
 
+    <!-- ℹ️ HAKKINDA SECTION -->
     <section class="about-section reveal" id="about">
         <h2 class="section-title">✦ HAKKINDA ✦</h2>
         <p class="about-text">
@@ -764,6 +777,7 @@
         </div>
     </section>
 
+    <!-- 🦶 FOOTER -->
     <footer>
         <div class="footer-main">⭐ PARLAYAN YILDIZLAR © 2026</div>
         <div class="footer-sub">Powered by J.A.R.V.I.S</div>
@@ -772,11 +786,14 @@
         </a>
     </footer>
 
+    <!-- ==========================================================================
+       ⚙️ JAVASCRIPT CORE SYSTEM
+       ========================================================================== */ -->
     <script>
         // Data Definitions
         const TEAM_DATA = [
             { username: "leresetsikmeboy6", rank: "Geliştirici Denetleyici", icon: "🛡️", color: "#ff4444", special: true },
-            { username: "o6_kuwo", rank: "Geliştirici Direktörü", icon: "🎯", color: "#ff0044", customClass: "kuwo-card" },
+            { username: "o6_kuwo", rank: "Geliştirici Direktörü", icon: "🎯", color: "#ff0044" },
             { username: "spideydeno", rank: "Lider Geliştirici", icon: "👑", color: "#ffd700" },
             { username: "_jarvisonline", rank: "Kıdemli Geliştirici", icon: "⭐", color: "#00d4ff" },
             { username: "ekinmiss0", rank: "Geliştirici", icon: "🚀", color: "#00ff88" }
@@ -785,8 +802,8 @@
         const RANKS_TIMELINE = [
             { rankId: 11, title: " Kurucu", desc: "PARLAYAN YILDIZLAR'ın sahibi. Tüm rütbelerin üzerindedir. Nihai karar yetkisine sahiptir. Terfi, alım ve sistem değişikliklerinde son söz ona aittir.", type: "supreme" },
             { rankId: 10, title: " Geliştirici Denetleyici", desc: "Tüm geliştiricilerin üstünde. İzni olmadan terfi & alım yapılamaz.", type: "denetleyici" },
-            { rankId: 9, title: "🎯 Direktör", desc: "Grubun en yüksek rütbesi." },
-            { rankId: 8, title: "🎖️ Direktör Yardımcısı", desc: "Kurucular kararı." },
+            { rankId: 9, title: "🎯 Direktör", desc: "Grubun en yüksek rütbesi.", type: "direktor" },
+            { rankId: 8, title: "🎖️ Direktör Yardımcısı", desc: "Kurucular kararı.", type: "yardimci" },
             { rankId: 7, title: "🌟 Yazılım Ustası", desc: "Direktör onayı + oybirliği." },
             { rankId: 6, title: "👑 Lider Geliştirici", desc: "Direktör onayı + oybirliği." },
             { rankId: 5, title: "🏗️ Yazılım Mimarı", desc: "Çok çalış, Direktör onaylasın." },
@@ -840,16 +857,20 @@
         TEAM_DATA.forEach(member => {
             const card = document.createElement('div');
             let finalClass = 'team-card';
+            
+            // "Direktör Yardımcısı" ifadesini hariç tutarak, rütbede sadece "Direktör" geçenleri veya o6_kuwo'yu kırmızı parlat
+            const isDirektor = (member.rank.toLowerCase().includes('direktör') && !member.rank.toLowerCase().includes('yardımcı')) || member.username === 'o6_kuwo';
+            
             if (member.special) finalClass += ' special-card';
-            if (member.customClass) finalClass += ' ' + member.customClass;
+            if (isDirektor) finalClass += ' kuwo-card';
             
             card.className = finalClass;
             card.innerHTML = `
                 ${member.special ? '<div class="card-badge">EN YETKİLİ</div>' : ''}
-                ${member.customClass === 'kuwo-card' ? '<div class="card-badge kuwo-badge">VIP DİREKTÖR</div>' : ''}
+                ${isDirektor ? '<div class="card-badge kuwo-badge">VIP DİREKTÖR</div>' : ''}
                 <div class="card-icon">${member.icon}</div>
-                <div class="card-rank" style="color: ${member.color}">${member.rank}</div>
-                <div class="card-username" style="text-shadow: 0 0 10px ${member.color}44">@${member.username}</div>
+                <div class="card-rank" style="color: ${isDirektor ? '#ff0044' : member.color}">${member.rank}</div>
+                <div class="card-username" style="text-shadow: 0 0 10px ${isDirektor ? '#ff0044' : member.color}44">@${member.username}</div>
                 <button class="card-btn" onclick="window.open('https://instagram.com/${member.username}', '_blank')">Bilgi İçin Tıklayın 👆</button>
             `;
             gridContainer.appendChild(card);
@@ -862,6 +883,7 @@
             item.className = 'timeline-item';
             if (node.type === 'supreme') item.classList.add('supreme-node');
             if (node.type === 'denetleyici') item.classList.add('denetleyici-node');
+            if (node.type === 'direktor') item.classList.add('direktor-node'); // Sadece ana direktöre özel stil düğümü
             
             item.innerHTML = `
                 <div class="timeline-badge-node"></div>
@@ -869,6 +891,7 @@
                     <div class="timeline-title">
                         ${node.title} 
                         ${node.type === 'supreme' ? '<span class="badge badge-supreme" style="font-size:0.6rem; padding:2px 8px;">SUPREME</span>' : ''}
+                        ${node.type === 'direktor' ? '<span class="badge" style="font-size:0.6rem; padding:2px 8px; background:#ff0044; border:none; color:#fff;">CHIEF</span>' : ''}
                     </div>
                     <div class="timeline-desc">${node.desc}</div>
                 </div>
@@ -953,7 +976,7 @@
         }
         window.addEventListener('DOMContentLoaded', () => setTimeout(executeTypewriter, 400));
 
-        // Intersection Observers (Failsafe Core Rules)
+        // Intersection Observers
         const revealElements = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -1095,7 +1118,7 @@
                 } else if (userText.includes('motivasyon')) {
                     mockAnswer = "Milyarder bir dahi, oyun alanı geniş bir hayırseverin bir keresinde dediği gibi: *'Yürümeyi öğrenmeden önce koşmayı denemeliyiz.'* Sınırlarınızı zorlayın efendim, sisteminizdeki potansiyel benim ark reaktörümden daha güçlü.";
                 } else if (userText.includes('tasarladı') || userText.includes('yaptı')) {
-                    mockAnswer = "Bu muazzam, kusursuz akışkanlığa ve şık tasarıma sahip portalı Kıdemli Geliştiricimiz **@_jarvisonline** tasarlayıp kodladı efendim! Kendisi saf HTML, CSS ve JavaScript kullanarak adeta bir başyapıt çıkadı.";
+                    mockAnswer = "Bu muazzam, kusursuz akışkanlığa ve şık tasarıma sahip portalı Kıdemli Geliştiricimiz **@_jarvisonline** tasarlayıp kodladı efendim! Kendisi saf HTML, CSS ve JavaScript kullanarak adeta bir başyapıt çıkardı.";
                 }
                 
                 appendMessageBubble('jarvis', mockAnswer);
