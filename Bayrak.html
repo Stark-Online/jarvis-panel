@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="gold">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parlayan Yıldızlar - _jarvisonline</title>
+    <style>
+        /*
+         * PARLAYAN YILDIZLAR - Premium Web Sitesi
+         * Tasarım & Geliştirme: _jarvisonline (Frontend Architect, UI/UX & Animation Specialist)
+         * Tema: Derin Uzay & Türk Bayrağı Birlikteliği
+         */
+
+        /* ═══════════════════════════════════════
+           CSS DEĞİŞKENLERİ (TEMA SİSTEMİ TEMELİ)
+           ═══════════════════════════════════════ */
+        :root {
+            --bg-deep: #020204; /* Derin uzay temeli */
+            --transition-speed: 0.6s;
+            --ease: cubic-bezier(0.23, 1, 0.32, 1); /* Akıcı animasyonlar için */
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.07);
+        }
+
+        /* 1) GALAKTİK ALTIN (Varsayılan Tema) */
+        [data-theme="gold"] {
+            --primary: #FBBF24; /* Altın */
+            --primary-glow: rgba(251, 191, 36, 0.5);
+            --nebula-1: rgba(251, 191, 36, 0.08);
+            --nebula-2: rgba(168, 85, 247, 0.05); /* Mor dokunuş */
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 2) KOZMİK MAVİ */
+        [data-theme="blue"] {
+            --primary: #38BDF8;
+            --primary-glow: rgba(56, 189, 248, 0.5);
+            --nebula-1: rgba(56, 189, 248, 0.1);
+            --nebula-2: rgba(236, 72, 153, 0.05); /* Pembe dokunuş */
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 3) KRALİYET MORU */
+        [data-theme="purple"] {
+            --primary: #C084FC;
+            --primary-glow: rgba(192, 132, 252, 0.5);
+            --nebula-1: rgba(168, 85, 247, 0.1);
+            --nebula-2: rgba(45, 212, 191, 0.05); /* Turkuaz dokunuş */
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 4) ZÜMRÜT YEŞİLİ */
+        [data-theme="green"] {
+            --primary: #4ADE80;
+            --primary-glow: rgba(74, 222, 128, 0.5);
+            --nebula-1: rgba(74, 222, 128, 0.08);
+            --nebula-2: rgba(251, 191, 36, 0.05); /* Altın dokunuş */
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 5) ATEŞ KIRMISIZI */
+        [data-theme="red"] {
+            --primary: #F87171;
+            --primary-glow: rgba(248, 113, 113, 0.5);
+            --nebula-1: rgba(248, 113, 113, 0.1);
+            --nebula-2: rgba(251, 191, 36, 0.05); /* Altın dokunuş */
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ═══════════════════════════════════════
+           TEMEL AYARLAR
+           ═══════════════════════════════════════ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth; /* Smooth scrolling */
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            transition: background-color var(--transition-speed) var(--ease),
+                        color var(--transition-speed) var(--ease);
+        }
+
+        /* ═══════════════════════════════════════
+           DERİN UZAY ARKA PLANI (YILDIZLAR VE NEBULALAR)
+           ═══════════════════════════════════════ */
+        #space-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2; /* En altta */
+        }
+
+        .nebula-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Yıldızların üstünde, içeriğin altında */
+            pointer-events: none;
+            transition: background var(--transition-speed) var(--ease);
+        }
+
+        /* Katmanlı Nebula Efekti */
+        .nebula-1 {
+            background: radial-gradient(circle at 20% 30%, var(--nebula-1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, var(--nebula-1) 0%, transparent 50%);
+        }
+
+        .nebula-2 {
+            background: radial-gradient(circle at 70% 20%, var(--nebula-2) 0%, transparent 40%),
+                        radial-gradient(circle at 30% 80%, var(--nebula-2) 0%, transparent 40%);
+        }
+
+        /* Mouse Takip Eden Işık Efekti */
+        #mouse-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            transition: background var(--transition-speed) var(--ease),
+                        opacity 0.3s ease;
+        }
+
+        /* ═══════════════════════════════════════
+           LOADING EKRANI
+           ═══════════════════════════════════════ */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-deep);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s var(--ease), visibility 0.8s var(--ease);
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-star {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: loaderPulse 1.5s infinite ease-in-out, loaderRotate 3s infinite linear;
+            box-shadow: 0 0 20px var(--primary-glow);
+            transition: background-color var(--transition-speed) var(--ease);
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        @keyframes loaderRotate {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ═══════════════════════════════════════
+           HEADER VE TEMA SEÇİCİ
+           ═══════════════════════════════════════ */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(2,2,4,0.8), transparent);
+        }
+
+        /* Logo: Parlayan Yıldız */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-star {
+            width: 32px;
+            height: 32px;
+            fill: #FBBF24; /* Altın */
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8))
+                    drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+            animation: logoGlow 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 15px rgba(255, 255, 255, 0.6)); opacity: 0.9; }
+            100% { filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1)) drop-shadow(0 0 25px rgba(255, 255, 255, 0.9)); opacity: 1; }
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            letter-spacing: 1px;
+        }
+
+        /* Tema Seçici Dropdown */
+        .theme-selector {
+            position: relative;
+        }
+
+        .theme-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: #FFFFFF;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease, border-color var(--transition-speed) var(--ease);
+            backdrop-filter: blur(5px);
+        }
+
+        .theme-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .theme-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            transition: background-color var(--transition-speed) var(--ease);
+        }
+
+        .theme-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px;
+            width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s var(--ease);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .theme-selector:hover .theme-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .theme-option {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+        }
+
+        .theme-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .theme-option.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .opt-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        /* ═══════════════════════════════════════
+           ANA MERKEZ (HERO BÖLÜMÜ)
+           ═══════════════════════════════════════ */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Kusursuz İşlenmiş Türk Bayrağı */
+        .flag-container {
+            position: relative;
+            margin-bottom: 30px;
+            perspective: 1000px;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInSlide 1s 0.8s var(--ease) forwards;
+        }
+
+        .turkish-flag {
+            width: 240px; /* PC boyutu */
+            height: auto;
+            display: block;
+            /* Hafif dalgalanma animasyonu */
+            animation: flagWave 6s infinite ease-in-out;
+            transform-style: preserve-3d;
+        }
+
+        /* SVG Detayları */
+        .flag-rect { fill: #E30A17; } /* Kırmızı */
+        .flag-emblem { fill: #FFFFFF; filter: drop-shadow(0 0 5px rgba(255,255,255,0.6)); } /* Ay Yıldız Işıltısı */
+
+        @keyframes flagWave {
+            0%, 100% { transform: rotateX(0deg) rotateY(0deg) skewX(0deg); }
+            25% { transform: rotateX(2deg) rotateY(1deg) skewX(0.5deg); }
+            50% { transform: rotateX(-1deg) rotateY(-1deg) skewX(-0.3deg); }
+            75% { transform: rotateX(1deg) rotateY(0.5deg) skewX(0.2deg); }
+        }
+
+        /* Ana Başlık: PARLAYAN YILDIZLAR */
+        .main-title {
+            font-size: 5rem; /* Devasa */
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #FFFFFF;
+            margin-bottom: 15px;
+            transition: text-shadow var(--transition-speed) var(--ease);
+            /* Tema rengine göre Glow */
+            text-shadow: 0 0 15px var(--primary-glow),
+                         0 0 30px var(--primary-glow),
+                         0 0 45px var(--primary-glow);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInSlide 1s 1s var(--ease) forwards;
+        }
+
+        /* Slogan */
+        .slogan {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInSlide 1s 1.2s var(--ease) forwards;
+        }
+
+        /* Hero Butonları */
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInSlide 1s 1.4s var(--ease) forwards;
+        }
+
+        /* Ortak Buton Stili (Premium Ripple & Glow) */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 15px 35px;
+            font-family: var(--font-family);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s var(--ease), border-color var(--transition-speed) var(--ease), color var(--transition-speed) var(--ease);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            color: #000;
+            box-shadow: 0 0 25px var(--primary-glow);
+        }
+
+        /* Buton Arka Plan Dolgusu (Hover) */
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            transition: all 0.4s var(--ease), background-color var(--transition-speed) var(--ease);
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        /* Ripple Efekti Sınıfı (JS ile eklenecek) */
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: rippleEffect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════
+           ANLAMLI SÖZLER BÖLÜMÜ
+           ═══════════════════════════════════════ */
+        .quotes-section {
+            padding: 100px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            color: #FFFFFF;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .section-title span {
+            color: var(--primary);
+            transition: color var(--transition-speed) var(--ease);
+        }
+
+        .quotes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* Cam (Glassmorphism) Kart Tasarımı */
+        .quote-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s var(--ease), border-color var(--transition-speed) var(--ease);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0; /* JS ile fade-in olacak */
+            transform: translateY(30px);
+        }
+
+        /* Görünür olduğunda tetiklenecek sınıf */
+        .quote-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .quote-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4), 0 0 15px var(--primary-glow);
+        }
+
+        /* Kart Işık Efekti (Glow on Hover) */
+        .quote-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .quote-card:hover::after {
+            opacity: 1;
+        }
+
+        .quote-text {
+            font-size: 1.15rem;
+            color: #FFFFFF;
+            line-height: 1.7;
+            font-style: italic;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        /* Tırnak İşareti İkonu */
+        .quote-text::before {
+            content: '“';
+            font-size: 4rem;
+            color: var(--primary);
+            position: absolute;
+            top: -20px;
+            left: -15px;
+            opacity: 0.3;
+            font-family: serif;
+            transition: color var(--transition-speed) var(--ease);
+        }
+
+        .quote-author {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color var(--transition-speed) var(--ease);
+            align-self: flex-end;
+        }
+
+        /* ═══════════════════════════════════════
+           FOOTER VE YUKARI ÇIK BUTONU
+           ═══════════════════════════════════════ */
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(2, 2, 4, 0.5);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .owner-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .owner-link:hover {
+            color: var(--primary);
+            transform: scale(1.05);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .instagram-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Sabit Yukari Çık Butonu */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease, border-color var(--transition-speed) var(--ease), color var(--transition-speed) var(--ease);
+            z-index: 90;
+        }
+
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        #back-to-top:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .arrow-up {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* ═══════════════════════════════════════
+           MİKRO ANİMASYONLAR VE GÖREVLİ SINIFLAR
+           ═══════════════════════════════════════ */
+        @keyframes fadeInSlide {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════
+           RESPONSIVE TASARIM (MOBİL UYUMLULUK)
+           ═══════════════════════════════════════ */
+        /* Tablet */
+        @media (max-width: 1024px) {
+            html { font-size: 15px; }
+            .main-title { font-size: 4rem; }
+            .turkish-flag { width: 200px; }
+            .quotes-section { padding: 80px 20px; }
+        }
+
+        /* Mobil */
+        @media (max-width: 768px) {
+            html { font-size: 14px; }
+            header { padding: 15px 20px; }
+            .logo-text { display: none; } /* Mobilde sadece ikon */
+            .theme-text { display: none; } /* Mobilde sadece ikon/nokta */
+            
+            .main-title { font-size: 3rem; letter-spacing: 2px; }
+            .slogan { font-size: 1.2rem; }
+            .turkish-flag { width: 160px; }
+            
+            .hero-btns { flex-direction: column; width: 100%; max-width: 300px; gap: 15px; }
+            .btn { width: 100%; padding: 12px 25px; }
+
+            .quotes-grid { grid-template-columns: 1fr; }
+            .quote-card { padding: 30px; }
+            
+            #back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; }
+        }
+
+        /* Çok Küçük Ekranlar */
+        @media (max-width: 480px) {
+            .main-title { font-size: 2.2rem; }
+            .turkish-flag { width: 130px; }
+        }
+    </style>
+</head>
+<body data-theme="gold">
+
+    <div id="loading-screen">
+        <div class="loader-star"></div>
+    </div>
+
+    <canvas id="space-canvas"></canvas>
+    <div class="nebula-layer nebula-1"></div>
+    <div class="nebula-layer nebula-2"></div>
+    <div id="mouse-glow"></div>
+
+    <header>
+        <a href="#" class="logo-container">
+            <svg class="logo-star" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"/>
+            </svg>
+            <span class="logo-text">PARLAYAN YILDIZLAR</span>
+        </a>
+
+        <div class="theme-selector">
+            <button class="theme-btn" aria-haspopup="true" aria-expanded="false">
+                <span class="theme-dot"></span>
+                <span class="theme-text">Tema</span>
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="theme-dropdown">
+                <button class="theme-option active" data-theme-id="gold"><span class="opt-dot" style="background:#FBBF24"></span>Galaktik Altın</button>
+                <button class="theme-option" data-theme-id="blue"><span class="opt-dot" style="background:#38BDF8"></span>Kozmik Mavi</button>
+                <button class="theme-option" data-theme-id="purple"><span class="opt-dot" style="background:#C084FC"></span>Kraliyet Moru</button>
+                <button class="theme-option" data-theme-id="green"><span class="opt-dot" style="background:#4ADE80"></span>Zümrüt Yeşili</button>
+                <button class="theme-option" data-theme-id="red"><span class="opt-dot" style="background:#F87171"></span>Ateş Kırmızısı</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="hero" id="top">
+        <div class="flag-container">
+            <svg class="turkish-flag" viewBox="0 0 1500 1000" xmlns="http://www.w3.org/2000/svg">
+                <rect class="flag-rect" width="1500" height="1000"/>
+                <g class="flag-emblem">
+                    <circle cx="375" cy="500" r="250"/>
+                    <circle cx="437.5" cy="500" r="200" fill="#E30A17"/> <polygon points="718.75,500 550,561.3 582.2,382.6 451.9,255.8 630.7,230 718.75,68 806.8,230 985.6,255.8 855.3,382.6 887.5,561.3" transform="translate(15,0)"/>
+                </g>
+            </svg>
+        </div>
+        
+        <h1 class="main-title">PARLAYAN YILDIZLAR</h1>
+        <p class="slogan">“Bir milletin en büyük gücü, birliğidir.”</p>
+
+        <div class="hero-btns">
+            <button class="btn" id="btn-salute">Bayrağı Selamla</button>
+            <button class="btn" id="btn-next-theme">Tema Değiştir</button>
+            <button class="btn" id="btn-star-rain">Yıldız Efekti</button>
+        </div>
+    </main>
+
+    <section class="quotes-section" id="sozler">
+        <h2 class="section-title">Vatan ve Birlik <span>Üzerine</span></h2>
+        
+        <div class="quotes-grid" id="quotes-container">
+            </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <a href="https://instagram.com/_jarvisonline" target="_blank" class="owner-link">
+                <svg class="instagram-icon" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+                <span>Site Sahibi: _jarvisonline</span>
+            </a>
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.4);">© 2023 Tüm Hakları Saklıdır.</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" aria-label="Yukarı Çık">
+        <svg class="arrow-up" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- UI Elementleri ---
+            const body = document.body;
+            const loadingScreen = document.getElementById('loading-screen');
+            const mouseGlow = document.getElementById('mouse-glow');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            const themeBtnDot = document.querySelector('.theme-btn .theme-dot');
+            const quotesContainer = document.getElementById('quotes-container');
+            const backToTopBtn = document.getElementById('back-to-top');
+
+            // --- Veri: Anlamlı Sözler ---
+            const quotes = [
+                { text: "Bayrakları bayrak yapan üstündeki kandır, toprak eğer uğrunda ölen varsa vatandır.", author: "Mithat Cemal Kuntay" },
+                { text: "Sahipsiz olan vatanın batması haktır; sen sahip olursan bu vatan batmayacaktır.", author: "Mehmet Akif Ersoy" },
+                { text: "Ne mutlu Türk'üm diyene!", author: "Mustafa Kemal Atatürk" },
+                { text: "Mevzubahis vatansa, gerisi teferruattır.", author: "Mustafa Kemal Atatürk" },
+                { text: "Birlikte rahmet, ayrılıkta azap vardır.", author: "Hadis-i Şerif" },
+                { text: "Girmeden tefrika bir millete, düşman giremez; Toplu vurdukça yürekler, onu top sindiremez.", author: "Mehmet Akif Ersoy" },
+                { text: "Bu vatan, toprağın kara bağrında sıradağlar gibi duranlarındır.", author: "Orhan Şaik Gökyay" },
+                { text: "Vatan sevgisi, ruhun gıdasıdır.", author: "Anonim" },
+                { text: "Tek bayrak, tek millet, tek vatan, tek devlet.", author: "Milli Ülkü" },
+                { text: "Göklerde parlayan ay yıldız, birliğimizin ve istikbalimizin teminatıdır.", author: "Anonim" }
+            ];
+
+            // --- 1. Loading ve Giriş Efektleri ---
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    loadingScreen.classList.add('fade-out');
+                }, 1000); // Premium his için yapay bekleme
+            });
+
+            // --- 2. Arka Plan: Yıldızlar ve Parallax (Canvas) ---
+            const canvas = document.getElementById('space-canvas');
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+            let shootingStars = [];
+            let width, height;
+
+            function resizeCanvas() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                initStars();
+            }
+
+            class Star {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.size = Math.random() * 1.5;
+                    this.baseOpacity = Math.random() * 0.7 + 0.1;
+                    this.opacity = this.baseOpacity;
+                    this.blinkSpeed = Math.random() * 0.02 + 0.005;
+                    this.parallaxFactor = Math.random() * 0.5 + 0.1; // Farklı derinlikler
+                }
+
+                update() {
+                    // Göz kırpma efekti
+                    this.opacity += this.blinkSpeed;
+                    if (this.opacity > 1 || this.opacity < 0.1) {
+                        this.blinkSpeed = -this.blinkSpeed;
+                    }
+                }
+
+                draw(scrollOffset) {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.beginPath();
+                    // Scroll ile hafif hareket (Parallax)
+                    const yParam = this.y - (scrollOffset * this.parallaxFactor);
+                    // Ekranın dışına çıkarsa başa sar
+                    let finalY = yParam % height;
+                    if(finalY < 0) finalY += height;
+
+                    ctx.arc(this.x, finalY, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            class ShootingStar {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height * 0.5;
+                    this.len = Math.random() * 80 + 50;
+                    this.speed = Math.random() * 10 + 15;
+                    this.active = true;
+                }
+                update() {
+                    if(!this.active) return;
+                    this.x -= this.speed;
+                    this.y += this.speed * 0.5; // Eğik gidiş
+                    if (this.x < -this.len || this.y > height) { this.active = false; }
+                }
+                draw() {
+                    if(!this.active) return;
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x + this.len, this.y - this.len * 0.5);
+                    ctx.stroke();
+                }
+            }
+
+            function initStars() {
+                stars = [];
+                const count = Math.floor((width * height) / 2000); // Ekrana göre yıldız sayısı
+                for (let i = 0; i < count; i++) { stars.push(new Star()); }
+            }
+
+            function animateCanvas() {
+                ctx.clearRect(0, 0, width, height);
+                const scrollOffset = window.pageYOffset;
+
+                stars.forEach(star => {
+                    star.update();
+                    star.draw(scrollOffset);
+                });
+
+                shootingStars.forEach(ss => {
+                    ss.update();
+                    ss.draw();
+                });
+
+                // Rastgele kayan yıldız oluştur
+                if (Math.random() < 0.005) { // Düşük ihtimal
+                    let ss = shootingStars.find(s => !s.active);
+                    if(!ss) { ss = new ShootingStar(); shootingStars.push(ss); }
+                    else { ss.reset(); }
+                }
+
+                requestAnimationFrame(animateCanvas);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            animateCanvas();
+
+            // --- 3. Tema Sistemi ---
+            const themes = ['gold', 'blue', 'purple', 'green', 'red'];
+            let currentThemeIndex = 0;
+
+            function setTheme(themeId) {
+                body.setAttribute('data-theme', themeId);
+                currentThemeIndex = themes.indexOf(themeId);
+                
+                // Tema seçici UI güncelleme
+                themeOptions.forEach(opt => opt.classList.remove('active'));
+                document.querySelector(`[data-theme-id="${themeId}"]`).classList.add('active');
+                
+                // Ana tema noktasını güncelle
+                const primaryColor = getComputedStyle(body).getPropertyValue('--primary').trim();
+                themeBtnDot.style.backgroundColor = primaryColor;
+            }
+
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    setTheme(option.dataset.themeId);
+                });
+            });
+
+            // Buton: Sonraki Tema
+            document.getElementById('btn-next-theme').addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                setTheme(themes[currentThemeIndex]);
+            });
+
+            // --- 4. Etkileşim efektleri (Mouse, Ripple, Scroll) ---
+
+            // Mouse Takip Eden Işık
+            window.addEventListener('mousemove', (e) => {
+                mouseGlow.style.left = e.clientX + 'px';
+                mouseGlow.style.top = e.clientY + 'px';
+            });
+
+            // Genel Buton Ripple Efekti
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // --- 5. Özel Buton Aksiyonları ---
+
+            // Bayrağı Selamla (Hafif bir zoom ve parlama)
+            const flagContainer = document.querySelector('.flag-container');
+            document.getElementById('btn-salute').addEventListener('click', () => {
+                flagContainer.style.transition = 'transform 0.5s var(--ease), filter 0.5s ease';
+                flagContainer.style.transform = 'scale(1.1) translateY(-10px)';
+                flagContainer.style.filter = 'drop-shadow(0 15px 35px var(--primary-glow))';
+                
+                setTimeout(() => {
+                    flagContainer.style.transform = '';
+                    flagContainer.style.filter = '';
+                }, 1000);
+            });
+
+            // Yıldız Yağmuru (Geçici yoğun kayan yıldızlar)
+            document.getElementById('btn-star-rain').addEventListener('click', () => {
+                for(let i=0; i<15; i++) {
+                    setTimeout(() => {
+                        let ss = shootingStars.find(s => !s.active);
+                        if(!ss) { ss = new ShootingStar(); shootingStars.push(ss); }
+                        else { ss.reset(); }
+                    }, i * 100);
+                }
+            });
+
+            // --- 6. Anlamlı Sözler: Kartları Oluştur ve Scroll Animasyonu ---
+            
+            // Kartları DOM'a ekle
+            quotes.forEach(quote => {
+                const card = document.createElement('div');
+                card.className = 'quote-card';
+                card.innerHTML = `
+                    <p class="quote-text">${quote.text}</p>
+                    <p class="quote-author">${quote.author}</p>
+                `;
+                quotesContainer.appendChild(card);
+
+                // Kart içi mouse efekt (Glassmorphism highlight)
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
+                    const y = ((e.clientY - rect.top) / card.clientHeight) * 100;
+                    card.style.setProperty('--mouse-x', `${x}%`);
+                    card.style.setProperty('--mouse-y', `${y}%`);
+                });
+            });
+
+            // Scroll Reveal Animasyonu (Intersection Observer)
+            const quoteCards = document.querySelectorAll('.quote-card');
+            const observerOptions = {
+                root: null,
+                threshold: 0.1, // %10 görünür olduğunda tetikle
+                rootMargin: "0px 0px -50px 0px" // Alttan biraz erken tetikle
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        // Hafif gecikmeli fade-in (staggered effect)
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, (index % 3) * 150); // Satır başına gecikme
+                        observer.unobserve(entry.target); // Sadece bir kez çalışsın
+                    }
+                });
+            }, observerOptions);
+
+            quoteCards.forEach(card => observer.observe(card));
+
+            // --- 7. Yukarı Çık Butonu ve Scroll Takibi ---
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 400) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // İlk tema ayarı
+            setTheme('gold');
+        });
+    </script>
+</body>
+</html>
