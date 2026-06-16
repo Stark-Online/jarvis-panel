@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nova'nın Evreni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══ TEMA SİSTEMİ ═══ */
+:root {
+  --bg1:#09020f;--bg2:#140828;--acc1:#9d4edd;--acc2:#c77dff;--acc3:#7b2d8b;
+  --glow:rgba(157,78,221,0.5);--glow2:rgba(199,125,255,0.3);
+  --card-bg:rgba(30,10,50,0.7);--card-border:rgba(157,78,221,0.4);
+  --text-main:#e8d5ff;--text-sub:#b89fd4;--text-dim:#7a5a9a;--neon:#da77ff;--gold:#ffd700;
+}
+[data-theme="kizil"]{--bg1:#0f0200;--bg2:#280808;--acc1:#dd4e4e;--acc2:#ff7d7d;--acc3:#8b2d2d;--glow:rgba(221,78,78,0.5);--glow2:rgba(255,125,125,0.3);--card-bg:rgba(50,10,10,0.7);--card-border:rgba(221,78,78,0.4);--text-main:#ffd5d5;--text-sub:#d49f9f;--text-dim:#9a5a5a;--neon:#ff5555;}
+[data-theme="okyanus"]{--bg1:#00060f;--bg2:#041428;--acc1:#4e7edd;--acc2:#7db0ff;--acc3:#2d528b;--glow:rgba(78,126,221,0.5);--glow2:rgba(125,176,255,0.3);--card-bg:rgba(5,20,50,0.7);--card-border:rgba(78,126,221,0.4);--text-main:#d5e8ff;--text-sub:#9fb8d4;--text-dim:#5a7a9a;--neon:#55aaff;}
+[data-theme="zumrut"]{--bg1:#000f02;--bg2:#042808;--acc1:#4edd6e;--acc2:#7dff9d;--acc3:#2d8b4e;--glow:rgba(78,221,110,0.5);--glow2:rgba(125,255,157,0.3);--card-bg:rgba(5,30,10,0.7);--card-border:rgba(78,221,110,0.4);--text-main:#d5ffd8;--text-sub:#9fd4a5;--text-dim:#5a9a65;--neon:#55ff88;}
+[data-theme="altin"]{--bg1:#0f0a00;--bg2:#281e04;--acc1:#ddaa4e;--acc2:#ffce7d;--acc3:#8b7a2d;--glow:rgba(221,170,78,0.5);--glow2:rgba(255,206,125,0.3);--card-bg:rgba(40,30,5,0.7);--card-border:rgba(221,170,78,0.4);--text-main:#fff5d5;--text-sub:#d4c09f;--text-dim:#9a8a5a;--neon:#ffcc33;}
+/* ═══ RESET ═══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Raleway',sans-serif;background:var(--bg1);color:var(--text-main);overflow-x:hidden;min-height:100vh;transition:background 0.5s,color 0.5s;}
+h1,h2,h3,h4,h5{font-family:'Cinzel',serif;}
+#particles-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;width:100%;height:100%;}
+.layer{position:relative;z-index:1;}
+/* ═══ TEMA SEÇİCİ ═══ */
+#theme-picker{position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;background:rgba(0,0,0,0.55);backdrop-filter:blur(12px);padding:8px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);}
+.theme-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.2s,border-color 0.2s;}
+.theme-dot:hover,.theme-dot.active{transform:scale(1.3);border-color:white;}
+.td-mistik{background:radial-gradient(circle,#c77dff,#7b2d8b);}
+.td-kizil{background:radial-gradient(circle,#ff7d7d,#8b2d2d);}
+.td-okyan{background:radial-gradient(circle,#7db0ff,#2d528b);}
+.td-zumrut{background:radial-gradient(circle,#7dff9d,#2d8b4e);}
+.td-altin{background:radial-gradient(circle,#ffce7d,#8b7a2d);}
+/* ═══ GİRİŞ EKRANI ═══ */
+#hub{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px 60px;text-align:center;}
+.nova-logo{font-family:'Cinzel',serif;font-size:clamp(4rem,12vw,9rem);font-weight:900;background:linear-gradient(135deg,#000,var(--acc1),var(--acc2),#000);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:logoGrad 4s ease infinite,logoGlow 3s ease-in-out infinite alternate;letter-spacing:0.05em;line-height:1;margin-bottom:12px;filter:drop-shadow(0 0 40px var(--glow));}
+@keyframes logoGrad{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+@keyframes logoGlow{from{filter:drop-shadow(0 0 20px var(--glow))}to{filter:drop-shadow(0 0 60px var(--acc2))}}
+.nova-subtitle{font-family:'Raleway',sans-serif;font-size:clamp(0.9rem,2.5vw,1.3rem);font-weight:300;letter-spacing:0.2em;text-transform:uppercase;background:linear-gradient(90deg,var(--acc2),var(--text-main),var(--acc2));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;margin-bottom:60px;}
+@keyframes shimmer{to{background-position:200% center}}
+/* ═══ MENÜ ═══ */
+.menu-grid{display:flex;flex-direction:column;gap:14px;width:100%;max-width:640px;}
+.menu-btn{display:flex;align-items:center;gap:16px;padding:18px 28px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(12px);text-align:left;font-family:'Cinzel',serif;color:var(--text-main);text-decoration:none;position:relative;overflow:hidden;}
+.menu-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,var(--glow2),transparent);opacity:0;transition:opacity 0.3s;}
+.menu-btn:hover::before{opacity:1;}
+.menu-btn:hover{border-color:var(--acc2);box-shadow:0 0 30px var(--glow),0 0 60px var(--glow2),inset 0 0 20px var(--glow2);transform:translateY(-3px) scale(1.01);}
+.menu-btn.featured{padding:24px 32px;background:linear-gradient(135deg,var(--card-bg),rgba(157,78,221,0.2));border-color:var(--acc1);box-shadow:0 0 20px var(--glow);margin-bottom:6px;}
+.menu-btn.featured:hover{box-shadow:0 0 50px var(--glow),0 0 100px var(--glow2);}
+.menu-icon{font-size:1.8rem;min-width:40px;}
+.menu-label{font-size:clamp(0.8rem,2vw,1rem);font-weight:600;letter-spacing:0.08em;}
+.menu-btn.featured .menu-label{font-size:clamp(0.9rem,2.5vw,1.15rem);}
+.menu-arrow{margin-left:auto;color:var(--acc2);font-size:1.2rem;transition:transform 0.3s;}
+.menu-btn:hover .menu-arrow{transform:translateX(6px);}
+/* ═══ MODLAR ═══ */
+.mode-screen{position:fixed;inset:0;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.5s;overflow-y:auto;min-height:100vh;background:var(--bg1);}
+.mode-screen.active{opacity:1;pointer-events:all;}
+.mode-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(0,0,0,0.6);backdrop-filter:blur(20px);border-bottom:1px solid var(--card-border);}
+.mode-logo{font-family:'Cinzel',serif;font-size:1rem;color:var(--acc2);letter-spacing:0.15em;}
+.back-btn{display:flex;align-items:center;gap:8px;padding:8px 18px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:50px;color:var(--text-main);cursor:pointer;font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.1em;transition:all 0.3s;}
+.back-btn:hover{border-color:var(--acc2);box-shadow:0 0 20px var(--glow);color:var(--acc2);}
+.mode-content{padding:40px 24px;max-width:1200px;margin:0 auto;}
+.mode-title{text-align:center;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--acc2);margin-bottom:8px;text-shadow:0 0 30px var(--glow);}
+.mode-desc{text-align:center;color:var(--text-sub);margin-bottom:40px;font-size:0.95rem;letter-spacing:0.05em;}
+/* ═══ ARAMA & FİLTRE ═══ */
+.search-wrapper{position:relative;max-width:600px;margin:0 auto 24px;}
+.search-input{width:100%;padding:16px 52px 16px 20px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:50px;color:var(--text-main);font-family:'Raleway',sans-serif;font-size:1rem;outline:none;backdrop-filter:blur(12px);transition:all 0.3s;}
+.search-input:focus{border-color:var(--acc2);box-shadow:0 0 30px var(--glow);}
+.search-input::placeholder{color:var(--text-dim);}
+.search-icon{position:absolute;right:20px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:1.1rem;pointer-events:none;}
+.filter-bar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:36px;}
+.filter-btn{padding:8px 20px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-sub);cursor:pointer;font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.1em;transition:all 0.3s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--acc2);color:var(--acc2);box-shadow:0 0 15px var(--glow);background:rgba(157,78,221,0.1);}
+/* ═══ KART GRİD ═══ */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:20px;perspective:1000px;}
+.card-tile{position:relative;background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(12px);overflow:hidden;animation:cardAppear 0.5s ease backwards;}
+.card-tile::before{content:'';position:absolute;inset:-2px;border-radius:17px;background:conic-gradient(from 0deg,var(--acc1),var(--acc2),var(--neon),var(--acc1));animation:rotateBorder 4s linear infinite;z-index:-1;opacity:0;transition:opacity 0.3s;}
+.card-tile:hover::before{opacity:1;}
+.card-tile:hover{transform:perspective(600px) rotateX(-5deg) rotateY(5deg) translateY(-8px);box-shadow:0 20px 60px var(--glow),0 0 40px var(--glow2);}
+@keyframes rotateBorder{to{transform:rotate(360deg)}}
+@keyframes cardAppear{from{opacity:0;transform:translateY(20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.card-suit-symbol{font-size:2.8rem;margin-bottom:8px;display:block;filter:drop-shadow(0 0 8px var(--glow));}
+.card-name{font-family:'Cinzel',serif;font-size:0.75rem;font-weight:600;color:var(--text-main);letter-spacing:0.08em;margin-bottom:4px;}
+.card-energy{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.65rem;font-weight:600;letter-spacing:0.1em;margin-top:6px;}
+.energy-high{background:rgba(255,80,80,0.2);color:#ff5555;border:1px solid rgba(255,80,80,0.4);}
+.energy-med{background:rgba(255,200,0,0.2);color:#ffcc33;border:1px solid rgba(255,200,0,0.4);}
+.energy-low{background:rgba(80,200,120,0.2);color:#55cc88;border:1px solid rgba(80,200,120,0.4);}
+.no-results{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:1.1rem;}
+/* ═══ MODAL ═══ */
+#card-modal{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.4s;}
+#card-modal.open{opacity:1;pointer-events:all;}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);cursor:pointer;}
+.modal-box{position:relative;z-index:1;background:linear-gradient(135deg,var(--bg2),var(--bg1));border:1px solid var(--acc1);border-radius:24px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 0 80px var(--glow),0 0 120px var(--glow2);transform:scale(0.8);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);scrollbar-width:thin;scrollbar-color:var(--acc1) transparent;}
+#card-modal.open .modal-box{transform:scale(1);}
+.modal-box::-webkit-scrollbar{width:4px;}.modal-box::-webkit-scrollbar-thumb{background:var(--acc1);border-radius:4px;}
+.modal-header{text-align:center;padding:40px 40px 20px;position:relative;}
+.modal-symbol{font-size:5rem;animation:modalPulse 2s ease-in-out infinite;display:block;filter:drop-shadow(0 0 20px var(--glow));}
+@keyframes modalPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 10px var(--glow))}50%{transform:scale(1.1);filter:drop-shadow(0 0 30px var(--acc2))}}
+.modal-card-name{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;color:var(--acc2);margin:12px 0 4px;text-shadow:0 0 20px var(--glow);}
+.modal-suit-label{color:var(--text-sub);font-size:0.9rem;letter-spacing:0.15em;text-transform:uppercase;}
+.modal-body{padding:0 32px 40px;}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-main);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all 0.3s;}
+.modal-close:hover{border-color:var(--acc2);color:var(--acc2);transform:rotate(90deg);}
+.modal-section{margin:20px 0;padding:20px;background:rgba(0,0,0,0.3);border-radius:14px;border:1px solid rgba(255,255,255,0.05);}
+.modal-section-title{font-family:'Cinzel',serif;font-size:0.75rem;color:var(--acc1);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.modal-section p{color:var(--text-sub);font-size:0.9rem;line-height:1.7;}
+.keywords-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.keyword-badge{padding:4px 14px;border-radius:20px;background:rgba(157,78,221,0.2);border:1px solid var(--acc1);color:var(--acc2);font-size:0.75rem;letter-spacing:0.08em;}
+.pros-cons-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;}
+.pros-list,.cons-list{list-style:none;}
+.pros-list li::before{content:'✦ ';color:#55cc88;}
+.cons-list li::before{content:'⚠ ';color:#ff5555;}
+.pros-list li,.cons-list li{color:var(--text-sub);font-size:0.85rem;line-height:1.8;}
+.energy-badge-modal{display:inline-block;padding:6px 20px;border-radius:20px;font-size:0.85rem;font-weight:600;margin-top:8px;}
+/* ═══ KADER ═══ */
+.fate-btn,.energy-refresh-btn,.generate-quote-btn{display:block;margin:0 auto 48px;padding:18px 48px;background:linear-gradient(135deg,var(--acc3),var(--acc1));border:none;border-radius:50px;color:white;font-family:'Cinzel',serif;font-size:1.05rem;font-weight:600;letter-spacing:0.15em;cursor:pointer;transition:all 0.3s;box-shadow:0 0 30px var(--glow);}
+.fate-btn:hover,.energy-refresh-btn:hover,.generate-quote-btn:hover{box-shadow:0 0 60px var(--glow),0 0 100px var(--glow2);transform:translateY(-3px) scale(1.03);}
+.energy-refresh-btn{margin-bottom:36px;padding:14px 40px;font-size:0.9rem;}
+.generate-quote-btn{margin-bottom:0;margin-top:0;padding:16px 44px;font-size:0.95rem;}
+.fate-cards{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:40px;}
+.fate-card-wrap{text-align:center;flex:1;min-width:180px;max-width:220px;}
+.fate-position{font-family:'Cinzel',serif;font-size:0.75rem;color:var(--acc2);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:12px;}
+.flip-card{width:100%;aspect-ratio:2/3;perspective:1000px;cursor:pointer;margin:0 auto;}
+.flip-inner{width:100%;height:100%;transition:transform 0.8s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d;position:relative;}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1px solid var(--card-border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:var(--card-bg);backdrop-filter:blur(12px);}
+.flip-back{transform:rotateY(180deg);background:linear-gradient(135deg,var(--card-bg),rgba(157,78,221,0.2));}
+.card-back-pattern{font-size:3rem;animation:floatAnim 3s ease-in-out infinite;filter:drop-shadow(0 0 10px var(--glow));}
+@keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.fate-symbol{font-size:3.5rem;margin-bottom:10px;}
+.fate-name{font-family:'Cinzel',serif;font-size:0.8rem;color:var(--acc2);text-align:center;margin-bottom:6px;}
+.fate-interp{max-width:700px;margin:0 auto;padding:28px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;backdrop-filter:blur(12px);}
+.fate-interp-title{font-family:'Cinzel',serif;font-size:1rem;color:var(--acc2);margin-bottom:14px;text-align:center;}
+.typing-text{color:var(--text-sub);line-height:1.8;font-size:0.9rem;min-height:60px;}
+.typing-cursor{display:inline-block;width:2px;height:1em;background:var(--acc2);vertical-align:text-bottom;animation:blink 0.7s step-end infinite;margin-left:2px;}
+@keyframes blink{from,to{opacity:1}50%{opacity:0}}
+/* ═══ ENERJİ ═══ */
+.energy-card.e-high{border-color:rgba(255,80,80,0.6);animation:cardAppear 0.5s backwards,pulseH 2s ease-in-out infinite;}
+.energy-card.e-med{border-color:rgba(255,200,0,0.6);animation:cardAppear 0.5s backwards,pulseM 3s ease-in-out infinite;}
+.energy-card.e-low{border-color:rgba(80,200,120,0.4);}
+@keyframes pulseH{0%,100%{box-shadow:0 0 25px rgba(255,80,80,0.3)}50%{box-shadow:0 0 50px rgba(255,80,80,0.5)}}
+@keyframes pulseM{0%,100%{box-shadow:0 0 15px rgba(255,200,0,0.2)}50%{box-shadow:0 0 35px rgba(255,200,0,0.4)}}
+/* ═══ SÖZLER ═══ */
+.mood-bar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:36px;}
+.mood-btn{padding:8px 22px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-sub);cursor:pointer;font-family:'Raleway',sans-serif;font-size:0.85rem;transition:all 0.3s;}
+.mood-btn:hover,.mood-btn.active{border-color:var(--acc2);color:var(--acc2);box-shadow:0 0 15px var(--glow);background:rgba(157,78,221,0.1);}
+.quote-display{max-width:700px;margin:0 auto 36px;padding:40px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:24px;text-align:center;position:relative;backdrop-filter:blur(12px);box-shadow:0 0 40px var(--glow2);min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+.quote-text{font-family:'Raleway',sans-serif;font-size:clamp(1rem,2.5vw,1.25rem);color:var(--text-main);line-height:1.8;font-style:italic;transition:opacity 0.4s;}
+.quote-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.quote-action-btn{padding:8px 20px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-sub);cursor:pointer;font-size:0.8rem;font-family:'Raleway',sans-serif;transition:all 0.3s;}
+.quote-action-btn:hover{border-color:var(--acc2);color:var(--acc2);}
+.quote-action-btn.favorited{border-color:var(--neon);color:var(--neon);}
+.fav-section{max-width:700px;margin:40px auto 0;}
+.fav-title{font-family:'Cinzel',serif;color:var(--acc2);font-size:1rem;margin-bottom:16px;letter-spacing:0.1em;}
+.fav-list{display:flex;flex-direction:column;gap:12px;}
+.fav-item{padding:14px 20px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;color:var(--text-sub);font-style:italic;font-size:0.9rem;line-height:1.7;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.fav-remove{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.9rem;transition:color 0.2s;flex-shrink:0;}
+.fav-remove:hover{color:#ff5555;}
+/* ═══ BAŞARIM ═══ */
+#achievement-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:99999;background:linear-gradient(135deg,var(--bg2),rgba(157,78,221,0.3));border:1px solid var(--acc1);border-radius:20px;padding:18px 28px;display:flex;align-items:center;gap:16px;box-shadow:0 0 50px var(--glow),0 10px 40px rgba(0,0,0,0.5);backdrop-filter:blur(20px);transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);min-width:280px;}
+#achievement-toast.show{transform:translateX(-50%) translateY(0);}
+.toast-icon{font-size:2rem;}
+.toast-title{font-family:'Cinzel',serif;font-size:0.75rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:2px;}
+.toast-name{font-family:'Cinzel',serif;font-size:1rem;color:var(--acc2);font-weight:600;}
+.toast-desc{font-size:0.8rem;color:var(--text-sub);}
+/* ═══ STATS BAR ═══ */
+.stats-bar{display:flex;justify-content:center;gap:30px;margin-top:50px;flex-wrap:wrap;}
+.stat-item{text-align:center;}
+.stat-num{font-family:'Cinzel',serif;font-size:1.8rem;color:var(--acc2);text-shadow:0 0 20px var(--glow);}
+.stat-label{font-size:0.75rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;}
+/* ═══ GİZLİ OVERLAY'LER ═══ */
+.nova-secret-card{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:opacity 0.5s;}
+.nova-secret-card.show{opacity:1;pointer-events:all;}
+.secret-inner{text-align:center;padding:60px 40px;max-width:500px;}
+.secret-symbol{font-size:6rem;animation:secFloat 3s ease-in-out infinite;filter:drop-shadow(0 0 30px #c77dff);display:block;margin-bottom:24px;}
+@keyframes secFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(10deg)}}
+.secret-title{font-family:'Cinzel',serif;font-size:2.5rem;background:linear-gradient(135deg,#c77dff,#ffd700,#c77dff);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2s linear infinite;margin-bottom:16px;}
+.secret-text{color:var(--text-sub);font-size:1rem;line-height:1.8;margin-bottom:32px;}
+.secret-close,.event13-close{padding:12px 36px;background:linear-gradient(135deg,var(--acc3),var(--acc1));border:none;border-radius:50px;color:white;font-family:'Cinzel',serif;font-size:0.9rem;cursor:pointer;transition:all 0.3s;box-shadow:0 0 30px var(--glow);}
+.secret-close:hover,.event13-close:hover{box-shadow:0 0 60px var(--glow);transform:scale(1.05);}
+.event13-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.97);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s;flex-direction:column;gap:24px;}
+.event13-overlay.show{opacity:1;pointer-events:all;}
+.event13-text{font-family:'Cinzel',serif;font-size:clamp(1.5rem,5vw,3rem);color:var(--neon);text-align:center;text-shadow:0 0 40px var(--glow);animation:flickr 0.5s ease-in-out infinite alternate;padding:0 20px;}
+@keyframes flickr{from{opacity:1}to{opacity:0.7;text-shadow:0 0 80px var(--acc2)}}
+.event13-close{background:none;border:1px solid var(--acc1);color:var(--acc2);}
+.event13-close:hover{background:var(--acc1);color:white;}
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:600px){
+  .mode-content{padding:20px 16px;}
+  .modal-body{padding:0 16px 24px;}
+  .modal-header{padding:30px 20px 16px;}
+  .pros-cons-grid{grid-template-columns:1fr;}
+  .fate-cards{gap:14px;}
+  .fate-card-wrap{min-width:130px;}
+  .cards-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;}
+  #theme-picker{top:8px;right:8px;padding:6px 10px;gap:6px;}
+  .theme-dot{width:16px;height:16px;}
+}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg1);}::-webkit-scrollbar-thumb{background:var(--acc3);border-radius:4px;}::-webkit-scrollbar-thumb:hover{background:var(--acc1);}
+</style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<!-- TEMA SEÇİCİ -->
+<div id="theme-picker">
+  <div class="theme-dot td-mistik active" data-theme="mistik" title="Mistik Mor"></div>
+  <div class="theme-dot td-kizil" data-theme="kizil" title="Kızıl Gece"></div>
+  <div class="theme-dot td-okyan" data-theme="okyanus" title="Okyanus"></div>
+  <div class="theme-dot td-zumrut" data-theme="zumrut" title="Zümrüt"></div>
+  <div class="theme-dot td-altin" data-theme="altin" title="Altın Çağ"></div>
+</div>
+
+<!-- ANA HUB -->
+<div id="hub" class="layer">
+  <div class="nova-logo">NOVA</div>
+  <div class="nova-subtitle">Nova'nın Evrenine Hoş Geldin</div>
+  <nav class="menu-grid">
+    <button class="menu-btn featured" onclick="openMode('ansiklopedi')">
+      <span class="menu-icon">📖</span><span class="menu-label">İSKAMBİL KARTLARI ANSİKLOPEDİSİ</span><span class="menu-arrow">→</span>
+    </button>
+    <button class="menu-btn" onclick="openMode('kartlar')">
+      <span class="menu-icon">🃏</span><span class="menu-label">Kartlar Dünyası Evreni</span><span class="menu-arrow">→</span>
+    </button>
+    <button class="menu-btn" onclick="openMode('kader')">
+      <span class="menu-icon">🔮</span><span class="menu-label">Kader Evreni</span><span class="menu-arrow">→</span>
+    </button>
+    <button class="menu-btn" onclick="openMode('enerji')">
+      <span class="menu-icon">⚡</span><span class="menu-label">Enerji Evreni</span><span class="menu-arrow">→</span>
+    </button>
+    <button class="menu-btn" onclick="openMode('ters')">
+      <span class="menu-icon">🪞</span><span class="menu-label">Ters Kart Evreni</span><span class="menu-arrow">→</span>
+    </button>
+    <button class="menu-btn" onclick="openMode('sozler')">
+      <span class="menu-icon">💬</span><span class="menu-label">Sözler Evreni</span><span class="menu-arrow">→</span>
+    </button>
+  </nav>
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-num" id="stat-explored">0</div><div class="stat-label">Keşfedilen Kart</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat-achievements">0</div><div class="stat-label">Başarım</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat-modes">0</div><div class="stat-label">Ziyaret Edilen Evren</div></div>
+  </div>
+</div>
+
+<!-- ANSİKLOPEDİ -->
+<div id="mode-ansiklopedi" class="mode-screen layer">
+  <div class="mode-header"><div class="mode-logo">✦ NOVA'NIN EVRENİ</div><button class="back-btn" onclick="closeMode('ansiklopedi')">← Evrene Dön</button></div>
+  <div class="mode-content">
+    <h2 class="mode-title">📖 İskambil Kartları Ansiklopedisi</h2>
+    <p class="mode-desc">Tüm 52 kartın mistik dünyasına adım at — anlamları, enerjileri ve sırları keşfet</p>
+    <div class="search-wrapper"><input type="text" class="search-input" id="search-ansiklopedi" placeholder='Kart ara... ("nova" veya "13" yaz)' oninput="filterCards('ansiklopedi')" autocomplete="off"><span class="search-icon">🔍</span></div>
+    <div class="filter-bar" id="filter-ansiklopedi">
+      <button class="filter-btn active" onclick="setSuitFilter('ansiklopedi','all',this)">Tümü</button>
+      <button class="filter-btn" onclick="setSuitFilter('ansiklopedi','spades',this)">♠ Maça</button>
+      <button class="filter-btn" onclick="setSuitFilter('ansiklopedi','hearts',this)">♥ Kupa</button>
+      <button class="filter-btn" onclick="setSuitFilter('ansiklopedi','diamonds',this)">♦ Karo</button>
+      <button class="filter-btn" onclick="setSuitFilter('ansiklopedi','clubs',this)">♣ Sinek</button>
+    </div>
+    <div class="cards-grid" id="grid-ansiklopedi"></div>
+  </div>
+</div>
+
+<!-- KARTLAR DÜNYASI -->
+<div id="mode-kartlar" class="mode-screen layer">
+  <div class="mode-header"><div class="mode-logo">✦ NOVA'NIN EVRENİ</div><button class="back-btn" onclick="closeMode('kartlar')">← Evrene Dön</button></div>
+  <div class="mode-content">
+    <h2 class="mode-title">🃏 Kartlar Dünyası Evreni</h2>
+    <p class="mode-desc">Neon galaksiler arasında kartların sonsuz dünyasını keşfet</p>
+    <div class="search-wrapper"><input type="text" class="search-input" id="search-kartlar" placeholder="Kart ara..." oninput="filterCards('kartlar')" autocomplete="off"><span class="search-icon">✦</span></div>
+    <div class="filter-bar" id="filter-kartlar">
+      <button class="filter-btn active" onclick="setSuitFilter('kartlar','all',this)">Tümü</button>
+      <button class="filter-btn" onclick="setSuitFilter('kartlar','spades',this)">♠ Maça</button>
+      <button class="filter-btn" onclick="setSuitFilter('kartlar','hearts',this)">♥ Kupa</button>
+      <button class="filter-btn" onclick="setSuitFilter('kartlar','diamonds',this)">♦ Karo</button>
+      <button class="filter-btn" onclick="setSuitFilter('kartlar','clubs',this)">♣ Sinek</button>
+    </div>
+    <div class="cards-grid" id="grid-kartlar"></div>
+  </div>
+</div>
+
+<!-- KADER -->
+<div id="mode-kader" class="mode-screen layer">
+  <div class="mode-header"><div class="mode-logo">✦ NOVA'NIN EVRENİ</div><button class="back-btn" onclick="closeMode('kader')">← Evrene Dön</button></div>
+  <div class="mode-content">
+    <h2 class="mode-title">🔮 Kader Evreni</h2>
+    <p class="mode-desc">Geçmiş, şimdi ve gelecek — üç kart senin için konuşsun</p>
+    <button class="fate-btn" onclick="drawFate()">✦ Kaderini Aç ✦</button>
+    <div class="fate-cards" id="fate-cards-wrap"></div>
+    <div class="fate-interp" id="fate-interp" style="display:none"><div class="fate-interp-title">🌌 Mistik Yorum</div><div class="typing-text" id="typing-output"></div></div>
+  </div>
+</div>
+
+<!-- ENERJİ -->
+<div id="mode-enerji" class="mode-screen layer">
+  <div class="mode-header"><div class="mode-logo">✦ NOVA'NIN EVRENİ</div><button class="back-btn" onclick="closeMode('enerji')">← Evrene Dön</button></div>
+  <div class="mode-content">
+    <h2 class="mode-title">⚡ Enerji Evreni</h2>
+    <p class="mode-desc">Her kart canlı bir varlık — enerji seviyeleri sürekli değişir</p>
+    <button class="energy-refresh-btn" onclick="renderEnergyGrid()">⚡ Enerjiyi Yenile</button>
+    <div class="cards-grid" id="grid-enerji"></div>
+  </div>
+</div>
+
+<!-- TERS KART -->
+<div id="mode-ters" class="mode-screen layer">
+  <div class="mode-header"><div class="mode-logo">✦ NOVA'NIN EVRENİ</div><button class="back-btn" onclick="closeMode('ters')">← Evrene Dön</button></div>
+  <div class="mode-content">
+    <h2 class="mode-title">🪞 Ters Kart Evreni</h2>
+    <p class="mode-desc">Karanlık aynada yansıyan gerçekler — kartlara dokun, sırları keşfet</p>
+    <div class="cards-grid" id="grid-ters"></div>
+  </div>
+</div>
+
+<!-- SÖZLER -->
+<div id="mode-sozler" class="mode-screen layer">
+  <div class="mode-header"><div class="mode-logo">✦ NOVA'NIN EVRENİ</div><button class="back-btn" onclick="closeMode('sozler')">← Evrene Dön</button></div>
+  <div class="mode-content">
+    <h2 class="mode-title">💬 Sözler Evreni</h2>
+    <p class="mode-desc">Sana özel — kalpten gelen, gerçek sözler</p>
+    <div class="mood-bar">
+      <button class="mood-btn active" onclick="setMood('all',this)">Tümü</button>
+      <button class="mood-btn" onclick="setMood('tatli',this)">🍬 Tatlı</button>
+      <button class="mood-btn" onclick="setMood('romantik',this)">❤️ Romantik</button>
+      <button class="mood-btn" onclick="setMood('motivasyon',this)">🚀 Motivasyon</button>
+      <button class="mood-btn" onclick="setMood('gizemli',this)">🌙 Gizemli</button>
+    </div>
+    <div class="quote-display">
+      <div class="quote-text" id="quote-text">Bir söz üretmek için aşağıdaki butona bas...</div>
+      <div class="quote-actions">
+        <button class="quote-action-btn" id="copy-btn" onclick="copyQuote()">📋 Kopyala</button>
+        <button class="quote-action-btn" id="fav-btn" onclick="toggleFavoriteQuote()">♡ Favorile</button>
+      </div>
+    </div>
+    <button class="generate-quote-btn" onclick="generateQuote()">✦ Yeni Söz Üret ✦</button>
+    <div class="fav-section">
+      <div class="fav-title" id="fav-title" style="display:none">⭐ Favorilerin</div>
+      <div class="fav-list" id="fav-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- KART MODALI -->
+<div id="card-modal">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-symbol" id="modal-symbol"></span>
+      <div class="modal-card-name" id="modal-name"></div>
+      <div class="modal-suit-label" id="modal-suit-label"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- GİZLİ NOVA KARTI -->
+<div class="nova-secret-card" id="nova-secret">
+  <div class="secret-inner">
+    <span class="secret-symbol">✧</span>
+    <div class="secret-title">NOVA KARTI</div>
+    <p class="secret-text">Bu kart evrende yalnızca bir kez ortaya çıkar.<br>Nova'nın Evreni'nde en nadir karttır.<br><br><em>Anlam:</em> Sonsuz potansiyel, yeni başlangıçlar ve evrensel bağlantı.<br>Bunu gören kişi, evrende özel bir yere sahiptir.</p>
+    <button class="secret-close" onclick="closeSecret()">Evrene Dön ✦</button>
+  </div>
+</div>
+
+<!-- MİSTİK 13 -->
+<div class="event13-overlay" id="event13">
+  <div class="event13-text" id="event13-text">13... Sayı mı, kader mi?</div>
+  <button class="event13-close" onclick="closeEvent13()">✦ Kabul Ediyorum ✦</button>
+</div>
+
+<!-- BAŞARIM TOSTU -->
+<div id="achievement-toast">
+  <div class="toast-icon" id="toast-icon">🏆</div>
+  <div class="toast-content">
+    <div class="toast-title">Başarım Kazanıldı!</div>
+    <div class="toast-name" id="toast-name"></div>
+    <div class="toast-desc" id="toast-desc"></div>
+  </div>
+</div>
+
+<script>
+/* ═══ VERİ — 52 KART ═══ */
+const CARDS=[
+  // MAÇA
+  {id:'SA',suit:'spades',name:'Maça Ası',symbol:'♠',value:'As (1/14)',energy:'High',general:'Maça Ası, güç ve kararlılığın zirvesini simgeler. Bir kılıç gibi keskin, bir taht gibi sağlamdır. Zihin ve iradeyle bağlantılıdır.',fal:'Fal yorumunda Maça Ası, büyük bir dönüm noktasına ya da zorlukla gelen bir gücün kapıya dayandığına işaret eder. Bu kart çıktığında, bir şeyi bitirmeye ya da kökten değiştirmeye hazır olduğunu gösterir. Başarı, ancak sert bir karar ile elde edilecektir.',numerology:'1 — Başlangıç, özgünlük ve liderlik enerjisi. Numerolojide 1, her şeyin kaynağıdır. Bağımsız hareket etme iradesiyle bağlantılıdır.',positive:['Güçlü liderlik kapasitesi','Zihinsel berraklık ve netlik','Cesur karar verme yeteneği'],negative:['Aşırı baskıcı olma eğilimi','Duygusal soğukluk riski','Yalnızlık ve izolasyon tehlikesi'],suit_meaning:'Maça takımı; zihin, mücadele, güç ve karanlığı temsil eder. Hava elementine bağlıdır ve entelektüel güçle irtibatlıdır.',history:'Maça takımı, Avrupa iskambil tarihinde kılıç (İtalyan) ve Fransız yaprak simgesinden evrilmiştir. Askerlik ve güç sembolü olarak kullanılmıştır.',keywords:['Güç','Kararlılık','Dönüşüm','Zirve']},
+  {id:'S2',suit:'spades',name:'Maça İkisi',symbol:'♠',value:'2',energy:'Medium',general:'Maça İkisi, gerilim ve denge arasındaki salınımı simgeler. İki güç arasında kalmak, karar noktasında durmak demektir.',fal:'Bu kart, bir çatışmanın ya da ikiliğin ortasında olduğuna işaret eder. İki yol arasında seçim yapmak zorunda kalacaksın. Acele etme; her iki tarafı da görmek daha değerlidir.',numerology:'2 — Denge, diyalog ve uyum enerjisi. İkiliği ve karşıtlığı dengelemek bu sayının özündedir.',positive:['Çatışmayı analiz etme becerisi','Diplomatik yaklaşım','Sakin kalabilme'],negative:['Kararsızlık','Sürekli bekleme hali','Kaçınma davranışı'],suit_meaning:'Maça takımı; zihin, mücadele ve karanlıkla bağlantılıdır. Hava elementine aittir.',history:'İki kart, tarihsel olarak zıtlıkların sembolü olmuştur. Pek çok kültürde ikili sayılar çift gücü ve gerilimi ifade eder.',keywords:['Gerilim','Denge','Seçim','İkilik']},
+  {id:'S3',suit:'spades',name:'Maça Üçü',symbol:'♠',value:'3',energy:'High',general:'Maça Üçü, hayal kırıklığı ve kayıp anlamıyla bilinir. Ancak acı, dönüşümün kapısıdır. Kırgınlıktan bilgelik doğar.',fal:'Duygusal bir yara ya da hayal kırıklığı dönemine girildiğini gösterir. Sevilen bir kişiyle yollar ayrılabilir ya da bir planın bozulduğunu fark edebilirsin. Bu an geçecek; acı seni güçlendirecek.',numerology:"3 — Yaratıcılık ve büyüme enerjisi, ancak Maça'da bu büyüme acı bir süreçten geçer.",positive:['Derin duygusal farkındalık','Acıdan öğrenme kapasitesi','Empati ve anlayış'],negative:['Hayal kırıklığı','Hüzün ve yas','İçe kapanma riski'],suit_meaning:'Maça takımı zorlukları temsil eder. Üçlü sayılar ise genişleme ve deneyimi simgeler.',history:"Maça 3, Tarot'taki 'Kılıçların Üçü' ile paralellik taşır; kalbi delen üç kılıç imgesiyle tanınır.",keywords:['Kayıp','Acı','Büyüme','Dönüşüm']},
+  {id:'S4',suit:'spades',name:'Maça Dördü',symbol:'♠',value:'4',energy:'Low',general:'Maça Dördü, duraksama, dinlenme ve içe çekilme zamanını simgeler. Savaş sona ermiştir; şimdi sağaltma vakti.',fal:'Bir mola verme ya da kendini yenileme sürecine girdiğine işaret eder. Bu süreç gerekli; beden ve zihin yenilenmeye ihtiyaç duyar.',numerology:'4 — Stabilite, temel ve güvenlik enerjisi. Duraksayan ama sağlam bir güç.',positive:['Kendini yenileme fırsatı','İç huzura erişim','Stratejik planlama zamanı'],negative:['Hareketsizlik','İzolasyon','Kaçınma davranışı'],suit_meaning:"Maça takımının dörtlüsü, duraksayanın güvenli alanıdır.",history:"Ortaçağ'da iskambil dörtlüleri tahta, istikrara ve malzemeye bağlıydı.",keywords:['Dinlenme','İyileşme','Duraksama','Güvenlik']},
+  {id:'S5',suit:'spades',name:'Maça Beşi',symbol:'♠',value:'5',energy:'High',general:'Maça Beşi, yenilgi, çatışma ve zihinsel mücadeleyi temsil eder. Kazanmak için her şeyi yaptın ama bedel ağır oldu.',fal:'Bir çatışmadan galip çıksan da etrafındakileri kaybettiğini gösterir. Pirhik zafer denen bu hal, gerçek bir kazanç değildir. Mücadeleni gözden geçir.',numerology:'5 — Değişim, özgürlük ve çatışma enerjisi. Beşli sayılar düzensizliği ve hareketi simgeler.',positive:['Mücadele azmi','Stratejik düşünme','Rekabetçi güç'],negative:['Etik dışı yollarla kazanma','İlişkilerin zarar görmesi','Yalnızlaşma'],suit_meaning:"Maça takımının en sert kartlarından biri; çatışma ve güç gösterisi.",history:'Beşli sayılar tarihsel olarak kritik kırılma noktasını simgelemiştir.',keywords:['Çatışma','Yenilgi','Güç','Pirhik zafer']},
+  {id:'S6',suit:'spades',name:'Maça Altısı',symbol:'♠',value:'6',energy:'Medium',general:'Maça Altısı, geçişi ve ileriye doğru hareketi simgeler. Zorlu bir dönem geride kalıyor; yeni bir kıyıya ulaşılıyor.',fal:'Zor bir süreçten çıkış yolunun göründüğüne işaret eder. Taşınma, seyahat ya da zihinsel geçiş yaşanabilir. Arkana bakma; önün açık.',numerology:'6 — Uyum, sorumluluk ve şefkat enerjisi. Altılı sayılar dengeyi ve çözümü simgeler.',positive:['Geçişe cesaret','İleriye odaklanma','Yeni başlangıçlar'],negative:['Geçmişe takılma riski','Belirsizlik korkusu','Güvenlik ihtiyacı'],suit_meaning:'Maça takımının altısı, fırtınadan sonraki sessizliği temsil eder.',history:"Altılı kart, birçok kültürde 'yolculuk' ve 'geçiş' anlamı taşır.",keywords:['Geçiş','İlerleme','Yeni kıyı','Çıkış']},
+  {id:'S7',suit:'spades',name:'Maça Yedisi',symbol:'♠',value:'7',energy:'High',general:'Maça Yedisi, hile, aldatma ve stratejik hareket etmeyi simgeler. Güçlü ama sorgulanabilir bir taktik.',fal:'Birisinin seni kandırmaya çalışabileceğine ya da senin kendi çıkarın için başkalarını görmezden gelebileceğine işaret eder. Dikkatli ol; gizli planlar gün yüzüne çıkabilir.',numerology:"7 — Sır, gizem ve içsel bilgelik enerjisi. Ancak Maça'da bu bilgelik kimi zaman karanlık bir yüz taşır.",positive:['Stratejik düşünme yeteneği','Adaptasyon becerisi','Zeka ve çeviklik'],negative:['Güvensizlik oluşturma','Dürüst olmayan yollar','Tespiti güç planlar'],suit_meaning:"Maça takımının yedisi, zihinsel hile ve stratejinin doruk noktasıdır.",history:'Yedi, kadim kültürlerde gizemle ilişkilendirilir. Maça yedi ise bu gizemli gücün karanlık yüzünü simgeler.',keywords:['Hile','Strateji','Gizem','Dikkat']},
+  {id:'S8',suit:'spades',name:'Maça Sekizi',symbol:'♠',value:'8',energy:'High',general:'Maça Sekizi, kısıtlama ve bağlılık hissini simgeler. Etrafı duvarlarla çevrilmiş gibi hissetmek, ancak çıkış yolu var.',fal:'Kendini hapsettiğini ya da bir durumun seni sıkıştırdığını hissediyorsundur. Aslında zincirlerin çoğu kendi zihnindedir. Bakış açını değiştirdiğinde özgürlük belirir.',numerology:'8 — Güç, başarı ve sonsuzluk enerjisi. Sekizli bazen kısıtlamayı anlatır çünkü büyük güç büyük sorumluluk getirir.',positive:['Kısıtlamalardan ders çıkarma','İçsel güç keşfi','Sabır ve dayanıklılık'],negative:['Özgürlük hissi kaybı','Kaygı ve çaresizlik','Hareketsizlik'],suit_meaning:'Maça sekizi, zihinsel hapishaneyi ve buradan kurtuluşun mümkün olduğunu anlatır.',history:'Sekiz rakamı, sonsuzluk sembolüyle bağlantılıdır. Bu kart sonsuz döngüyü ve çıkışı temsil eder.',keywords:['Kısıtlama','Özgürlük','Zihin','Kurtuluş']},
+  {id:'S9',suit:'spades',name:'Maça Dokuzu',symbol:'♠',value:'9',energy:'High',general:'Maça Dokuzu, kaygı ve korku kartıdır. Gece yarısı uyanıp düşünen zihinlerin, zihinsel eziyetin kartta yansımasıdır.',fal:'Geceleri düşünceler seni rahat bırakmıyordur. Var olmayan tehlikeler bile gerçekmiş gibi hissettiriyor. Bu süreç geçicidir; korku yerine farkındalık seç.',numerology:'9 — Tamamlanma ve derin bilgelik enerjisi. Ancak en zor sondur; dokuzun bilgeliği acıyla gelir.',positive:['Derin iç dönüşüm','Acıdan öğrenme','Farkındalık ve uyanış'],negative:['Kronik kaygı','Uyku sorunları','Karanlık düşünceler'],suit_meaning:'Maça dokuzu, en yoğun ve en karanlık Maça enerjisini taşır.',history:"Tarot'ta Kılıçların Dokuzu, ağlayan bir figürü ve karardan önceki ağır geceyi simgeler.",keywords:['Kaygı','Korku','Gece','Farkındalık']},
+  {id:'S10',suit:'spades',name:'Maça Onu',symbol:'♠',value:'10',energy:'High',general:'Maça Onu, bitişi, çöküşü ve bir dönemin kapanmasını simgeler. Ağır bir yük nihayet bırakılıyor.',fal:'Bir şeyin kesin olarak sona erdiğini gösterir. Bu son, acı verici olabilir ama aynı zamanda yeni bir başlangıcı mümkün kılar. En karanlık an, şafaktan öncekidir.',numerology:'10 — Tamamlanma ve yeni döngünün başlangıcı. On, hem sonu hem de yeniden doğuşu simgeler.',positive:['Kesin bir bağ kopuşu','Yükten kurtulma','Yeni dönemin kapısı'],negative:['Ağır kayıp','Hayal kırıklığı','Son bırakma güçlüğü'],suit_meaning:"Maça onu, takımın en ağır ve en dönüştürücü kartıdır.",history:'On rakamı, Pitagoras felsefesinde kusursuz sayı olarak görülmüştür.',keywords:['Son','Çöküş','Dönüşüm','Yeniden doğuş']},
+  {id:'SJ',suit:'spades',name:'Maça Valesi',symbol:'♠',value:'Vale (11)',energy:'High',general:'Maça Valesi, zeki ama güvenilmez bir figürü simgeler. Keskin zekası ve dili vardır; ama motivasyonları karanlıktır.',fal:'Hayatında güvenilmez ya da iki yüzlü biri olabilir. Belki de sen kendin biriyle oyun oynuyorsundur. Dürüstlük, en güçlü silahtır.',numerology:'11 — Karmaşa içinde içgüdü. Vale, ham gücün henüz olgunlaşmamış halidir.',positive:['Keskin zeka','Analitik bakış','Cesur söz'],negative:['Güvenilmezlik','Manipülasyon','Samimiyet eksikliği'],suit_meaning:'Maça valeleri, dehasını henüz doğru yolda kullanmayan figürleri temsil eder.',history:"Ortaçağ kartlarında vale, soylu bir hizmetkârı temsil ederdi. Maça valesi ise her zaman şüpheyle izlenirdi.",keywords:['Zeka','Güvensizlik','Keskinlik','Oyun']},
+  {id:'SQ',suit:'spades',name:'Maça Kızı',symbol:'♠',value:'Kız (12)',energy:'High',general:'Maça Kızı, zekası ve soğukkanlılığıyla etkileyici bir figürdür. Hem koruyucu hem de kırılgan; hem kuvvetli hem derin.',fal:'Güçlü, bağımsız bir kadın figürü ya da bu enerji senin kendi içinde yükseliyor olabilir. Karar verme zamanı; ve bu karar sert ama adil olacak.',numerology:'12 — Sezgi ve güç. Onikinin enerjisi tamlık ve iktidar arasında köprü kurar.',positive:['Güçlü sezgi','Bağımsız düşünce','Adalet ve netlik'],negative:['Duygusal soğukluk','İzolasyon','Bağlanmaktan kaçınma'],suit_meaning:'Maça kızı, güçlü kadın arketipini taşır; ama bu güç bazen yalnızlıkla ödenir.',history:'Kraliçe figürü, iskambil tarihinde gerçek hükümdar kadınlardan ilham almıştır.',keywords:['Güç','Sezgi','Bağımsızlık','Netlik']},
+  {id:'SK',suit:'spades',name:'Maça Kralı',symbol:'♠',value:'Kral (13)',energy:'High',general:'Maça Kralı, otoritenin, bilgeliğin ve gücün zirvesini simgeler. Güçlü bir lider; ama bazen soğuk ve mesafeli.',fal:'Hayatında güçlü bir erkek figürü var ya da sen kendin bu liderlik rolüne adım atıyorsun. Sorumluluğu al; ama insanları unutma.',numerology:'13 — Dönüşüm. Oniki + 1; yeni bir döngünün başlangıcı, güçlü bir geçiş.',positive:['Güçlü liderlik','Stratejik düşünce','Otorite ve güven'],negative:['Duygusal mesafe','Diktatörlük eğilimi','İletişim kopuklukları'],suit_meaning:"Maça Kralı, takımının en güçlü ve en otoriter figürüdür.",history:"Kral figürü, Fransız iskambilinde Davut'u simgeler.",keywords:['Otorite','Liderlik','Güç','Sorumluluk']},
+  // KUPA
+  {id:'HA',suit:'hearts',name:'Kupa Ası',symbol:'♥',value:'As (1/14)',energy:'High',general:'Kupa Ası, saf ve güçlü duygusal bir başlangıcı simgeler. Kalp bu kartla açılır; yeni bir sevgi, derin bir bağ ya da ruhsal uyanış habercisidir.',fal:'Yeni bir aşk kapınızı çalıyor ya da mevcut ilişkiniz derin bir boyut kazanıyor. Duygular doruk noktasında; bu hissi yaşamak için en ideal zaman. Kalbin ne diyorsa onu dinle.',numerology:'1 — Başlangıç ve özgünlük. Kupa elementinde bu, duygusal bir sıfırdan başlayışı simgeler.',positive:['Saf sevgi kapasitesi','Duygusal açıklık','Derin bağ kurabilme'],negative:['Aşırı duygusallık','İdealizm','Hayal kırıklığı riski'],suit_meaning:'Kupa takımı; aşk, duygu, sezgi ve ilişkileri temsil eder. Su elementine aittir.',history:"Kupa sembolü, Avrupa'da 'kadeh' simgesinden evrilmiştir. Ruhsal ve duygusal bolluğu temsil ederdi.",keywords:['Aşk','Başlangıç','Duygu','Bağ']},
+  {id:'H2',suit:'hearts',name:'Kupa İkisi',symbol:'♥',value:'2',energy:'Medium',general:"Kupa İkisi, karşılıklı çekim, ortaklık ve romantik uyumu simgeler. İki kalbin buluşma noktasıdır.",fal:'Bir ilişkide denge ve karşılıklı sevgi var ya da böyle bir bağın kapıda olduğunu gösterir. Duyguların karşılık bulacağı an geldi.',numerology:"2 — Denge ve ortaklık. Kupa'da bu, duygusal uyumu ve romantik birleşimi simgeler.",positive:['Karşılıklı çekim','Derin uyum','Romantik bağ'],negative:['Bağımlılık riski','Sınırların bulanıklığı','Ayrılık korkusu'],suit_meaning:'Kupa ikisi, iki kalbin dans ettiği anı simgeler.',history:'İki kupa sembolü, evlilik ve sevgili kartı olarak kullanılmıştır.',keywords:['Aşk','Uyum','Ortaklık','Çekim']},
+  {id:'H3',suit:'hearts',name:'Kupa Üçü',symbol:'♥',value:'3',energy:'High',general:'Kupa Üçü, kutlama, arkadaşlık ve duygusal doluluk kartıdır. Hayatın güzelliğini paylaşmak için doğru an.',fal:'Sevinçli bir dönem, kutlama ya da sosyal buluşmaların zamanı. Arkadaşlıklar derinleşiyor, hayat güzel geliyor. Bu enerjiyi iç ve başkalarına ver.',numerology:"3 — Yaratıcılık ve büyüme. Kupa'da bu, duygusal taşma ve kutlamadır.",positive:['Neşe ve coşku','Paylaşım sevinci','Topluluk ruhu'],negative:['Yüzeysellik riski','Aşırı kutlama','Sevinç sarhoşluğu'],suit_meaning:'Kupa üçü, duygusal bolluk ve kutlamanın kartıdır.',history:"Üç Kupa, Tarot'ta kutlama imgesiyle özdeşleşmiştir.",keywords:['Kutlama','Arkadaşlık','Sevinç','Paylaşım']},
+  {id:'H4',suit:'hearts',name:'Kupa Dördü',symbol:'♥',value:'4',energy:'Low',general:'Kupa Dördü, duygusal durgunluk ve bezginliği simgeler. Sahip olduklarına şükretmez ve yeni fırsatları görmezden gelirsin.',fal:'Sana sunulan fırsatları ya da sevgiyi fark etmediğini gösterir. Belki doyumsuzluk içindesin. Etrafına bak; seni bekleyen güzellikler var.',numerology:'4 — Stabilite, ama burada bu duygusal blokajdır.',positive:['İç dönüşüme fırsat','Bekleme bilgeliği','Farkındalık kapısı'],negative:['Nankörlük','Duygusal donukluk','Fırsatları kaçırma'],suit_meaning:'Kupa dördü, durmuş kalbin yeniden çarpması için bir davet.',history:'Dört rakamı, kararlılığı ama aynı zamanda sıkışıp kalmayı simgeler.',keywords:['Bezginlik','Durgunluk','Fırsatlar','Farkındalık']},
+  {id:'H5',suit:'hearts',name:'Kupa Beşi',symbol:'♥',value:'5',energy:'High',general:'Kupa Beşi, kayıp ve pişmanlık kartıdır. Üzüntüyle yüzleşme, ancak geride kalanların hâlâ değerli olduğunu hatırlama zamanı.',fal:'Bir kayıp ya da hayal kırıklığı yaşadıysan, şu an yas tutuyorsundur. Dökülen bardakları gör; ama hâlâ dolu olanları da. Geçmişi bırak, ileriye bak.',numerology:"5 — Değişim ve çatışma. Kupa'da bu, duygusal kırılma ve yenilenme sürecidir.",positive:['Acıyla yüzleşme','Duygusal dürüstlük','İyileşme gücü'],negative:['Pişmanlık','Hüzün','Geçmişe takılma'],suit_meaning:'Kupa beşi, kaybın içinde bile umudun var olduğunu hatırlatır.',history:"Beş Kupa, Tarot'ta 3 dökülmüş ve 2 dolu kadeh imgesiyle tanınır.",keywords:['Kayıp','Pişmanlık','İyileşme','Umut']},
+  {id:'H6',suit:'hearts',name:'Kupa Altısı',symbol:'♥',value:'6',energy:'Medium',general:'Kupa Altısı, nostalji ve geçmişe özlem kartıdır. Masum anlar, çocukluk hisleri ve eski sevgiler yeniden canlanır.',fal:'Geçmişten biri geri dönebilir ya da eski anılar seni ziyaret ediyor. Bu nostaljinin içinde güzel bir ders var; ama bugünü kaçırma.',numerology:"6 — Uyum ve şefkat. Kupa'da bu, geçmişin sıcaklığına dönüştür.",positive:['Derin şükran','Geçmişten ders','Sıcak anılar'],negative:['Nostaljiye takılma','İdealize etme','Bugünden kaçış'],suit_meaning:'Kupa altısı, geçmişin nazik kollarına uzanır.',history:"Altı Kupa, Tarot'ta çocukluk imgesiyle özdeşleşmiştir.",keywords:['Nostalji','Geçmiş','Masumiyet','Anılar']},
+  {id:'H7',suit:'hearts',name:'Kupa Yedisi',symbol:'♥',value:'7',energy:'Medium',general:'Kupa Yedisi, hayal gücü ve yanılsamayı simgeler. Çok fazla seçenek, çok az netlik. Gerçek ile hayali ayırt etme zamanı.',fal:'Kafanda pek çok farklı olasılık ya da hayal kuruyorsun. Bunların hepsi gerçek değil. Hangi yolun gerçekten senin yolun olduğunu bulmak için durakla.',numerology:"7 — Gizem ve içsel arayış. Kupa'da bu, duygusal yanılsamalar labirentidir.",positive:['Zengin hayal gücü','Yaratıcı vizyon','Ruhsal olasılıklar'],negative:['Gerçekçi olmayan beklentiler','Kafa karışıklığı','Kaçınma'],suit_meaning:'Kupa yedisi, hayal ile gerçek arasında süzülür.',history:"Yedi Kupa, Tarot'ta parlak renkli hayaller ve boş vaatlerle dolu kadeh imgesiyle bilinir.",keywords:['Hayal','Yanılsama','Seçim','Netlik']},
+  {id:'H8',suit:'hearts',name:'Kupa Sekizi',symbol:'♥',value:'8',energy:'Medium',general:'Kupa Sekizi, vazgeçme ve ayrılış kartıdır. Dolu olan bardakları geride bırakıp yeni bir yolculuğa çıkma cesareti.',fal:'Bir ilişkiyi, işi ya da durumu bırakma zamanı gelmiş. Bunu yapmak zor; ama dolu olan kadehler bile bazen arkada kalmalı. Kalbindeki rehbere güven.',numerology:"8 — Güç ve karar. Kupa'da bu, bir şeyi bırakmanın güç gerektirdiğini gösterir.",positive:['Vazgeçme cesareti','Yeni yolculuğa adım','Duygusal dürüstlük'],negative:['Geride kalanlar için yas','Belirsizlik','Yalnızlık hissi'],suit_meaning:'Kupa sekizinde, bırakmanın kendisi bir uyanıştır.',history:"Sekiz Kupa, Tarot'ta bir figürün arkasına bile bakmadan denizi geçmesini simgeler.",keywords:['Ayrılış','Bırakma','Yolculuk','Cesaret']},
+  {id:'H9',suit:'hearts',name:'Kupa Dokuzu',symbol:'♥',value:'9',energy:'High',general:"Kupa Dokuzu, 'dilek kartı'dır. Duygusal tatmin, mutluluk ve arzuların gerçekleşme zamanı.",fal:'Dileklerinin gerçekleşmek üzere olduğunu gösterir. Sevinç ve tatmin kapıdadır. Hak ettiğin güzellikler sana geliyor.',numerology:"9 — Tamamlanma ve derin bilgelik. Kupa'da bu, duygusal doruktur.",positive:['Dileklerin gerçekleşmesi','Duygusal tatmin','Sevinç ve bolluk'],negative:['Kibir riski','Aşırı tatmin','Başkalarını görmezden gelme'],suit_meaning:'Kupa dokuzu, kalp sevinci ve dilek gerçekleşmesinin zirvesidir.',history:"'Dilek kartı' olarak bilinen bu kart, iskambil falında en olumlu anlamlardan birini taşır.",keywords:['Dilek','Tatmin','Sevinç','Mutluluk']},
+  {id:'H10',suit:'hearts',name:'Kupa Onu',symbol:'♥',value:'10',energy:'High',general:'Kupa Onu, aile mutluluğu, duygusal bütünlük ve kalıcı sevinci simgeler. Hayallerindeki huzur bu karttadır.',fal:'Duygusal açıdan tam anlamıyla memnun olacağın bir dönem seni bekliyor. Aile, sevgi ve uyum bir arada. Bu zamanı biriktir.',numerology:"10 — Tamamlanma. Kupa'da bu, duygusal mükemmellik ve bolluktur.",positive:['Aile mutluluğu','Kalıcı huzur','Duygusal bütünlük'],negative:['Gerçekçi olmayan beklentiler','Mükemmeliyetçilik','Değişime direnç'],suit_meaning:"Kupa onu, takımın en mutlu ve en doyurucu kartıdır.",history:"On Kupa, Tarot'ta gökkuşağı ve mutlu aile imgesiyle tanınır.",keywords:['Mutluluk','Aile','Huzur','Bütünlük']},
+  {id:'HJ',suit:'hearts',name:'Kupa Valesi',symbol:'♥',value:'Vale (11)',energy:'Medium',general:'Kupa Valesi, romantik, hayalperest ve duygusal bir gençliği simgeler. Saf sevgiye inanan, iyimser bir figür.',fal:'Hayatında ya da senin içinde saf ve romantik bir enerji var. Güzel şeyler hayal ediyorsun. Bu sezgiyi kullan; ama gerçek dünyayı da unutma.',numerology:"11 — İlham ve ruhsallık. Kupa vale'sinde bu, duygusal açıklık ve romantizmdir.",positive:['Saf romantizm','Duygusal yaratıcılık','Sezgisel güç'],negative:['Hayalcilik','Gerçekçilik eksikliği','Kırılganlık'],suit_meaning:'Kupa valesi, romantik enerjiyi en saf haliyle taşır.',history:'Vale figürü, genç ve idealist soyluları temsil ederdi.',keywords:['Romantizm','Sezgi','Gençlik','Hayal']},
+  {id:'HQ',suit:'hearts',name:'Kupa Kızı',symbol:'♥',value:'Kız (12)',energy:'Medium',general:'Kupa Kızı, şefkat, sezgi ve duygusal zekanın doruk noktasını simgeler. Hem sever hem de sezar; hem verir hem de anlar.',fal:'Hayatında derin şefkatli bir kadın figürü var ya da bu enerji sende yükseliyor. Sezgine güven; kalbin sana doğru yolu gösterecek.',numerology:"12 — Sezgi ve tamamlanma. Kupa kızında bu, duygusal olgunluktur.",positive:['Derin şefkat','Güçlü sezgi','Duygusal zeka'],negative:['Aşırı empati','Sınırları koruyamama','Kendini feda etme'],suit_meaning:'Kupa kızı, kalbi ve sezgisiyle eşsiz bir figürdür.',history:"Kupa Kızı, çoğu kültürde 'şifacı' ya da 'kahin' figürüyle özdeşleştirilir.",keywords:['Şefkat','Sezgi','Empati','Şifa']},
+  {id:'HK',suit:'hearts',name:'Kupa Kralı',symbol:'♥',value:'Kral (13)',energy:'High',general:'Kupa Kralı, duygusal olgunluk, denge ve şefkatli liderliği simgeler. Hem güçlü hem de anlayışlıdır.',fal:'Duygusal açıdan olgun, güçlü ve anlayışlı bir figür hayatında etkili. Ya da sen bu olgunluğa erişiyorsun.',numerology:"13 — Dönüşüm ve güç. Kupa'da bu, duygusal bilgeliğin ve iktidarın birleşimidir.",positive:['Duygusal denge','Şefkatli liderlik','Güçlü aile bağları'],negative:['Aşırı kontrolcülük','Duygusal manipülasyon riski','Beklentiler yükü'],suit_meaning:"Kupa kralı, kalp krallığının en bilge ve dengeli yöneticisidir.",history:"Kupa Kralı, Fransız iskambilinde Charlemagne'yi temsil ettiği söylenir.",keywords:['Olgunluk','Liderlik','Şefkat','Denge']},
+  // KARO
+  {id:'DA',suit:'diamonds',name:'Karo Ası',symbol:'♦',value:'As (1/14)',energy:'High',general:'Karo Ası, maddi başarı ve yeni finansal fırsatların müjdecisidir. Bolluk enerjisi doruk noktasında.',fal:'Yeni bir mali fırsat ya da maddi kazanç kapında. Bir iş teklifini, yatırımı ya da hediyeyi kabul etmeye hazırlan. Bolluk sana geliyor.',numerology:"1 — Yeni başlangıç. Karo'da bu, maddi dünyada sıfırdan başlayıştır.",positive:['Maddi bereket','Yeni fırsatlar','Güçlü motivasyon'],negative:['Maddi takıntı riski','Açgözlülük','Yüzeysellik'],suit_meaning:'Karo takımı; para, maddi dünya, iş ve başarıyı temsil eder. Toprak elementine bağlıdır.',history:'Karo sembolü, elmas şeklinden evrilmiştir. Zenginlik ve ticaretle ilişkilendirilir.',keywords:['Zenginlik','Fırsat','Başarı','Başlangıç']},
+  {id:'D2',suit:'diamonds',name:'Karo İkisi',symbol:'♦',value:'2',energy:'Medium',general:'Karo İkisi, iş dünyasında denge arayışını simgeler. Mali dengeleri tutturmak zorlu ama mümkün.',fal:'Para ve iş dengesini kurmaya çalışıyorsun. Öncelikleri belirle; her şeye aynı anda odaklanamassın.',numerology:"2 — Denge ve uyum. Karo'da bu, iş dengesini ve pratik kararları simgeler.",positive:['Pratik düşünce','Kaynakları dengeleme','Uyum arayışı'],negative:['Kararsızlık','Mali sıkışma','Aşırı hesapçılık'],suit_meaning:'Karo ikisi, maddi dengeyi kurma çabasını anlatır.',history:'İki karo, ticaret yollarında denge sembolu olarak kullanılmıştır.',keywords:['Denge','İş','Para','Pratiklik']},
+  {id:'D3',suit:'diamonds',name:'Karo Üçü',symbol:'♦',value:'3',energy:'High',general:'Karo Üçü, ekip çalışması ve ustalığı simgeler. Bir projede birlikte inşa edilen başarı.',fal:'Bir ekiple çalışarak büyük bir şey inşa ediyorsun ya da edeceksin. Ustalığın takdir görüyor; yeteneklerini paylaş.',numerology:"3 — Yaratıcılık ve büyüme. Karo'da bu, maddi üretkenlik ve ustalıktır.",positive:['Ekip uyumu','Ustalık ve beceri','Verimlilik'],negative:['Ego çatışmaları','Takdir görememe','Aşırı çalışma'],suit_meaning:'Karo üçü, emek ve ustalıkla inşa edilen başarının kartıdır.',history:"Üç Karo, Tarot'ta el sanatları ve mimarlıkla ilişkilendirilir.",keywords:['Ustalık','Ekip','İnşa','Başarı']},
+  {id:'D4',suit:'diamonds',name:'Karo Dördü',symbol:'♦',value:'4',energy:'Low',general:'Karo Dördü, cimrilik ve aşırı tutumluluğu simgeler. Sahip olduklarını elinden bırakmak istemiyorsun.',fal:'Mali güvenlik hissi önemli ama aşırı tutumlu davranmak seni donup kalmasını sağlar. Bolluğun bir kısmını paylaşmayı dene.',numerology:"4 — Stabilite ve temel. Karo'da bu, maddi takıntıya dönüşür.",positive:['Mali güvenlik','Tutumlu olmak','Tasarruf bilinci'],negative:['Cimrilik','Maddi takıntı','Paylaşamama'],suit_meaning:"Karo dördü, biriktirmenin cimriliğe döndüğü ince çizgidir.",history:"Dört Karo, Tarot'ta hazinesini koruyan figürle bilinir.",keywords:['Tutumluluk','Güvenlik','Cimrilik','Denge']},
+  {id:'D5',suit:'diamonds',name:'Karo Beşi',symbol:'♦',value:'5',energy:'High',general:'Karo Beşi, mali zorluk ve yoksunluğu simgeler. Maddi anlamda zor bir dönem ama içsel kaynaklara sahipsin.',fal:'Finansal zorluklar ya da maddi kayıp yaşanabilir. Ama destek mevcut; gururu bırak ve yardım kabul et. Bu dönem geçici.',numerology:"5 — Değişim ve çatışma. Karo'da bu, maddi krizdir.",positive:['Dayanıklılık','Mütevazılık','İçsel güç'],negative:['Mali kriz','Dışlanma hissi','Umutsuzluk'],suit_meaning:'Karo beşi, maddi dünyada en zorlu kartlardan biridir.',history:"Beş Karo, Tarot'ta soğukta yürüyen iki figürle bilinir.",keywords:['Zorluk','Kriz','Dayanıklılık','Destek']},
+  {id:'D6',suit:'diamonds',name:'Karo Altısı',symbol:'♦',value:'6',energy:'Medium',general:'Karo Altısı, cömertlik ve adil paylaşımı simgeler. Vermek ve almak arasındaki dengeyi kurmak.',fal:'Birine yardım etme ya da destek alma zamanı. Cömertlik karşılık bulur; iyilik döner.',numerology:"6 — Uyum ve sorumluluk. Karo'da bu, maddi cömertliktir.",positive:['Cömertlik','Paylaşım','Adalet'],negative:['Güç dengesizliği','Aşırı bağımlılık','Kabullenme'],suit_meaning:'Karo altısı, vermenin ve almanın dengelendiği noktadır.',history:"Altı Karo, Tarot'ta terazi tutan bir figürle bilinir.",keywords:['Cömertlik','Paylaşım','Denge','İyilik']},
+  {id:'D7',suit:'diamonds',name:'Karo Yedisi',symbol:'♦',value:'7',energy:'Medium',general:'Karo Yedisi, uzun vadeli yatırım ve sabırla büyümeyi simgeler. Eken biçer, ama hasat zamanı gelecek.',fal:'Emek verdiğin bir proje ya da yatırım meyvelerini vermeye başlıyor. Sabır gerekli; aceleden kaçın.',numerology:"7 — Gizem ve arayış. Karo'da bu, maddi evrenin gizlerine sabırla yaklaşmaktır.",positive:['Uzun vadeli düşünce','Sabır','Stratejik yatırım'],negative:['Dengesiz beklentiler','Sabırsızlık','Yanlış yatırım'],suit_meaning:'Karo yedisi, geleceğe güvenle ekilmiş tohumları simgeler.',history:"Yedi Karo, Tarot'ta tarlasını değerlendiren bir figürle bilinir.",keywords:['Sabır','Yatırım','Büyüme','Hasat']},
+  {id:'D8',suit:'diamonds',name:'Karo Sekizi',symbol:'♦',value:'8',energy:'High',general:'Karo Sekizi, ustalık ve yoğun çalışmayı simgeler. Zanaatkâr titizliğiyle yapılan işin ödülü gelecek.',fal:'Bir işe ya da beceriye çok yoğun odaklanıyorsun. Bu bağlılık seni uzman yapacak. Yeteneğini geliştirme zamanı.',numerology:"8 — Güç ve başarı. Karo'da bu, emek yoluyla kazanılan maddi güçtür.",positive:['Ustalık','Güçlü odak','Verimlilik'],negative:['Aşırı çalışma','Tekdüzelik','Sosyal izolasyon'],suit_meaning:'Karo sekizi, işine aşık zanaatkârın kartıdır.',history:"Sekiz Karo, Tarot'ta detaycı bir zanaatkârla özdeşleşir.",keywords:['Ustalık','Odak','Çalışma','Beceri']},
+  {id:'D9',suit:'diamonds',name:'Karo Dokuzu',symbol:'♦',value:'9',energy:'High',general:'Karo Dokuzu, bağımsızlık ve maddi bolluğu simgeler. Kendin için çalışmış ve bunu başarmışsın.',fal:'Mali açıdan bağımsızlığa kavuşuyorsun ya da bu yoldasın. Lüks ve konfor hak ettiğin ödüller. Tadını çıkar.',numerology:"9 — Tamamlanma. Karo'da bu, maddi zaferin doruk noktasıdır.",positive:['Mali bağımsızlık','Konfor ve lüks','Öz disiplin'],negative:['Yalnızlık','Maddi doyumsuzluk','Kibir'],suit_meaning:'Karo dokuzu, maddi başarı ve bağımsızlığın zirvesidir.',history:'Dokuz Karo, bağımsız ve müreffeh figürüyle tanınır.',keywords:['Bağımsızlık','Bolluk','Başarı','Konfor']},
+  {id:'D10',suit:'diamonds',name:'Karo Onu',symbol:'♦',value:'10',energy:'High',general:'Karo Onu, kalıcı maddi başarı ve nesiller boyu sürecek zenginliği simgeler. Ailece refah.',fal:'Mali açıdan büyük bir başarı ya da miras söz konusu. Bu bolluk paylaşılacak kadar büyük. Bereketin toplumsal boyutu var.',numerology:"10 — Tamamlanma ve yeni döngü. Karo'da bu, maddi mirastır.",positive:['Kalıcı zenginlik','Aile refahı','Güçlü temel'],negative:['Maddeciliğe kapılma','Şımarıklık','Sorumluluktan kaçış'],suit_meaning:'Karo onu, maddi başarının en kalıcı ve en kapsamlı halidir.',history:"On Karo, Tarot'ta refah içindeki aile imgesiyle özdeşleşir.",keywords:['Zenginlik','Miras','Aile','Kalıcılık']},
+  {id:'DJ',suit:'diamonds',name:'Karo Valesi',symbol:'♦',value:'Vale (11)',energy:'High',general:'Karo Valesi, genç ve hırslı bir figürü simgeler. İş dünyasında hızlı ilerlemek isteyen, enerjik ve pratik.',fal:'Hayatında hırslı ve pratik zekası güçlü genç biri etkili. Ya da sen bu enerjiyle çalışıyorsun. Fırsatları kaçırma; hareket et.',numerology:"11 — İlham ve hız. Karo'da bu, maddi dünyada çabuk hareket etmektir.",positive:['Hız ve dinamizm','Pratik zeka','İş dünyasında başarı'],negative:['Sabırsızlık','Aceleci kararlar','Maddi odaklılık'],suit_meaning:'Karo valesi, iş dünyasının dinamik genç figürüdür.',history:'Vale figürü, ticaret yollarında hızlı ilerleme sembolüydü.',keywords:['Hız','Hırs','Pratiklik','Fırsat']},
+  {id:'DQ',suit:'diamonds',name:'Karo Kızı',symbol:'♦',value:'Kız (12)',energy:'Medium',general:'Karo Kızı, pratik zekası ve güvenilirliğiyle öne çıkan, maddi dünyada başarılı bir figürü simgeler.',fal:'İş hayatında güçlü ve güvenilir bir kadın figürü öne çıkıyor. Ya da sen bu pratikliğe ulaşıyorsun. İş konularında danışılacak birisin.',numerology:"12 — Tamamlanma ve sezgi. Karo'da bu, pratik sezgidir.",positive:['Pratik zeka','Güvenilirlik','Maddi istikrar'],negative:['Maddi takıntı','Soğuk hesapçılık','Sezgiyi görmezden gelme'],suit_meaning:'Karo kızı, iş dünyasının pratik ve güvenilir figürüdür.',history:'Karo Kızı, tarihsel olarak işbilir ve güvenilir figürle özdeşleştirilir.',keywords:['Pratiklik','Güvenilirlik','İş','İstikrar']},
+  {id:'DK',suit:'diamonds',name:'Karo Kralı',symbol:'♦',value:'Kral (13)',energy:'High',general:'Karo Kralı, maddi dünyada başarı ve liderliğin zirvesini simgeler. Güçlü, pratik ve vizyon sahibi.',fal:'İş ve finansal açıdan büyük bir liderlik rolüne giriyorsun. Bu güç, paylaşılarak daha da büyür.',numerology:"13 — Dönüşüm ve iktidar. Karo'da bu, maddi gücün olgunlaşmasıdır.",positive:['İş liderliği','Finansal güç','Vizyon'],negative:['Maddi takıntı','Kontrolcülük','Duygusal soğukluk'],suit_meaning:'Karo Kralı, maddi dünyayı hükmeden bilge figürdür.',history:"Karo Kralı, Fransız iskambilinde Büyük İskender'i temsil ettiği söylenir.",keywords:['Liderlik','Güç','Finans','Vizyon']},
+  // SİNEK
+  {id:'CA',suit:'clubs',name:'Sinek Ası',symbol:'♣',value:'As (1/14)',energy:'High',general:'Sinek Ası, yeni bir fikrin, girişimin ya da eğitim sürecinin başladığının habercisidir. Ateşli bir enerjiye sahiptir.',fal:'Yeni bir fikir ya da proje hayata geçmek üzere. Heyecan ve girişimci ruh sende yüksek. Bu enerjiyi doğru kanala yönelt.',numerology:"1 — Başlangıç ve özgünlük. Sinek'te bu, ateşli girişimci ruhtur.",positive:['Girişimcilik','Yaratıcı enerji','Yeni fikirler'],negative:['Aceleci başlangıçlar','Sürdürme güçlüğü','Dağınık enerji'],suit_meaning:'Sinek takımı; iletişim, öğrenme, enerji ve doğayı temsil eder. Ateş elementine bağlıdır.',history:'Sinek sembolü, yaprak biçiminden evrilmiştir. Doğa ve büyüme ile ilişkilidir.',keywords:['Başlangıç','Enerji','Girişim','Fikir']},
+  {id:'C2',suit:'clubs',name:'Sinek İkisi',symbol:'♣',value:'2',energy:'Medium',general:'Sinek İkisi, ortaklık ve güçleri birleştirmeyi simgeler. Birlikte daha güçlü olabilirsiniz.',fal:'Birisiyle iş birliği yapmak faydalı olacak. Güçlü bir ortaklık doğmak üzere. Birlikte hareket et.',numerology:"2 — Denge ve ortaklık. Sinek'te bu, güçlerin birleşimidir.",positive:['İş birliği','Güçlü ortaklık','Sinerji'],negative:['Güç çatışması','Bağımlılık riski','Rekabet'],suit_meaning:'Sinek ikisi, iki gücün bir araya gelmesini simgeler.',history:'İki kart, ortaklık ve anlaşma sembolü olarak tarihte kullanılmıştır.',keywords:['Ortaklık','İşbirliği','Güç','Sinerji']},
+  {id:'C3',suit:'clubs',name:'Sinek Üçü',symbol:'♣',value:'3',energy:'High',general:'Sinek Üçü, büyüme ve genişlemeyi simgeler. Girişimler ivme kazanıyor; sonuçlar görünmeye başlıyor.',fal:'Başlattığın projeler büyümeye başlıyor. Vizyon güçleniyor, fırsatlar çoğalıyor. Bu enerjiyi koru.',numerology:"3 — Yaratıcılık ve büyüme. Sinek'te bu, hızlı genişlemedir.",positive:['Büyüme ivmesi','Fırsatların çoğalması','Vizyon gücü'],negative:['Aşırı yayılma','Odak kaybı','Enerji dağılımı'],suit_meaning:'Sinek üçü, girişimlerin kanatlandığı noktayı simgeler.',history:"Üç Sinek, Tarot'ta denizaşırı girişimleri temsil eder.",keywords:['Büyüme','Genişleme','Vizyon','İvme']},
+  {id:'C4',suit:'clubs',name:'Sinek Dördü',symbol:'♣',value:'4',energy:'Low',general:'Sinek Dördü, dinlenme, değerlendirme ve kutlama zamanını simgeler. Emekler verildi; şimdi soluklana.',fal:'Bir dönemi başarıyla tamamladın. Bu zamanı kutla ve ilerisi için güçlen. Dinlenme hak ettiğin bir şey.',numerology:"4 — Stabilite ve temel. Sinek'te bu, kazanımların değerlendirilmesidir.",positive:['Emeklerin karşılığı','Kutlama zamanı','Yenilenme'],negative:['Durağanlık','Konfor alanına sığınma','İlerlemeyi durdurma'],suit_meaning:'Sinek dördü, emeklerin ardından gelen huzurun kartıdır.',history:"Dört Sinek, Tarot'ta zafer sonrası kutlamayı simgeler.",keywords:['Dinlenme','Kutlama','Yenilenme','Başarı']},
+  {id:'C5',suit:'clubs',name:'Sinek Beşi',symbol:'♣',value:'5',energy:'High',general:'Sinek Beşi, çatışma ve rekabeti simgeler. Ama bu rekabet inşa edici de olabilir.',fal:'Bir rekabet ya da anlaşmazlık ortamındasın. Enerji yüksek ama dağınık. Güçlerini akıllıca kullan.',numerology:"5 — Değişim ve çatışma. Sinek'te bu, üretken ama bazen kaotik bir rekabettir.",positive:['Rekabet azmi','Güçlü enerji','Gelişim baskısı'],negative:['Anlamsız kavgalar','Enerji israfı','Grup çatışması'],suit_meaning:'Sinek beşi, rekabetin insanı güçlendirebileceğini ya da yorabileceğini gösterir.',history:'Beş Sinek, spor ya da grup oyunlarıyla ilişkilendirilmiştir.',keywords:['Rekabet','Çatışma','Enerji','Güç']},
+  {id:'C6',suit:'clubs',name:'Sinek Altısı',symbol:'♣',value:'6',energy:'Medium',general:'Sinek Altısı, zafer ve halk tarafından tanınmayı simgeler. Emeklerin görülüyor ve takdir ediliyor.',fal:'Çabaların sonunda tanınacaksın. Halk ya da çevre seni destekliyor. Bu başarı paylaşılmaya değer.',numerology:"6 — Uyum ve şefkat. Sinek'te bu, zafer ve takdirdir.",positive:['Tanınma','Zafer','Toplumsal destek'],negative:['Kibir riski','Süregelen baskı','Başarıyı sürdürme zorluğu'],suit_meaning:'Sinek altısı, halkın sevgisi ve takdirini simgeler.',history:"Altı Sinek, Tarot'ta at üzerindeki zafer figürüyle bilinir.",keywords:['Zafer','Tanınma','Başarı','Destek']},
+  {id:'C7',suit:'clubs',name:'Sinek Yedisi',symbol:'♣',value:'7',energy:'High',general:'Sinek Yedisi, zorlukların üstesinden gelme ve savunmayı simgeler. Tek başına çok şeyle mücadele ediyorsun.',fal:'Pek çok zorluğun altında eziliyorsun ama direnmek seni güçlendiriyor. Kendine inan; bu dönemi atlatacaksın.',numerology:"7 — Gizem ve içsel güç. Sinek'te bu, zorluğa karşı direnç ve cesaret.",positive:['Direnç','Cesaret','Dayanıklılık'],negative:['Aşırı yük','Yalnız mücadele','Tükenme riski'],suit_meaning:'Sinek yedisi, zorluk ortamında tek başına savaşan gücü simgeler.',history:"Yedi Sinek, Tarot'ta çok güçlükle baş etmek zorunda kalan kahramanı temsil eder.",keywords:['Direniş','Mücadele','Güç','Yalnızlık']},
+  {id:'C8',suit:'clubs',name:'Sinek Sekizi',symbol:'♣',value:'8',energy:'High',general:'Sinek Sekizi, hız ve ani gelişmeleri simgeler. Her şey çok hızlı oluyor; kendin hazır mısın?',fal:'Hızlı gelişmeler ve değişimler yaşanıyor. Bu akıntıya kapılma; yönünü belirle ve hızla ilerle.',numerology:"8 — Güç ve hız. Sinek'te bu, ivmeli değişimdir.",positive:['Hız','İvme','Çabuk hareket'],negative:['Kontrol kaybı','Aceleci kararlar','Yorulma'],suit_meaning:'Sinek sekizi, hayatın ivme kazandığı anı simgeler.',history:"Sekiz Sinek, Tarot'ta hızla geçen okları simgeler.",keywords:['Hız','İvme','Değişim','Hareket']},
+  {id:'C9',suit:'clubs',name:'Sinek Dokuzu',symbol:'♣',value:'9',energy:'High',general:'Sinek Dokuzu, dayanıklılık ve son bir direnişi simgeler. Neredeyse tükenmişsin ama ayaktasın.',fal:'Çok şey yaşadın ve yoruldun. Ama direniyor ve ayakta duruyorsun. Son adım için güç topla; neredeyse bitti.',numerology:"9 — Tamamlanma. Sinek'te bu, uzun mücadelenin son basamağıdır.",positive:['Olağanüstü dayanıklılık','Son direnç','Güçlü irade'],negative:['Tükenmişlik','Paranoya','Pes etme eşiği'],suit_meaning:'Sinek dokuzu, yorgunluğa rağmen ayakta kalmanın kartıdır.',history:"Dokuz Sinek, Tarot'ta yorgun ama direnen bir figürle tanınır.",keywords:['Dayanıklılık','Son direnç','İrade','Güç']},
+  {id:'C10',suit:'clubs',name:'Sinek Onu',symbol:'♣',value:'10',energy:'High',general:'Sinek Onu, aşırı yüklenme ve sorumluluk yükünü simgeler. Taşıyabileceğinden fazla şey sırtında.',fal:'Çok fazla sorumluluk aldın. Bu yük seni eziyor. Delege etmeyi öğren ya da bazı şeyleri bırak.',numerology:'10 — Tamamlanma ama burada yükün tamamlanması.',positive:['Sorumlu yaklaşım','Güçlü çalışma etiği','Verimlilik'],negative:['Aşırı yüklenme','Tükenmişlik sendromu','Yardım istememe'],suit_meaning:'Sinek onu, sorumluluğun insanı ezip geçebileceğini gösterir.',history:"On Sinek, Tarot'ta çok ağır yük taşıyan bir figürle bilinir.",keywords:['Sorumluluk','Yük','Tükenme','Denge']},
+  {id:'CJ',suit:'clubs',name:'Sinek Valesi',symbol:'♣',value:'Vale (11)',energy:'Medium',general:'Sinek Valesi, meraklı, enerji dolu ve yeni fikirlere açık genç bir figürü simgeler.',fal:'Hayatında ya da senin içinde enerjik ve meraklı bir enerji var. Yeni şeyler öğrenmeye hazırsın. Bu heyecanı besle.',numerology:"11 — İlham ve entelektüel güç. Sinek'te bu, öğrenme hevesidir.",positive:['Entelektüel merak','Öğrenme hevesi','Enerjik yaklaşım'],negative:['Dağınık enerji','Sabırsızlık','Yarım bırakma'],suit_meaning:'Sinek valesi, öğrenme ve keşif yolculuğunun en dinamik figürüdür.',history:'Vale figürü tarihsel olarak yeni ve hevesli hizmetkârı simgelerdi.',keywords:['Merak','Enerji','Öğrenme','Keşif']},
+  {id:'CQ',suit:'clubs',name:'Sinek Kızı',symbol:'♣',value:'Kız (12)',energy:'Medium',general:'Sinek Kızı, pratik, verimli ve doğada güçlü bir figürü simgeler. Hem üretir hem de ilham verir.',fal:'Pratik zekası güçlü, verimli bir kadın figürü öne çıkıyor. Ya da sen bu üretkenliğe ulaşıyorsun.',numerology:"12 — Sezgi ve pratiklik. Sinek'te bu, verimli ve yaratıcı güçtür.",positive:['Pratik yaratıcılık','Verimlilik','Güçlü enerji'],negative:['Aşırı pratiklik','Sezgiyi görmezden gelme','Kontrol ihtiyacı'],suit_meaning:'Sinek kızı, üreten ve ilham veren figürdür.',history:'Kız figürü tarihsel olarak toplulukların lider kadınlarından ilham almıştır.',keywords:['Üretkenlik','Pratiklik','Enerji','İlham']},
+  {id:'CK',suit:'clubs',name:'Sinek Kralı',symbol:'♣',value:'Kral (13)',energy:'High',general:'Sinek Kralı, karizmatik, vizyoner ve güçlü bir liderlik figürünü simgeler. Hem ilham verir hem de yönetir.',fal:'Güçlü ve karizmatik bir figür ya da sen bu liderlik enerjisine adım atıyorsun. Topluluğunu ilerlemeye taşı.',numerology:"13 — Dönüşüm ve güç. Sinek'te bu, karizmatik ve vizyoner liderliğin zirvesidir.",positive:['Karizmatik liderlik','Güçlü vizyon','İlham verme kapasitesi'],negative:['Otoriter eğilim','İktidar sarhoşluğu','Dinlememek'],suit_meaning:"Sinek Kralı, topluluğunu vizyon ve karizmayla yönetir.",history:"Sinek Kralı, Fransız iskambilinde Julius Caesar'ı simgelediği söylenir.",keywords:['Karizmatik','Vizyon','Liderlik','Güç']},
+];
+
+/* ═══ SÖZLER ═══ */
+const QUOTES=[
+  {text:'Güldüğünde sanki oda aydınlanıyor — bu tesadüf değil, bu senin doğan.',mood:'tatli'},
+  {text:'Seninle konuşmak; sıcak bir kahve gibi — tam da ihtiyaç duyduğun an geliyor.',mood:'tatli'},
+  {text:'Sen bir evren taşıyorsun içinde, farkında değilsin.',mood:'gizemli'},
+  {text:'Güçlü olmak için her şeyi taşımak zorunda değilsin. Bazen bırakmak da cesaret ister.',mood:'motivasyon'},
+  {text:'Her sabah gözlerini açtığında, dünya biraz daha zengin oluyor.',mood:'tatli'},
+  {text:'Seninle geçen bir saat, başkasıyla geçen bir yıldan değerli.',mood:'romantik'},
+  {text:'O gülüşün bütün karanlıkları yenebilir.',mood:'romantik'},
+  {text:'Sen varken hiçbir şey eksik hissettirmiyor.',mood:'romantik'},
+  {text:'İçinde taşıdığın sessizliğin bile anlamı var.',mood:'gizemli'},
+  {text:'Güneş çıkmasa da, sen ışığını içinden bulursun.',mood:'motivasyon'},
+  {text:'Düşünce tarzın beni her gün biraz daha şaşırtıyor.',mood:'tatli'},
+  {text:'Seninle olan her an; ruhun en saf halini görmek gibi.',mood:'romantik'},
+  {text:'Senin varlığın bile bir teselli.',mood:'tatli'},
+  {text:'Öyle bir şey var sende ki tarif etmek imkânsız ama hissetmek çok kolay.',mood:'gizemli'},
+  {text:'Zor günlerde bile yıkılmadan ayakta duruyorsun. Bu sıradan bir güç değil.',mood:'motivasyon'},
+  {text:'Saçlarındaki o dalgalanma bile birer şiir gibi.',mood:'romantik'},
+  {text:'Senin adın geçince içimde bir şeyler canlanıyor.',mood:'romantik'},
+  {text:'En karmaşık düşünceleri bile seninle anlamlı hale geliyor.',mood:'tatli'},
+  {text:'Seni düşündükçe dünya biraz daha katlanılır oluyor.',mood:'romantik'},
+  {text:'Kendi yolunu kendin çiziyorsun ve bu seni benzersiz kılıyor.',mood:'motivasyon'},
+  {text:'Bazı insanlar hayata renk katar, sen ışık koyarsın.',mood:'tatli'},
+  {text:'Seninle olmak; kendi evimde gibi hissettiriyor.',mood:'romantik'},
+  {text:'İçinde taşıdığın yıldızların adını henüz bilmiyorsun.',mood:'gizemli'},
+  {text:'Her zorluk seni daha derin bir insan yapıyor.',mood:'motivasyon'},
+  {text:'Neşen bulaşıcı — ve ben hiç aşı olmak istemiyorum.',mood:'tatli'},
+  {text:'Bakışlarında anlatılmamış bin hikaye var.',mood:'gizemli'},
+  {text:'Seni gördüğüm her gün bir şükran sebebi.',mood:'romantik'},
+  {text:'Vazgeçmedin — ve işte bu yüzden ileride çok şeyle gurur duyacaksın.',mood:'motivasyon'},
+  {text:'Sesini duymak bazen tek ihtiyacım oluyor.',mood:'romantik'},
+  {text:'Evrenin sana nasıl baktığını bilseydin, bambaşka hissederdin.',mood:'gizemli'},
+  {text:'Küçük jestlerin büyük etki yaratıyor, haberin olsun.',mood:'tatli'},
+  {text:'Sevgin hiçbir zaman boşa gitmiyor — sadece şeklini değiştiriyor.',mood:'romantik'},
+  {text:'Bugün yorulmuş olabilirsin ama yarın başarılı olacaksın.',mood:'motivasyon'},
+  {text:'Sıradan bir hayat sürmek için doğmadın.',mood:'gizemli'},
+  {text:'İyilik senden önce kapı açar.',mood:'tatli'},
+  {text:'Seninle zaman; duraksıyor gibi oluyor.',mood:'romantik'},
+  {text:'En güçlü insanlar en sessiz kalpleri taşır.',mood:'gizemli'},
+  {text:'Başladığın her yol, seni biraz daha sana götürüyor.',mood:'motivasyon'},
+  {text:'Kahkahandan bütün enerjimi alıyorum.',mood:'tatli'},
+  {text:'Senin sevgin bir mevsim — içine girince çıkmak istemiyorsun.',mood:'romantik'},
+  {text:'Henüz tanımadığın yeteneklerin seni bekliyor.',mood:'motivasyon'},
+  {text:'Bazı anlar sonsuz — seninle geçen her an onlardan biri.',mood:'romantik'},
+  {text:'Varlığın sessiz bir hediyedir.',mood:'tatli'},
+  {text:'Kainatta bir yere ait olma hissi var mı? Sen benim yerimsin.',mood:'romantik'},
+  {text:'Korku seni durduramaz çünkü sen korkundan daha büyüksün.',mood:'motivasyon'},
+  {text:'Gözlerinde sanki tüm gecelerin sırrı saklı.',mood:'gizemli'},
+  {text:'Seni tanımak; giderek daha derin bir kuyu keşfetmek gibi.',mood:'gizemli'},
+  {text:'Her güçlük bir şeyleri sana öğretmek için geldi.',mood:'motivasyon'},
+  {text:'Dünyayı daha iyi bir yer yapıyorsun — fark etmesen de.',mood:'tatli'},
+  {text:'Sensiz bir gün eksiksiz sayılmaz.',mood:'romantik'},
+  {text:'Karanlıkta bile yol bulmayı biliyorsun.',mood:'gizemli'},
+  {text:'Başarı sana yabancı bir kavram değil — sadece sabır istiyor.',mood:'motivasyon'},
+  {text:'Seni düşünmek; ruhuma ferahlama veriyor.',mood:'romantik'},
+  {text:'Doğanın en güzel armağanlarından birisin.',mood:'tatli'},
+  {text:'Sen bir sır gibisin — çözmeye çalıştıkça daha derin oluyor.',mood:'gizemli'},
+  {text:'Her adım seni daha güçlü yapıyor, her düşüş seni daha bilge.',mood:'motivasyon'},
+  {text:'Kalbindeki yeri doldurmak imkânsız.',mood:'romantik'},
+  {text:'İçindeki ışık hiç söndü mü? Ben hiç görmedim.',mood:'tatli'},
+  {text:'Seninle sessiz oturmak bile konuşmak kadar anlamlı.',mood:'romantik'},
+  {text:'Yıldızlar seninle aynı anda doğmadı — ama sanki seninle ışıldıyorlar.',mood:'gizemli'},
+  {text:'En büyük zaferler sessizce kazanılır — senin gibi.',mood:'motivasyon'},
+  {text:'Hayatımın en güzel parantezi sensin.',mood:'romantik'},
+  {text:'Güzelliğin sadece dışında değil; düşüncelerinde, sözlerinde.',mood:'tatli'},
+  {text:'Bir karanlıkta kaybolsam bile, sesini düşünürüm — yeterli.',mood:'gizemli'},
+  {text:'Her deneme bir adım — hiçbiri kayıp değil.',mood:'motivasyon'},
+  {text:'Seninle olan anlar tarihin en değerli sayfaları.',mood:'romantik'},
+  {text:'Sen bir his gibisin — tanımlamak zor ama vazgeçmek imkânsız.',mood:'gizemli'},
+  {text:'Bu dünyayı güzel yapan şeylerden birisin.',mood:'tatli'},
+  {text:'Seni sevmek; her gün yeni bir şey keşfetmek gibi.',mood:'romantik'},
+  {text:'Hayatta kalmak bile zaman zaman cesaret ister. Sen her gün bu cesareti gösteriyorsun.',mood:'motivasyon'},
+  {text:'Seninle geçen her dakika bir lütuf.',mood:'romantik'},
+  {text:'Bazen en sıradan anlar, seninle olunca efsaneye dönüyor.',mood:'tatli'},
+  {text:'Düşüncelerinde kaybolmak en güzel macera.',mood:'gizemli'},
+  {text:'Yorulmak değil, durmamak önemli olan.',mood:'motivasyon'},
+  {text:'Senin için kelimelerin hepsi yetersiz kalıyor.',mood:'romantik'},
+  {text:'Sıcaklığın sadece içinde değil; etrafına da yayılıyor.',mood:'tatli'},
+  {text:'Gecelerin en derin noktasında bile, seninle bir şeyler parlıyor.',mood:'gizemli'},
+  {text:'Harika olmak için izin almana gerek yok.',mood:'motivasyon'},
+  {text:'Her "iyi geceler" seninle sabah olmayı diler gibi geliyor.',mood:'romantik'},
+  {text:'Kalbindeki merhamet, sesinde yankılanıyor.',mood:'tatli'},
+  {text:'Gözlerinde anlık bir evren var.',mood:'gizemli'},
+  {text:'Düşmek sona gelmek değildir. Kalmak sona gelmektir.',mood:'motivasyon'},
+  {text:'Her seferinde senin düşüncen, içimde bir şeyleri aydınlatıyor.',mood:'romantik'},
+  {text:'Seni tanıdığımdan beri dünya daha gerçek geliyor.',mood:'tatli'},
+  {text:'Evren seni bilerek tasarlamış olmalı.',mood:'gizemli'},
+  {text:'Küçük adımlar da ileriye gider — bunu unutma.',mood:'motivasyon'},
+  {text:'Seninle olmak; hem huzur hem de heyecan.',mood:'romantik'},
+  {text:'İçindeki güzellik hiç solmuyor.',mood:'tatli'},
+  {text:'Sırların senin içinde gizli — kimse bilmiyor ama sen hissediyorsun.',mood:'gizemli'},
+  {text:'Azmin, çevreni dönüştürecek kadar güçlü.',mood:'motivasyon'},
+  {text:'Seni düşünmek artık bir alışkanlık değil, ihtiyaç.',mood:'romantik'},
+  {text:'Gülüşün en güçlü silah.',mood:'tatli'},
+  {text:'Sessizliğinde bile anlam taşıyorsun.',mood:'gizemli'},
+  {text:'Her yeni gün, sana ait bir mucize barındırıyor.',mood:'motivasyon'},
+  {text:'Seninle paylaşılan her an, zamanın en değerli armağanı.',mood:'romantik'},
+  {text:'Dürüstlüğün; nadiren bulunan bir cevher.',mood:'tatli'},
+  {text:'Ruhun bu dünyaya sığmıyor gibi.',mood:'gizemli'},
+  {text:'Zorluklar seni kıramaz, sadece biçimlendirebilir.',mood:'motivasyon'},
+  {text:'Seninle olmak; sanki zaman dursa da razı olurdum.',mood:'romantik'},
+  {text:'İnsanlara huzur verme yeteneğin çok nadir.',mood:'tatli'},
+  {text:'Senin için henüz bulunamamış kelimeler var.',mood:'gizemli'},
+  {text:'Bugün dikmediğin ağaçları yarın özlersin — ama henüz geç değil.',mood:'motivasyon'},
+  {text:'Her bakışında bitmez tükenmez bir hikaye başlıyor.',mood:'romantik'},
+];
+
+/* ═══ STATE ═══ */
+const STATE={
+  exploredCards:new Set(JSON.parse(localStorage.getItem('nova_explored')||'[]')),
+  achievements:new Set(JSON.parse(localStorage.getItem('nova_achievements')||'[]')),
+  visitedModes:new Set(JSON.parse(localStorage.getItem('nova_modes')||'[]')),
+  favQuotes:JSON.parse(localStorage.getItem('nova_quotes')||'[]'),
+  currentMood:'all',currentQuoteText:'',usedQuotes:new Set(),
+  suitFilter:{ansiklopedi:'all',kartlar:'all'},
+};
+
+/* ═══ CANVAS ═══ */
+const canvas=document.getElementById('particles-canvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+let currentMode='stars';
+const lightnings=[];
+let galaxyAngle=0;
+
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
+
+class Particle{
+  constructor(mode){this.mode=mode;this.reset();}
+  reset(){
+    const W=canvas.width,H=canvas.height;
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.size=Math.random()*2+0.5;
+    this.speedX=(Math.random()-0.5)*0.4;this.speedY=(Math.random()-0.5)*0.4;
+    this.alpha=Math.random()*0.6+0.1;this.alphaDir=(Math.random()>0.5?1:-1)*0.005;
+    this.color=this.getColor();
+    this.sym=this.getSym();this.fontSize=Math.random()*14+10;
+    this.rot=Math.random()*Math.PI*2;this.rotSpd=(Math.random()-0.5)*0.02;
+  }
+  getColor(){
+    const t=document.documentElement.getAttribute('data-theme')||'mistik';
+    const c={mistik:['#9d4edd','#c77dff','#7b2d8b','#da77ff'],kizil:['#dd4e4e','#ff7d7d','#8b2d2d','#ff5555'],okyanus:['#4e7edd','#7db0ff','#2d528b','#55aaff'],zumrut:['#4edd6e','#7dff9d','#2d8b4e','#55ff88'],altin:['#ddaa4e','#ffce7d','#8b7a2d','#ffcc33']};
+    const arr=c[t]||c.mistik;return arr[Math.floor(Math.random()*arr.length)];
+  }
+  getSym(){
+    if(this.mode==='hearts')return['♥','❤','·','✿'][Math.floor(Math.random()*4)];
+    if(this.mode==='lightning')return['·','◦','⋆'][Math.floor(Math.random()*3)];
+    if(this.mode==='mirror')return['◆','◇','·'][Math.floor(Math.random()*3)];
+    return['★','✦','·','◦','⋆'][Math.floor(Math.random()*5)];
+  }
+  update(){
+    this.x+=this.speedX;this.y+=this.speedY;
+    this.alpha+=this.alphaDir;
+    if(this.alpha<=0.05||this.alpha>=0.8)this.alphaDir*=-1;
+    this.rot+=this.rotSpd;
+    const W=canvas.width,H=canvas.height;
+    if(this.x<-20)this.x=W+20;if(this.x>W+20)this.x=-20;
+    if(this.y<-20)this.y=H+20;if(this.y>H+20)this.y=-20;
+  }
+  draw(){
+    ctx.save();ctx.globalAlpha=this.alpha;ctx.fillStyle=this.color;
+    if(this.sym==='·'||this.sym==='◦'||this.sym==='⋆'){
+      ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();
+    } else {
+      ctx.translate(this.x,this.y);ctx.rotate(this.rot);
+      ctx.font=`${this.fontSize}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(this.sym,0,0);
+    }
+    ctx.restore();
+  }
+}
+
+function initParticles(mode='stars'){
+  currentMode=mode;particles=[];
+  const count=mode==='lightning'?50:70;
+  for(let i=0;i<count;i++)particles.push(new Particle(mode));
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(currentMode==='galaxy'){
+    ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(galaxyAngle);
+    const g=ctx.createRadialGradient(0,0,0,0,0,Math.min(canvas.width,canvas.height)*0.4);
+    g.addColorStop(0,'rgba(157,78,221,0.06)');g.addColorStop(0.5,'rgba(90,30,130,0.04)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,canvas.width*0.4,canvas.height*0.25,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    galaxyAngle+=0.0008;
+  }
+  if(currentMode==='lightning'&&Math.random()>0.97){
+    const l={x:Math.random()*canvas.width,alpha:1};
+    lightnings.push(l);
+    ctx.save();ctx.globalAlpha=l.alpha;ctx.strokeStyle='#9d4edd';ctx.lineWidth=1.5;ctx.shadowColor='#c77dff';ctx.shadowBlur=12;
+    ctx.beginPath();let cx=l.x,cy=0;ctx.moveTo(cx,cy);
+    for(let s=0;s<8;s++){cx+=(Math.random()-0.5)*60;cy+=canvas.height/8;ctx.lineTo(cx,cy);}
+    ctx.stroke();ctx.restore();
+  }
+  particles.forEach(p=>{p.color=p.getColor();p.update();p.draw();});
+  requestAnimationFrame(animate);
+}
+initParticles('stars');animate();
+
+/* ═══ TEMA ═══ */
+document.querySelectorAll('.theme-dot').forEach(dot=>{
+  dot.addEventListener('click',()=>{
+    document.querySelectorAll('.theme-dot').forEach(d=>d.classList.remove('active'));
+    dot.classList.add('active');
+    const t=dot.dataset.theme;
+    if(t==='mistik')document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme',t);
+  });
+});
+
+/* ═══ MOD AÇMA/KAPAMA ═══ */
+function openMode(mode){
+  document.getElementById(`mode-${mode}`).classList.add('active');
+  STATE.visitedModes.add(mode);
+  localStorage.setItem('nova_modes',JSON.stringify([...STATE.visitedModes]));
+  updateStats();
+  if(mode==='kader')checkAchievement('kader-gordu','🔮','Kaderi Gördün','Kader Evreni\'ni açtın!');
+  checkAchievement('nova-kesfedici','⭐','Nova Keşifçisi','Tüm evrenleri ziyaret ettin!',STATE.visitedModes.size>=6);
+  if(mode==='ansiklopedi')renderCardGrid('ansiklopedi');
+  if(mode==='kartlar'){renderCardGrid('kartlar');initParticles('stars');}
+  if(mode==='kader')initParticles('galaxy');
+  if(mode==='enerji'){renderEnergyGrid();initParticles('lightning');}
+  if(mode==='ters'){renderReversedGrid();initParticles('mirror');}
+  if(mode==='sozler'){renderFavorites();initParticles('hearts');}
+}
+function closeMode(mode){
+  document.getElementById(`mode-${mode}`).classList.remove('active');
+  initParticles('stars');
+}
+
+/* ═══ YARDIMCILAR ═══ */
+function norm(t){return t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c');}
+function suitColor(s){return{spades:'#c8b4e8',hearts:'#ff6b8a',diamonds:'#ff9d4d',clubs:'#7aef9d'}[s]||'#fff';}
+function suitName(s){return{spades:'Maça ♠',hearts:'Kupa ♥',diamonds:'Karo ♦',clubs:'Sinek ♣'}[s]||s;}
+
+/* ═══ KART GRİD ═══ */
+function filterCards(ctx){renderCardGrid(ctx);}
+function setSuitFilter(ctx,suit,btn){
+  STATE.suitFilter[ctx]=suit;
+  document.getElementById(`filter-${ctx}`).querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderCardGrid(ctx);
+}
+function renderCardGrid(ctx){
+  const grid=document.getElementById(`grid-${ctx}`);
+  const si=document.getElementById(`search-${ctx}`);
+  const q=norm(si?si.value:'');
+  if(q==='nova'){showSecret();return;}
+  if(q==='13'){showEvent13();return;}
+  const suit=STATE.suitFilter[ctx]||'all';
+  let cards=CARDS;
+  if(suit!=='all')cards=cards.filter(c=>c.suit===suit);
+  if(q)cards=cards.filter(c=>norm(c.name).includes(q)||norm(c.keywords.join(' ')).includes(q));
+  grid.innerHTML='';
+  if(!cards.length){grid.innerHTML='<div class="no-results">Kart bulunamadı 🃏</div>';return;}
+  cards.forEach((card,i)=>{
+    const d=document.createElement('div');
+    d.className='card-tile';d.style.animationDelay=`${i*0.03}s`;
+    const eClass=card.energy==='High'?'energy-high':card.energy==='Medium'?'energy-med':'energy-low';
+    d.innerHTML=`<span class="card-suit-symbol" style="color:${suitColor(card.suit)}">${card.symbol}</span><div class="card-name">${card.name}</div><span class="card-energy ${eClass}">${card.energy}</span>`;
+    d.addEventListener('click',()=>openCardModal(card));
+    grid.appendChild(d);
+  });
+}
+
+/* ═══ MODAL ═══ */
+function openCardModal(card){
+  STATE.exploredCards.add(card.id);
+  localStorage.setItem('nova_explored',JSON.stringify([...STATE.exploredCards]));
+  updateStats();
+  checkAchievement('ilk-kart','🃏','İlk Kart','İlk karta tıkladın!',true);
+  document.getElementById('modal-symbol').textContent=card.symbol;
+  document.getElementById('modal-symbol').style.color=suitColor(card.suit);
+  document.getElementById('modal-name').textContent=card.name;
+  document.getElementById('modal-suit-label').textContent=`${suitName(card.suit)} • ${card.value}`;
+  const eC=card.energy==='High'?'energy-high':card.energy==='Medium'?'energy-med':'energy-low';
+  const kw=card.keywords.map(k=>`<span class="keyword-badge">${k}</span>`).join('');
+  const pos=card.positive.map(p=>`<li>${p}</li>`).join('');
+  const neg=card.negative.map(n=>`<li>${n}</li>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-section"><div class="modal-section-title">⚡ Enerji Seviyesi</div><span class="card-energy energy-badge-modal ${eC}">${card.energy}</span></div>
+    <div class="modal-section"><div class="modal-section-title">🌟 Genel Anlam & Sembolizm</div><p>${card.general}</p></div>
+    <div class="modal-section"><div class="modal-section-title">🔮 Fal & Mistik Yorum</div><p>${card.fal}</p></div>
+    <div class="modal-section"><div class="modal-section-title">🔢 Numerolojik Değer</div><p>${card.numerology}</p></div>
+    <div class="modal-section"><div class="modal-section-title">⚖️ Pozitif & Negatif Yönler</div><div class="pros-cons-grid"><div><ul class="pros-list">${pos}</ul></div><div><ul class="cons-list">${neg}</ul></div></div></div>
+    <div class="modal-section"><div class="modal-section-title">🌙 Suit Anlamı</div><p>${card.suit_meaning}</p></div>
+    <div class="modal-section"><div class="modal-section-title">📜 Tarihsel Arka Plan</div><p>${card.history}</p></div>
+    <div class="modal-section"><div class="modal-section-title">🔑 Anahtar Kelimeler</div><div class="keywords-list">${kw}</div></div>`;
+  document.getElementById('card-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('card-modal').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeSecret();closeEvent13();}});
+
+/* ═══ KADER ═══ */
+let fateCards=[];let fateFlipped=0;
+function drawFate(){
+  fateCards=[...CARDS].sort(()=>Math.random()-0.5).slice(0,3);
+  fateFlipped=0;
+  document.getElementById('fate-interp').style.display='none';
+  const wrap=document.getElementById('fate-cards-wrap');
+  wrap.innerHTML='';
+  const pos=['Geçmiş','Şimdi','Gelecek'];
+  fateCards.forEach((card,i)=>{
+    const d=document.createElement('div');d.className='fate-card-wrap';
+    d.innerHTML=`<div class="fate-position">${pos[i]}</div>
+    <div class="flip-card" id="fc${i}" onclick="flipFate(${i},event)">
+      <div class="flip-inner">
+        <div class="flip-front"><span class="card-back-pattern">✦</span><div style="font-family:Cinzel,serif;font-size:0.65rem;color:var(--text-dim);margin-top:8px;letter-spacing:0.1em">Dokunarak aç</div></div>
+        <div class="flip-back"><span class="fate-symbol" style="color:${suitColor(card.suit)}">${card.symbol}</span><div class="fate-name">${card.name}</div></div>
+      </div>
+    </div>`;
+    wrap.appendChild(d);
+  });
+  checkAchievement('kader-gordu','🔮','Kaderi Gördün','Kader Evreni\'ni kullandın!',true);
+}
+function flipFate(i,e){
+  const el=document.getElementById(`fc${i}`);
+  if(el.classList.contains('flipped'))return;
+  el.classList.add('flipped');fateFlipped++;
+  if(fateFlipped===3)setTimeout(()=>showFateInterp(),900);
+}
+function showFateInterp(){
+  const el=document.getElementById('fate-interp');el.style.display='block';
+  const sd={hearts:'aşk ve duygulara',spades:'mücadele ve dönüşüme',diamonds:'maddi başarı ve fırsatlara',clubs:'enerji ve büyümeye'};
+  const t=`Geçmişte "${fateCards[0].name}" seni ${sd[fateCards[0].suit]||'derin bir deneyime'} taşıdı. ${fateCards[0].fal.split('.')[0]}.\n\nŞu an "${fateCards[1].name}" enerjisiyle çevrilmiş durumdasın. ${fateCards[1].general.split('.')[0]}.\n\nGeleceğe baktığında "${fateCards[2].name}" beliriyor. ${fateCards[2].fal.split('.')[0]}. Evren seninle konuşuyor — dinle.`;
+  typeText('typing-output',t,28);
+}
+function typeText(id,text,speed=30){
+  const el=document.getElementById(id);el.innerHTML='<span class="typing-cursor"></span>';
+  let i=0;
+  const inv=setInterval(()=>{
+    if(i<text.length){el.innerHTML=text.slice(0,i+1).replace(/\n/g,'<br>')+'<span class="typing-cursor"></span>';i++;}
+    else{el.innerHTML=text.replace(/\n/g,'<br>');clearInterval(inv);}
+  },speed);
+}
+
+/* ═══ ENERJİ ═══ */
+function renderEnergyGrid(){
+  const grid=document.getElementById('grid-enerji');grid.innerHTML='';
+  [...CARDS].sort(()=>Math.random()-0.5).forEach((card,i)=>{
+    const e=['High','Medium','Low'][Math.floor(Math.random()*3)];
+    const eC=e==='High'?'e-high':e==='Medium'?'e-med':'e-low';
+    const d=document.createElement('div');d.className=`card-tile energy-card ${eC}`;d.style.animationDelay=`${i*0.02}s`;
+    const ec2=e==='High'?'energy-high':e==='Medium'?'energy-med':'energy-low';
+    d.innerHTML=`<span class="card-suit-symbol" style="color:${suitColor(card.suit)}">${card.symbol}</span><div class="card-name">${card.name}</div><span class="card-energy ${ec2}">${e}</span>`;
+    d.addEventListener('click',()=>openCardModal(card));grid.appendChild(d);
+  });
+}
+
+/* ═══ TERS KART ═══ */
+function renderReversedGrid(){
+  const grid=document.getElementById('grid-ters');grid.innerHTML='';
+  [...CARDS].sort(()=>Math.random()-0.5).forEach((card,i)=>{
+    const d=document.createElement('div');d.className='card-tile';d.style.animationDelay=`${i*0.02}s`;
+    d.innerHTML=`<div class="flip-card"><div class="flip-inner">
+      <div class="flip-front"><span class="card-back-pattern" style="font-size:2rem">🪞</span><div style="font-family:Cinzel,serif;font-size:0.65rem;color:var(--text-dim);margin-top:8px">???</div></div>
+      <div class="flip-back"><span style="font-size:2.5rem;color:${suitColor(card.suit)};transform:rotate(180deg);display:block">${card.symbol}</span><div style="font-family:Cinzel,serif;font-size:0.75rem;color:var(--acc2);text-align:center;margin-top:8px">${card.name}</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px">TERS</div></div>
+    </div></div>`;
+    const fc=d.querySelector('.flip-card');
+    fc.addEventListener('click',()=>{fc.classList.toggle('flipped');if(fc.classList.contains('flipped'))setTimeout(()=>openCardModal(card),400);});
+    grid.appendChild(d);
+  });
+}
+
+/* ═══ SÖZLER ═══ */
+function setMood(mood,btn){
+  STATE.currentMood=mood;STATE.usedQuotes.clear();
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+}
+function generateQuote(){
+  let pool=STATE.currentMood==='all'?QUOTES:QUOTES.filter(q=>q.mood===STATE.currentMood);
+  if(!pool.length)pool=QUOTES;
+  const avail=pool.filter((_,i)=>!STATE.usedQuotes.has(STATE.currentMood+i));
+  const src=avail.length?avail:pool;
+  const q=src[Math.floor(Math.random()*src.length)];
+  const ki=pool.indexOf(q);STATE.usedQuotes.add(STATE.currentMood+ki);
+  STATE.currentQuoteText=q.text;
+  const el=document.getElementById('quote-text');
+  el.style.opacity=0;
+  setTimeout(()=>{el.textContent=`"${q.text}"`;el.style.opacity=1;el.style.transition='opacity 0.4s';
+    const isFav=STATE.favQuotes.includes(q.text);
+    document.getElementById('fav-btn').textContent=isFav?'♥ Favoride':'♡ Favorile';
+    document.getElementById('fav-btn').className='quote-action-btn'+(isFav?' favorited':'');
+  },200);
+}
+function copyQuote(){
+  if(!STATE.currentQuoteText)return;
+  navigator.clipboard.writeText(STATE.currentQuoteText).then(()=>{
+    const b=document.getElementById('copy-btn');b.textContent='✓ Kopyalandı';setTimeout(()=>b.textContent='📋 Kopyala',2000);
+  });
+}
+function toggleFavoriteQuote(){
+  if(!STATE.currentQuoteText)return;
+  const idx=STATE.favQuotes.indexOf(STATE.currentQuoteText);
+  if(idx>-1){STATE.favQuotes.splice(idx,1);document.getElementById('fav-btn').textContent='♡ Favorile';document.getElementById('fav-btn').classList.remove('favorited');}
+  else{STATE.favQuotes.unshift(STATE.currentQuoteText);document.getElementById('fav-btn').textContent='♥ Favoride';document.getElementById('fav-btn').classList.add('favorited');}
+  localStorage.setItem('nova_quotes',JSON.stringify(STATE.favQuotes));renderFavorites();
+}
+function renderFavorites(){
+  const list=document.getElementById('fav-list');const title=document.getElementById('fav-title');
+  if(!STATE.favQuotes.length){title.style.display='none';list.innerHTML='';return;}
+  title.style.display='block';
+  list.innerHTML=STATE.favQuotes.map((q,i)=>`<div class="fav-item"><span>"${q}"</span><button class="fav-remove" onclick="removeFav(${i})">✕</button></div>`).join('');
+}
+function removeFav(i){STATE.favQuotes.splice(i,1);localStorage.setItem('nova_quotes',JSON.stringify(STATE.favQuotes));renderFavorites();}
+
+/* ═══ BAŞARIMLAR ═══ */
+let toastT;
+function checkAchievement(id,icon,name,desc,cond=true){
+  if(!cond||STATE.achievements.has(id))return;
+  STATE.achievements.add(id);localStorage.setItem('nova_achievements',JSON.stringify([...STATE.achievements]));
+  clearTimeout(toastT);
+  document.getElementById('toast-icon').textContent=icon;
+  document.getElementById('toast-name').textContent=name;
+  document.getElementById('toast-desc').textContent=desc;
+  const t=document.getElementById('achievement-toast');t.classList.add('show');
+  toastT=setTimeout(()=>t.classList.remove('show'),4000);
+  updateStats();
+}
+function updateStats(){
+  document.getElementById('stat-explored').textContent=STATE.exploredCards.size;
+  document.getElementById('stat-achievements').textContent=STATE.achievements.size;
+  document.getElementById('stat-modes').textContent=STATE.visitedModes.size;
+}
+updateStats();
+
+/* ═══ GİZLİ SİSTEMLER ═══ */
+function showSecret(){document.getElementById('nova-secret').classList.add('show');}
+function closeSecret(){document.getElementById('nova-secret').classList.remove('show');}
+const e13msgs=['13... Sayı mı, kader mi? Evren seninle konuşuyor...','On üç. Ne mutlu ne kötü — sadece dönüşüm.','Sayılar sırlarını taşır. 13 bir son değil; yeni bir başlangıç.','Karanlık sayılar aydınlık kapılar açar.'];
+function showEvent13(){
+  document.getElementById('event13-text').textContent=e13msgs[Math.floor(Math.random()*e13msgs.length)];
+  document.getElementById('event13').classList.add('show');
+}
+function closeEvent13(){document.getElementById('event13').classList.remove('show');}
+
+/* ═══ GİRİŞ ANİMASYONU ═══ */
+document.querySelectorAll('.menu-btn').forEach((b,i)=>{
+  b.style.opacity=0;b.style.transform='translateY(30px)';b.style.transition=`opacity 0.5s ${i*0.1}s,transform 0.5s ${i*0.1}s`;
+  setTimeout(()=>{b.style.opacity=1;b.style.transform='translateY(0)';},100);
+});
+</script>
+</body>
+</html>
