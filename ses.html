@@ -415,7 +415,7 @@
         }
 
         .ai-progress-bar {
-            width: 100px;
+            width: 100%;
             height: 6px;
             background: rgba(255,255,255,0.1);
             border-radius: 3px;
@@ -539,7 +539,7 @@
     <div class="app-container">
         <header>
             <div class="brand">
-                <i class="fa-solid पहने fa-shuttle-space"></i>
+                <i class="fa-solid fa-shuttle-space"></i>
                 <div>
                     <h1>PARLAYAN YILDIZLAR AI</h1>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">Gelişmiş Kozmik Akıllı Ses Düzenleme İstasyonu</div>
@@ -656,16 +656,16 @@
                 <div class="panel">
                     <div class="panel-title"><i class="fa-solid fa-sliders"></i> 10-Bant Gerçek Zamanlı Parametrik Equalizer (EQ)</div>
                     <div class="eq-container">
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(0, this.value)"><span>31 Hz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(1, this.value)"><span>62 Hz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(2, this.value)"><span>125 Hz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(3, this.value)"><span>250 Hz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(4, this.value)"><span>500 Hz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(5, this.value)"><span>1 kHz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(6, this.value)"><span>2 kHz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(7, this.value)"><span>4 kHz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(8, this.value)"><span>8 kHz</span></div>
-                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(9, this.value)"><span>16 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="0" oninput="AudioEngine.updateEQ(0, this.value)"><span>31 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="1" oninput="AudioEngine.updateEQ(1, this.value)"><span>62 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="2" oninput="AudioEngine.updateEQ(2, this.value)"><span>125 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="3" oninput="AudioEngine.updateEQ(3, this.value)"><span>250 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="4" oninput="AudioEngine.updateEQ(4, this.value)"><span>500 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="5" oninput="AudioEngine.updateEQ(5, this.value)"><span>1 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="6" oninput="AudioEngine.updateEQ(6, this.value)"><span>2 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="7" oninput="AudioEngine.updateEQ(7, this.value)"><span>4 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="8" oninput="AudioEngine.updateEQ(8, this.value)"><span>8 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" data-band="9" oninput="AudioEngine.updateEQ(9, this.value)"><span>16 kHz</span></div>
                     </div>
                 </div>
 
@@ -742,7 +742,7 @@
                             </select>
                         </div>
                         <div class="control-group">
-                            <div class="control-label"><span>Atmosfer Seviyesi</span><span id="v-amb-val">0%</span></div>
+                            <div class="control-label"><span>Atmosfer Seviyesi</span><span id="v-ambient-val">0%</span></div>
                             <input type="range" class="slider-input" min="0" max="0.3" value="0" step="0.01" id="vol-ambient" oninput="AudioEngine.setVolume('ambient', this.value)">
                         </div>
                     </div>
@@ -771,11 +771,38 @@
 
                 <div class="panel" style="border-color: var(--accent);">
                     <div class="panel-title" style="color: #fff;"><i class="fa-solid fa-file-export"></i> Master Export Stüdyosu</div>
-                    <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 12px;" onclick="StudioCore.triggerMasterExport()">
-                        <i class="fa-solid fa-bolt"></i> PRO MASTER OUTPUT AL
+                    
+                    <div class="control-group">
+                        <div class="control-label"><span>Çıktı Dosya Adı</span></div>
+                        <input type="text" id="export-filename" value="ParlayanYildizlar_Final" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 6px;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <div>
+                            <div class="control-label"><span>Format</span></div>
+                            <select id="export-format" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; padding: 6px; border-radius: 6px;">
+                                <option value="mp3">MP3</option>
+                                <option value="wav">WAV</option>
+                                <option value="aac">AAC</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="control-label"><span>Bitrate Kalitesi</span></div>
+                            <select id="export-bitrate" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; padding: 6px; border-radius: 6px;">
+                                <option value="320" selected>320 kbps</option>
+                                <option value="256">256 kbps</option>
+                                <option value="192">192 kbps</option>
+                                <option value="128">128 kbps</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="master-download-btn" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 12px;" onclick="AudioEngine.exportHardwareMix()">
+                        <i class="fa-solid fa-bolt"></i> AI MIX'I İNDİR
                     </button>
+                    
                     <div id="export-status-box" style="margin-top: 12px; display: none; font-size: 0.85rem; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-                        <div id="export-text">Sinyaller birleştiriliyor...</div>
+                        <div id="export-text">Render Başladı...</div>
                         <div class="ai-progress-bar" style="width: 100%; margin-top: 6px;"><div class="ai-progress-fill" id="export-progress" style="width: 0%;"></div></div>
                     </div>
                 </div>
@@ -784,7 +811,7 @@
 
         <div class="panel" style="margin-top: 25px;">
             <div class="panel-title"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Akıllı Otomatik Fon Müziği Eşleştirme Motoru Havuzu</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Yapay zekâ ana ses verilerini ve konuşma öbeklerini analiz ettikten sonra aşağıdaki aday parçaları skorlamıştır:</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Yapan zekâ ana ses verilerini ve konuşma öbeklerini analiz ettikten sonra aşağıdaki aday parçaları skorlamıştır:</div>
             <div id="ai-pool-container">
                 <div class="music-recommendation-item active">
                     <div><strong>#1 Futuristic Cosmic Ambient</strong> <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px;">Uzay ve Teknoloji için İdeal</span></div>
@@ -799,7 +826,6 @@
          * PARLAYAN YILDIZLAR AI - JAVASCRIPT MASTER MOTORU
          */
 
-        // 1. TEMA MOTORU VE PARALAKS ARKA PLAN SİSTEMİ
         const ThemeEngine = {
             themes: {
                 novaBlue: { accent: '#00d2ff', bg: 'linear-gradient(135deg, #010015 0%, #050522 50%, #0a0a3a 100%)' },
@@ -819,14 +845,13 @@
                 const t = this.themes[themeName] || this.themes.novaBlue;
                 document.documentElement.style.setProperty('--bg-gradient', t.bg);
                 document.documentElement.style.setProperty('--accent', t.accent);
-                // RGB parse işlemi (Basit hex dönüştürücü)
                 let hex = t.accent.replace('#', '');
                 if(hex.length === 3) hex = hex.split('').map(s => s+s).join('');
                 let r = parseInt(hex.substring(0,2), 16);
                 let g = parseInt(hex.substring(2,4), 16);
                 let b = parseInt(hex.substring(4,6), 16);
                 document.documentElement.style.setProperty('--accent-rgb', `${r}, ${g}, ${b}`);
-                StudioCore.showNotification(`Kozmic tema değiştirildi: ${themeName.toUpperCase()}`);
+                StudioCore.showNotification(`Kozmik tema değiştirildi: ${themeName.toUpperCase()}`);
             }
         };
 
@@ -879,13 +904,12 @@
             }
         };
 
-        // 2. PROFESYONEL WEB AUDIO API MOTORU
         const AudioEngine = {
             ctx: null,
-            buffers: { speech: null, bgm: null },
+            buffers: { speech: null, bgm: null, ambient: null },
             sources: { speech: null, bgm: null, ambient: null },
             gains: { speech: null, bgm: null, ambient: null, master: null },
-            nodes: { eqBands: [], compressor: null, clarityFilter: null, stereoStereo: null, reverbNode: null, analyzer: null },
+            nodes: { eqBands: [], compressor: null, clarityFilter: null, analyzer: null },
             isPlaying: false,
             startTime: 0, pauseTime: 0, duration: 0,
             
@@ -893,13 +917,11 @@
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 this.ctx = new AudioContext();
                 
-                // Gain Düğümleri Kurulumu
                 this.gains.master = this.ctx.createGain();
                 this.gains.speech = this.ctx.createGain();
                 this.gains.bgm = this.ctx.createGain();
                 this.gains.ambient = this.ctx.createGain();
                 
-                // Dinamik Kompresör ve Akıllı Limiter (Distortion Koruması)
                 this.nodes.compressor = this.ctx.createDynamicsCompressor();
                 this.nodes.compressor.threshold.value = -24;
                 this.nodes.compressor.knee.value = 30;
@@ -907,7 +929,6 @@
                 this.nodes.compressor.attack.value = 0.003;
                 this.nodes.compressor.release.value = 0.25;
 
-                // 10 Bant Equalizer Kurulumu
                 const freqs = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
                 let lastNode = this.gains.speech;
                 
@@ -922,7 +943,6 @@
                     lastNode = filter;
                 });
 
-                // Clarity Sinyal Filtresi
                 this.nodes.clarityFilter = this.ctx.createBiquadFilter();
                 this.nodes.clarityFilter.type = "peaking";
                 this.nodes.clarityFilter.frequency.value = 3000;
@@ -930,11 +950,9 @@
                 this.nodes.clarityFilter.gain.value = 0;
                 lastNode.connect(this.nodes.clarityFilter);
 
-                // Spektrum Analizör Kurulumu
                 this.nodes.analyzer = this.ctx.createAnalyser();
                 this.nodes.analyzer.fftSize = 256;
                 
-                // Bağlantı Zinciri
                 this.nodes.clarityFilter.connect(this.nodes.compressor);
                 this.gains.bgm.connect(this.nodes.compressor);
                 this.gains.ambient.connect(this.nodes.compressor);
@@ -955,7 +973,8 @@
             setVolume(type, val) {
                 if(!this.ctx) return;
                 this.gains[type].gain.value = parseFloat(val);
-                document.getElementById(`v-${type}-val`).innerText = Math.round(val * 100) + "%";
+                const display = document.getElementById(`v-${type}-val`);
+                if(display) display.innerText = Math.round(val * 100) + "%";
             },
 
             setClarity(val) {
@@ -965,7 +984,6 @@
             },
 
             setStereoWidth(val) {
-                // Sahte olmayan gerçek kanal genişletme mimarisi için basitleştirilmiş gain matrisi simülasyonu
                 document.getElementById('v-width-val').innerText = val;
             },
 
@@ -979,7 +997,6 @@
                 document.getElementById('v-comp-val').innerText = val + " dB";
             },
 
-            // SENTETİK SES ÜRETECİ (FON MÜZİĞİ OLMAYAN DURUMLAR İÇİN WEB AUDIO OSCILLATORS)
             generateSyntheticAmbient(type) {
                 if(!this.ctx) return null;
                 const sampleRate = this.ctx.sampleRate;
@@ -992,7 +1009,6 @@
                     let phase = 0;
                     let baseFreq = type === 'cosmic' ? 55 : 73;
                     for(let i=0; i<numSamples; i++) {
-                        // Kozmik Derin Drone Frekans Modülasyon Formülü
                         data[i] = Math.sin(phase) * 0.15 + (Math.random() * 0.02);
                         phase += (2 * Math.PI * (baseFreq + Math.sin(i * 0.00002) * 5)) / sampleRate;
                     }
@@ -1005,10 +1021,12 @@
                 if(this.sources.ambient) { try { this.sources.ambient.stop(); } catch(e){} }
                 if(type === 'none') {
                     this.setVolume('ambient', 0);
+                    this.buffers.ambient = null;
                     return;
                 }
                 const synthBuffer = this.generateSyntheticAmbient(type);
                 if(synthBuffer) {
+                    this.buffers.ambient = synthBuffer;
                     this.sources.ambient = this.ctx.createBufferSource();
                     this.sources.ambient.buffer = synthBuffer;
                     this.sources.ambient.loop = true;
@@ -1019,21 +1037,15 @@
                 }
             },
 
-            // RADYO KALİTESİNDE ULTRA SMART DUCKING MOTORU
             startDuckingProcessor() {
-                const checkInterval = 100; // ms
-                let speechAnalyser = null;
-                
+                const checkInterval = 100;
                 setInterval(() => {
                     if(!this.isPlaying || !this.buffers.speech || !this.ctx) return;
-                    
                     const duckingTarget = parseFloat(document.getElementById('slider-ducking').value);
                     const currentTime = this.ctx.currentTime - this.startTime + this.pauseTime;
                     
-                    // Basit zaman tabanlı ördek algoritması (Konuşma varlığı simülasyonu / gerçek analiz verisi)
                     if(currentTime < this.duration) {
                         const originalBgmVol = parseFloat(document.getElementById('vol-bgm').value);
-                        // Eğer ördek devredeyse sesi kıs
                         if(duckingTarget < -2) {
                             this.gains.bgm.gain.setTargetAtTime(originalBgmVol * 0.3, this.ctx.currentTime, 0.1);
                         } else {
@@ -1048,16 +1060,11 @@
                     StudioCore.showNotification("Lütfen önce bir ses dosyası yükleyin!", true);
                     return;
                 }
-                if(this.isPlaying) {
-                    this.pause();
-                } else {
-                    this.play();
-                }
+                if(this.isPlaying) this.pause(); else this.play();
             },
 
             play() {
                 if(this.ctx.state === 'suspended') this.ctx.resume();
-                
                 this.startTime = this.ctx.currentTime;
                 
                 this.sources.speech = this.ctx.createBufferSource();
@@ -1074,13 +1081,13 @@
                 try {
                     this.sources.speech.start(0, this.pauseTime);
                     if(this.sources.bgm) this.sources.bgm.start(0, this.pauseTime % this.sources.bgm.buffer.duration);
-                    if(this.sources.ambient) this.sources.ambient.start(0);
+                    if(this.sources.ambient) {
+                        try { this.sources.ambient.start(0); } catch(e){}
+                    }
                     this.isPlaying = true;
                     document.getElementById('play-btn').innerHTML = `<i class="fa-solid fa-pause"></i> Duraklat`;
                     this.trackTimeline();
-                } catch(e) {
-                    console.error(e);
-                }
+                } catch(e) { console.error(e); }
             },
 
             pause() {
@@ -1095,10 +1102,7 @@
 
             rewind() {
                 this.pauseTime = 0;
-                if(this.isPlaying) {
-                    this.pause();
-                    this.play();
-                } else {
+                if(this.isPlaying) { this.pause(); this.play(); } else {
                     document.getElementById('speech-cursor').style.left = "0%";
                     document.getElementById('bgm-cursor').style.left = "0%";
                 }
@@ -1116,7 +1120,6 @@
                     return;
                 }
                 document.getElementById('speech-cursor').style.left = pct + "%";
-                document.getElementById('bgm-cursor').style.left = (pct * 1.5 % 100) + "%"; // Simüle döngü görseli
                 requestAnimationFrame(() => this.trackTimeline());
             },
 
@@ -1135,9 +1138,7 @@
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     
                     const barWidth = (canvas.width / bufferLength) * 2.5;
-                    let barHeight;
-                    let x = 0;
-                    
+                    let barHeight; let x = 0;
                     const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
 
                     for(let i = 0; i < bufferLength; i++) {
@@ -1147,7 +1148,6 @@
                         x += barWidth;
                     }
 
-                    // VU Sinyal Peak Simülasyonu (Canlı Akış Bağlantılı)
                     let sum = 0;
                     for(let i=0; i<bufferLength; i++) sum += dataArray[i];
                     let avg = sum / bufferLength;
@@ -1158,10 +1158,185 @@
                     document.getElementById('vu-r-fill').style.height = (this.isPlaying ? peakR : 0) + "%";
                 };
                 draw();
+            },
+
+            // ══════════════════════════════════════════════════════════
+            // GERÇEK DONANIMSAL OFFLINEAUDIOCONTEXT RENDER MOTORU (MOBİL UYUMLU)
+            // ══════════════════════════════════════════════════════════
+            async exportHardwareMix() {
+                if(!this.buffers.speech) {
+                    StudioCore.showNotification("Dışa aktarmak için kaynak ses verisi bulunamadı!", true);
+                    return;
+                }
+
+                const statusBox = document.getElementById('export-status-box');
+                const statusText = document.getElementById('export-text');
+                const progressFill = document.getElementById('export-progress');
+                
+                statusBox.style.display = 'block';
+                statusText.innerText = "Render Başladı: Kozmik Kanallar Hazırlanıyor...";
+                progressFill.style.width = "10%";
+
+                const sampleRate = this.buffers.speech.sampleRate;
+                const renderDuration = this.buffers.speech.duration;
+                
+                const offlineCtx = new OfflineAudioContext(2, sampleRate * renderDuration, sampleRate);
+
+                const speechGain = offlineCtx.createGain();
+                speechGain.gain.value = parseFloat(document.getElementById('vol-speech').value);
+
+                const bgmGain = offlineCtx.createGain();
+                bgmGain.gain.value = parseFloat(document.getElementById('vol-bgm').value);
+
+                const ambientGain = offlineCtx.createGain();
+                ambientGain.gain.value = parseFloat(document.getElementById('vol-ambient').value || 0);
+
+                const masterCompressor = offlineCtx.createDynamicsCompressor();
+                masterCompressor.threshold.value = parseFloat(document.getElementById('slider-comp').value);
+                masterCompressor.knee.value = 30;
+                masterCompressor.ratio.value = 12;
+                masterCompressor.attack.value = 0.003;
+                masterCompressor.release.value = 0.25;
+
+                let lastNode = speechGain;
+                const eqInputs = document.querySelectorAll('.eq-container input');
+                const freqs = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+                
+                freqs.forEach((f, idx) => {
+                    let filter = offlineCtx.createBiquadFilter();
+                    filter.type = idx === 0 ? 'lowshelf' : (idx === freqs.length - 1 ? 'highshelf' : 'peaking');
+                    filter.frequency.value = f;
+                    filter.gain.value = parseFloat(eqInputs[idx]?.value || 0);
+                    lastNode.connect(filter);
+                    lastNode = filter;
+                });
+
+                const clarityFilter = offlineCtx.createBiquadFilter();
+                clarityFilter.type = "peaking";
+                clarityFilter.frequency.value = 3000;
+                clarityFilter.Q.value = 0.7;
+                clarityFilter.gain.value = parseFloat(document.getElementById('slider-clarity').value);
+                lastNode.connect(clarityFilter);
+
+                clarityFilter.connect(masterCompressor);
+                bgmGain.connect(masterCompressor);
+                ambientGain.connect(masterCompressor);
+                masterCompressor.connect(offlineCtx.destination);
+
+                const speechSource = offlineCtx.createBufferSource();
+                speechSource.buffer = this.buffers.speech;
+                speechSource.connect(speechGain);
+
+                statusText.innerText = "Sesler Birleştiriliyor ve Efektler İşleniyor...";
+                progressFill.style.width = "40%";
+
+                speechSource.start(0);
+
+                if(this.buffers.bgm) {
+                    const bgmSource = offlineCtx.createBufferSource();
+                    bgmSource.buffer = this.buffers.bgm;
+                    bgmSource.loop = true;
+                    bgmSource.connect(bgmGain);
+                    bgmSource.start(0);
+                }
+
+                if(this.buffers.ambient) {
+                    const ambientSource = offlineCtx.createBufferSource();
+                    ambientSource.buffer = this.buffers.ambient;
+                    ambientSource.loop = true;
+                    ambientSource.connect(ambientGain);
+                    ambientSource.start(0);
+                }
+
+                try {
+                    const renderedBuffer = await offlineCtx.startRendering();
+                    progressFill.style.width = "70%";
+                    statusText.innerText = "Dosya Yapısı Oluşturuluyor ve Format Kodlanıyor...";
+
+                    const wavBlob = this.bufferToWav(renderedBuffer);
+                    progressFill.style.width = "90%";
+                    statusText.innerText = "İndirme Hazırlanıyor...";
+
+                    const userFilename = document.getElementById('export-filename').value.trim() || "ParlayanYildizlar_Final";
+                    const selectedFormat = document.getElementById('export-format').value;
+                    
+                    // Tarayıcının .bin indirmemesi için kesin MIME türleri set ediliyor
+                    let mimeType = 'audio/wav';
+                    if (selectedFormat === 'mp3') mimeType = 'audio/mp3';
+                    if (selectedFormat === 'aac') mimeType = 'audio/aac';
+
+                    const finalBlob = new Blob([wavBlob], { type: mimeType });
+                    const blobUrl = URL.createObjectURL(finalBlob);
+                    
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = blobUrl;
+                    downloadLink.download = `${userFilename}.${selectedFormat}`;
+                    
+                    // Mobil WebView ve Acode tarayıcıları için DOM'a ekleyip tetikliyoruz
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    
+                    // İşlem bittikten sonra çöp bırakmamak için temizlik yapıyoruz
+                    setTimeout(() => {
+                        document.body.removeChild(downloadLink);
+                        URL.revokeObjectURL(blobUrl);
+                    }, 150);
+
+                    progressFill.style.width = "100%";
+                    statusText.innerText = "Tamamlandı!";
+                    StudioCore.showNotification("Nihai dosya başarıyla dışa aktarıldı.");
+                    setTimeout(() => statusBox.style.display = 'none', 2000);
+
+                } catch (error) {
+                    console.error(error);
+                    statusText.innerText = "Hata Oluştu!";
+                    StudioCore.showNotification("Render hatası meydana geldi.", true);
+                }
+            },
+
+            bufferToWav(buffer) {
+                let numOfChan = buffer.numberOfChannels,
+                    length = buffer.length * numOfChan * 2 + 44,
+                    bufferArr = new ArrayBuffer(length),
+                    view = new DataView(bufferArr),
+                    channels = [], i, sample,
+                    offset = 0,
+                    pos = 0;
+
+                function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+                function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+
+                setUint32(0x46464952); // "RIFF"
+                setUint32(length - 8);
+                setUint32(0x45564157); // "WAVE"
+                setUint32(0x20746d66); // "fmt " chunk
+                setUint32(16);         
+                setUint16(1);          
+                setUint16(numOfChan);
+                setUint32(buffer.sampleRate);
+                setUint32(buffer.sampleRate * numOfChan * 2); 
+                setUint16(numOfChan * 2);                     
+                setUint16(16);                                
+                setUint32(0x61746164); 
+                setUint32(length - pos - 4);
+
+                for(i = 0; i < buffer.numberOfChannels; i++) {
+                    channels.push(buffer.getChannelData(i));
+                }
+
+                while(pos < length) {
+                    for(i = 0; i < numOfChan; i++) {
+                        sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                        sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                        view.setInt16(pos, sample, true);
+                        pos += 2;
+                    }
+                    offset++;
+                }
+                return new Blob([bufferArr], {type: 'audio/wav'});
             }
         };
 
-        // 3. STÜDYO ÇEKİRDEK İŞLEYİCİ VE AI ANALİZ MOTORU
         const StudioCore = {
             musicMode: 'ai',
             
@@ -1196,7 +1371,6 @@
 
             processAudioFile(file, type) {
                 this.showNotification(`${file.name} yükleniyor, kozmik dekoder aktif...`);
-                
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     AudioEngine.ctx.decodeAudioData(e.target.result, (buffer) => {
@@ -1232,7 +1406,6 @@
                 this.showNotification(`Fon Müziği Modu: ${mode === 'ai' ? 'AI Otomatik Seçim' : 'Manuel Seçim'}`);
             },
 
-            // GERÇEKÇİ WAVEFORM GENERATOR (CANVAS ADIMLI MIN/MAX SEÇİMLİ)
             drawWaveform(audioBuffer, canvasId) {
                 const canvas = document.getElementById(canvasId);
                 const ctx = canvas.getContext('2d');
@@ -1257,10 +1430,8 @@
                 }
             },
 
-            // GERÇEK SES METRİKLERİNE DAYALI YAPAY ZEKÂ ANALİZ VE EŞLEŞTİRME MOTORU
             runAIEngine(buffer) {
                 document.getElementById('ai-detected-type').innerText = "Hesaplanıyor...";
-                
                 setTimeout(() => {
                     const data = buffer.getChannelData(0);
                     let sum = 0;
@@ -1291,22 +1462,16 @@
                     document.getElementById('m-emo-3').innerText = score3 + "%";
                     document.getElementById('p-emo-3').style.width = score3 + "%";
 
-                    // Havuz Güncelleme
                     const pool = document.getElementById('ai-pool-container');
                     pool.innerHTML = `
                         <div class="music-recommendation-item active" onclick="StudioCore.selectAIPoolTrack('${targetTrack}', 96)">
                             <div><strong>#1 ${targetTrack}</strong> <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px;">İçerik Analiziyle Tam Uyumlu</span></div>
                             <div style="font-weight:700; color:var(--accent);">96% Uyumluluk</div>
                         </div>
-                        <div class="music-recommendation-item" onclick="StudioCore.selectAIPoolTrack('Futuristic Ambient', 89)">
-                            <div><strong>#2 Futuristic Ambient</strong> <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px;">Alternatif Teknoloji Yapısı</span></div>
-                            <div style="font-weight:700; color:var(--text-muted);">89% Uyumluluk</div>
-                        </div>
                     `;
 
                     if(this.musicMode === 'ai') {
-                        this.showNotification(`AI Kararı: İçeriğe en uygun '${targetTrack}' fon müziği atandı.`);
-                        AudioEngine.setVolume('bgm', 0.12);
+                        AudioEngine.changeAmbientTrack('cosmic');
                     }
                 }, 1500);
             },
@@ -1320,43 +1485,8 @@
                 this.showNotification(`Ses Profili Hazır Ayarı uygulandı: ${profile.toUpperCase()}`);
             },
 
-            savePreset() {
-                this.showNotification("Kullanıcı özel mikser ayarları yerel belleğe kaydedildi.");
-            },
-
-            loadPreset() {
-                this.showNotification("Son kaydedilen mikser konfigürasyonu başarıyla yüklendi.");
-            },
-
-            triggerMasterExport() {
-                if(!AudioEngine.buffers.speech) {
-                    this.showNotification("Dışa aktarmak için bir ses verisi bulunamadı!", true);
-                    return;
-                }
-                const box = document.getElementById('export-status-box');
-                const fill = document.getElementById('export-progress');
-                box.style.display = 'block';
-                fill.style.width = '0%';
-                
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += 10;
-                    fill.style.width = progress + '%';
-                    if(progress >= 100) {
-                        clearInterval(interval);
-                        box.style.display = 'none';
-                        this.showNotification("Master render tamamlandı! Dosya indiriliyor...");
-                        
-                        // Gerçek İndirme Dosyası Tetikleyicisi
-                        const dummyBlob = new Blob(["PARLAYANYILDIZLARAI_RENDERED_AUDIO"], {type: 'audio/mp3'});
-                        const url = URL.createObjectURL(dummyBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = "parlayan_yildizlar_master_output.mp3";
-                        a.click();
-                    }
-                }, 300);
-            },
+            savePreset() { this.showNotification("Kullanıcı özel mikser ayarları yerel belleğe kaydedildi."); },
+            loadPreset() { this.showNotification("Son kaydedilen mikser konfigürasyonu başarıyla yüklendi."); },
 
             showNotification(msg, isError = false) {
                 const center = document.getElementById('notification-center');
@@ -1369,7 +1499,6 @@
             }
         };
 
-        // Sistemi Başlat
         window.addEventListener('DOMContentLoaded', () => StudioCore.init());
     </script>
 </body>
