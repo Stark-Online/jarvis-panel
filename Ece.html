@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ece'nin Mekanı - Premium Audio Experience</title>
+    <style>
+        /* --- Gelişmiş CSS Değişkenleri ve 5 Premium Tema --- */
+        :root {
+            /* 1. Gece Modu / Derin Uzay */
+            --bg-gradient: linear-gradient(135deg, #020208 0%, #090a1e 50%, #03030d 100%);
+            --text-main: #f0f3ff;
+            --text-muted: #8fa0dd;
+            --accent-color: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.6);
+            --card-bg: rgba(10, 12, 32, 0.5);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --btn-active-text: #020208;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        [data-theme="neon"] {
+            /* 2. Neon Rüya */
+            --bg-gradient: linear-gradient(135deg, #0f011a 0%, #1d0236 50%, #06000c 100%);
+            --text-main: #ffe5fc;
+            --text-muted: #c99aff;
+            --accent-color: #ff007f;
+            --accent-glow: rgba(255, 0, 127, 0.7);
+            --card-bg: rgba(25, 5, 40, 0.55);
+            --card-border: rgba(255, 0, 127, 0.25);
+            --btn-active-text: #ffffff;
+        }
+
+        [data-theme="light"] {
+            /* 3. Zarif Aydınlık */
+            --bg-gradient: linear-gradient(135deg, #f4f7fc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent-color: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.3);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --btn-active-text: #ffffff;
+        }
+
+        [data-theme="cyber"] {
+            /* 4. Retro Cyberpunk */
+            --bg-gradient: linear-gradient(135deg, #120c00 0%, #1a1000 50%, #0a0600 100%);
+            --text-main: #ffee00;
+            --text-muted: #ffaa00;
+            --accent-color: #ffaa00;
+            --accent-glow: rgba(255, 170, 0, 0.6);
+            --card-bg: rgba(20, 15, 0, 0.65);
+            --card-border: rgba(255, 170, 0, 0.3);
+            --btn-active-text: #120c00;
+        }
+
+        [data-theme="sapphire"] {
+            /* 5. Sihirli Safir */
+            --bg-gradient: linear-gradient(135deg, #00111c 0%, #001f33 50%, #000a12 100%);
+            --text-main: #e0f2fe;
+            --text-muted: #38bdf8;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.6);
+            --card-bg: rgba(0, 20, 35, 0.6);
+            --card-border: rgba(56, 189, 248, 0.2);
+            --btn-active-text: #00111c;
+        }
+
+        /* --- Genel Tasarım Ayarları --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                        color 0.4s ease, 
+                        border-color 0.4s ease, 
+                        box-shadow 0.4s ease;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* İnteraktif Arka Plan */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Ortalanmış Ana Konteyner */
+        .main-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 550px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* --- Başlık Alanı --- */
+        .brand-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            text-shadow: 0 0 30px var(--accent-glow);
+            text-align: center;
+        }
+
+        [data-theme="light"] .brand-title {
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Yenilenen Şık Tema Seçici (Kartın Hemen Üstünde) --- */
+        .theme-selector-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-btn:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        .theme-btn.active {
+            background: var(--accent-color);
+            color: var(--btn-active-text);
+            box-shadow: 0 0 15px var(--accent-glow);
+            border-color: transparent;
+        }
+
+        /* --- Glassmorphism Kart Düzeni --- */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 28px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+        }
+
+        .track-info {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .track-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .track-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Zaman Çizelgesi */
+        .timeline-container {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .timeline-bg {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        [data-theme="light"] .timeline-bg {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .timeline-progress {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-color);
+            box-shadow: 0 0 12px var(--accent-glow);
+            border-radius: 10px;
+        }
+
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Oynatıcı Buton */
+        .controls-hub {
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-play-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+
+        .main-play-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Saf CSS İkonlar */
+        .shape-play {
+            width: 0;
+            height: 0;
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-left: 18px solid var(--btn-active-text);
+            margin-left: 5px;
+        }
+
+        .shape-pause {
+            display: flex;
+            gap: 5px;
+        }
+        .shape-pause span {
+            width: 5px;
+            height: 18px;
+            background: var(--btn-active-text);
+            border-radius: 3px;
+        }
+
+        /* --- Samimi Sözler Alanı --- */
+        .quotes-hub {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .quote-card {
+            font-style: italic;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            opacity: 0.95;
+            padding: 15px 20px;
+            border-left: 4px solid var(--accent-color);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0 16px 16px 0;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        [data-theme="light"] .quote-card {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        /* Mobil Optimizasyonu */
+        @media (max-width: 480px) {
+            .brand-title { font-size: 2.4rem; }
+            .glass-card { padding: 22px; }
+            .quote-card { font-size: 0.9rem; padding: 12px 15px; }
+            .theme-btn { padding: 6px 12px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Akıllı ve İnteraktif Arka Plan Parçacık Sistemi -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="main-container">
+        
+        <!-- Başlık -->
+        <h1 class="brand-title">Ece'nin Mekanı</h1>
+
+        <!-- Güncellenen Stratejik Tema Seçici -->
+        <div class="theme-selector-bar">
+            <button class="theme-btn active" onclick="changeTheme('space', this)">🌌 Derin Uzay</button>
+            <button class="theme-btn" onclick="changeTheme('neon', this)">🔮 Neon Rüya</button>
+            <button class="theme-btn" onclick="changeTheme('light', this)">✨ Aydınlık</button>
+            <button class="theme-btn" onclick="changeTheme('cyber', this)">⚡ Cyberpunk</button>
+            <button class="theme-btn" onclick="changeTheme('sapphire', this)">💎 Safir</button>
+        </div>
+
+        <!-- Ana Ses Kartı -->
+        <div class="glass-card">
+            <div class="track-info">
+                <div class="track-title">Özel Ses Kaydı</div>
+                <div class="track-subtitle">Ece Hanım</div>
+            </div>
+
+            <!-- Arka Plandaki Audio Elementi -->
+            <audio id="audio-engine" src="EceHanim_Muzik.mp3" preload="metadata"></audio>
+
+            <!-- İlerleme Çubuğu -->
+            <div class="timeline-container">
+                <div class="timeline-bg" id="timeline-track">
+                    <div class="timeline-progress" id="timeline-current"></div>
+                </div>
+                <div class="time-labels">
+                    <span id="label-current">0:00</span>
+                    <span id="label-total">0:00</span>
+                </div>
+            </div>
+
+            <!-- Tetikleyici Kontrol Butonu -->
+            <div class="controls-hub">
+                <button class="main-play-btn" id="play-btn" onclick="handlePlayback()">
+                    <div id="play-icon" class="shape-play"></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Anlamlı Sözler Bölümü -->
+        <div class="quotes-hub">
+            <p class="quote-card">"Sesinizde insanın ruhunu dinlendiren, kelimelerle tarif edilemeyecek kadar zarif bir huzur var Ece hanım..."</p>
+            <p class="quote-card">"Bazı sesler sadece duyulmaz, hissedilir. Her notasında ayrı bir hikaye, ayrı bir samimiyet gizli."</p>
+            <p class="quote-card">"Dünyanın bütün gürültüsünü susturan, geriye sadece huzuru bırakan muazzam bir tını... Ağzınıza, yüreğinize sağlık."</p>
+        </div>
+
+    </div>
+
+    <script>
+        /* --- SES ALTYAPISI VE KONTROLLERİ --- */
+        const audio = document.getElementById('audio-engine');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const timelineTrack = document.getElementById('timeline-track');
+        const timelineCurrent = document.getElementById('timeline-current');
+        const labelCurrent = document.getElementById('label-current');
+        const labelTotal = document.getElementById('label-total');
+
+        function handlePlayback() {
+            if (audio.paused) {
+                audio.play();
+                playIcon.className = "shape-pause";
+                playIcon.innerHTML = "<span></span><span></span>";
+            } else {
+                audio.pause();
+                playIcon.className = "shape-play";
+                playIcon.innerHTML = "";
+            }
+        }
+
+        function convertSeconds(seconds) {
+            let m = Math.floor(seconds / 60);
+            let s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            if(audio.duration) {
+                const ratio = (audio.currentTime / audio.duration) * 100;
+                timelineCurrent.style.width = `${ratio}%`;
+                labelCurrent.textContent = convertSeconds(audio.currentTime);
+            }
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            labelTotal.textContent = convertSeconds(audio.duration);
+        });
+
+        timelineTrack.addEventListener('click', (event) => {
+            const rect = timelineTrack.getBoundingClientRect();
+            const clickPosition = (event.clientX - rect.left) / rect.width;
+            if(audio.duration) {
+                audio.currentTime = clickPosition * audio.duration;
+            }
+        });
+
+
+        /* --- GELİŞMİŞ FARE ETKİLEŞİMLİ CANVAS SİMÜLASYONU --- */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let starField = [];
+        let activeTheme = 'space';
+        let cursor = { x: null, y: null, radius: 130 };
+
+        function adaptCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', adaptCanvas);
+        adaptCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            cursor.x = e.clientX;
+            cursor.y = e.clientY;
+        });
+
+        window.addEventListener('mouseout', () => {
+            cursor.x = null;
+            cursor.y = null;
+        });
+
+        class Star {
+            constructor() {
+                this.generate();
+            }
+            generate() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.6;
+                this.baseSpeedX = (Math.random() - 0.5) * 0.3;
+                this.baseSpeedY = (Math.random() - 0.5) * 0.3;
+                this.speedX = this.baseSpeedX;
+                this.speedY = this.baseSpeedY;
+                this.brightness = Math.random();
+                this.pulseRate = Math.random() * 0.015 + 0.005;
+            }
+            update() {
+                // Temel Parçacık Hareketi
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.brightness += this.pulseRate;
+
+                if (this.brightness > 1 || this.brightness < 0.1) {
+                    this.pulseRate = -this.pulseRate;
+                }
+
+                // İnteraktif Fare İtme/Çekme Efekti
+                if (cursor.x !== null && cursor.y !== null) {
+                    let dx = this.x - cursor.x;
+                    let dy = this.y - cursor.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < cursor.radius) {
+                        let force = (cursor.radius - distance) / cursor.radius;
+                        // Fare yaklaşınca parçacıkları yumuşakça uzağa iter
+                        this.x += (dx / distance) * force * 2;
+                        this.y += (dy / distance) * force * 2;
+                    }
+                }
+
+                // Ekran Sınır Kontrolü
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.generate();
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.brightness;
+                
+                let colorPalette = '#ffffff';
+                if (activeTheme === 'space') {
+                    colorPalette = this.brightness > 0.5 ? '#00f2fe' : '#ffffff';
+                } else if (activeTheme === 'neon') {
+                    colorPalette = this.brightness > 0.5 ? '#ff007f' : '#00ffff';
+                } else if (activeTheme === 'light') {
+                    colorPalette = this.brightness > 0.5 ? '#0284c7' : '#475569';
+                } else if (activeTheme === 'cyber') {
+                    colorPalette = this.brightness > 0.5 ? '#ffee00' : '#ff0000';
+                } else if (activeTheme === 'sapphire') {
+                    colorPalette = this.brightness > 0.5 ? '#38bdf8' : '#0369a1';
+                }
+
+                ctx.fillStyle = colorPalette;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createStarField() {
+            starField = [];
+            const calculatedCount = Math.min(Math.floor(window.innerWidth / 8), 150);
+            for (let i = 0; i < calculatedCount; i++) {
+                starField.push(new Star());
+            }
+        }
+        createStarField();
+
+        function renderLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            starField.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(renderLoop);
+        }
+        renderLoop();
+
+
+        /* --- MODERN TEMA MOTORU --- */
+        function changeTheme(themeKey, element) {
+            activeTheme = themeKey;
+            
+            // DOM data-theme attribute ayarı
+            if (themeKey === 'space') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeKey);
+            }
+
+            // Buton aktiflik durumu eşitleme
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Parçacık davranışlarını temaya göre uyarla
+            starField.forEach(star => {
+                if(themeKey === 'cyber' || themeKey === 'neon') {
+                    star.speedX = star.baseSpeedX * 2.5;
+                    star.speedY = star.baseSpeedY * 2.5;
+                } else {
+                    star.speedX = star.baseSpeedX;
+                    star.speedY = star.baseSpeedY;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
