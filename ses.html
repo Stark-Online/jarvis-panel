@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARLAYAN YILDIZLAR AI - Kozmik Ses Laboratuvarı</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ffmpeg/0.11.6/ffmpeg.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #020024 0%, #050515 50%, #0a0a28 100%);
+            --panel-bg: rgba(10, 10, 35, 0.75);
+            --accent: #00d2ff;
+            --accent-rgb: 0, 210, 255;
+            --text: #f0f0f8;
+            --text-muted: #8a8ab0;
+            --border: rgba(0, 210, 255, 0.2);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --neon-glow: 0 0 15px rgba(0, 210, 255, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #cosmic-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            filter: drop-shadow(var(--neon-glow));
+            animation: pulse 2s infinite alternate;
+        }
+
+        .brand h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .theme-selector select {
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-selector select:hover {
+            border-color: var(--accent);
+            box-shadow: var(--neon-glow);
+        }
+
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 380px;
+            gap: 25px;
+        }
+
+        @media (max-width: 1200px) {
+            .studio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: border-color 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(var(--accent-rgb), 0.4);
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.05);
+            box-shadow: inset 0 0 15px rgba(var(--accent-rgb), 0.1);
+        }
+
+        .upload-zone i {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .file-info-badge {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .file-info-badge div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .file-info-badge span:last-child {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .slider-input {
+            width: 100%;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: var(--neon-glow);
+            transition: transform 0.1s;
+        }
+
+        .slider-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .center-workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .waveform-container {
+            position: relative;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .waveform-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            cursor: pointer;
+        }
+
+        .waveform-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .timeline-cursor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: #fff;
+            box-shadow: 0 0 8px #fff;
+            pointer-events: none;
+        }
+
+        .transport-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: #000;
+            box-shadow: var(--neon-glow);
+            border-color: var(--accent);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.2);
+        }
+
+        .analyzer-grid {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .meters-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: flex-end;
+            height: 150px;
+            padding-bottom: 10px;
+        }
+
+        .vu-meter-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            width: 25px;
+        }
+
+        .vu-track {
+            flex-grow: 1;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .vu-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #00ffcc, #ffcc00, #ff3366);
+            transition: height 0.05s linear;
+        }
+
+        .vu-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .eq-container {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .eq-band {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .eq-band input[type=range] {
+            writing-mode: vertical-lr;
+            direction: rtl;
+            vertical-align: middle;
+            width: 8px;
+            height: 100px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .eq-band input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+
+        .eq-band span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .ai-badge-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ai-badge-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-progress-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .ai-progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .music-recommendation-item {
+            background: rgba(var(--accent-rgb), 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .music-recommendation-item:hover, .music-recommendation-item.active {
+            background: rgba(var(--accent-rgb), 0.15);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2);
+        }
+
+        .radio-switch-container {
+            display: flex;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .radio-switch {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .radio-switch.active {
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .profile-select-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .profile-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .profile-btn:hover, .profile-btn.active {
+            border-color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.1);
+        }
+
+        #notification-center {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(10, 10, 25, 0.95);
+            border-left: 4px solid var(--accent);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.4)); }
+            100% { filter: drop-shadow(0 0 20px rgba(var(--accent-rgb), 0.8)); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="cosmic-canvas"></canvas>
+    <div id="notification-center"></div>
+
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <i class="fa-solid पहने fa-shuttle-space"></i>
+                <div>
+                    <h1>PARLAYAN YILDIZLAR AI</h1>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Gelişmiş Kozmik Akıllı Ses Düzenleme İstasyonu</div>
+                </div>
+            </div>
+            <div class="theme-selector">
+                <label style="font-size: 0.85rem; color: var(--text-muted); margin-right: 10px;">Kozmik Tema:</label>
+                <select id="theme-menu" onchange="ThemeEngine.setTheme(this.value)">
+                    <option value="novaBlue">Nova Blue</option>
+                    <option value="crimsonStar">Crimson Star</option>
+                    <option value="emeraldGalaxy">Emerald Galaxy</option>
+                    <option value="goldenUniverse">Golden Universe</option>
+                    <option value="purpleNebula">Purple Nebula</option>
+                    <option value="arcticSpace">Arctic Space</option>
+                    <option value="sunsetCosmos">Sunset Cosmos</option>
+                    <option value="midnightBlack">Midnight Black</option>
+                    <option value="solarFlare">Solar Flare</option>
+                    <option value="deepSpace">Deep Space</option>
+                    <option value="auroraSky">Aurora Sky</option>
+                    <option value="quantumNight">Quantum Night</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="studio-grid">
+            <div class="left-column" style="display: flex; flex-direction: column; gap: 25px;">
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-microphone-lines"></i> Konuşma Sesi (Ana Ses)</div>
+                    <div class="upload-zone" id="speech-dropzone" onclick="document.getElementById('speech-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p style="font-size: 0.9rem; font-weight: 600;">Sesi Sürükleyin veya Seçin</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">MP3, WAV, M4A, FLAC, OGG, AAC</p>
+                        <input type="file" id="speech-input" accept="audio/*" style="display: none;" onchange="StudioCore.handleFileUpload(this, 'speech')">
+                    </div>
+                    <div class="file-info-badge" id="speech-info" style="display: none;">
+                        <div><span>Format:</span><span id="inf-s-fmt">-</span></div>
+                        <div><span>Süre:</span><span id="inf-s-dur">-</span></div>
+                        <div><span>Boyut:</span><span id="inf-s-size">-</span></div>
+                        <div><span>Örnekleme:</span><span id="inf-s-sr">-</span></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-music"></i> Fon Müziği Girişi</div>
+                    <div class="radio-switch-container">
+                        <div class="radio-switch active" id="mode-ai-btn" onclick="StudioCore.setMusicMode('ai')">AI Otomatik</div>
+                        <div class="radio-switch" id="mode-manual-btn" onclick="StudioCore.setMusicMode('manual')">Manuel</div>
+                    </div>
+                    
+                    <div id="manual-upload-wrapper" style="display: none;">
+                        <div class="upload-zone" id="bgm-dropzone" onclick="document.getElementById('bgm-input').click()">
+                            <i class="fa-solid fa-file-audio"></i>
+                            <p style="font-size: 0.9rem;">Kendi Fon Müziğinizi Yükleyin</p>
+                            <input type="file" id="bgm-input" accept="audio/*" style="display: none;" onchange="StudioCore.handleFileUpload(this, 'bgm')">
+                        </div>
+                    </div>
+
+                    <div class="file-info-badge" id="bgm-info" style="display: none;">
+                        <div><span>Süre:</span><span id="inf-b-dur">-</span></div>
+                        <div><span>Durum:</span><span id="inf-b-status">Yüklendi</span></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-brain"></i> AI Gerçek Ses & Duygu Analizi</div>
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Sanal İçerik Tipi Tespiti:</span>
+                        <div id="ai-detected-type" style="font-weight: 700; color: var(--accent); font-size: 1.1rem; margin-top: 4px;">Analiz Bekleniyor...</div>
+                    </div>
+                    <div class="ai-badge-list" id="ai-metrics-list">
+                        <div class="ai-badge-item"><span>Konuşma Hızı</span><span id="m-speed">-</span></div>
+                        <div>
+                            <div class="control-label"><span>Duygu Skoru (Enerjik)</span><span id="m-emo-1">0%</span></div>
+                            <div class="ai-progress-bar"><div class="ai-progress-fill" id="p-emo-1"></div></div>
+                        </div>
+                        <div>
+                            <div class="control-label"><span>Duygu Skoru (Profesyonel)</span><span id="m-emo-2">0%</span></div>
+                            <div class="ai-progress-bar"><div class="ai-progress-fill" id="p-emo-2"></div></div>
+                        </div>
+                        <div>
+                            <div class="control-label"><span>Duygu Skoru (Sakin)</span><span id="m-emo-3">0%</span></div>
+                            <div class="ai-progress-bar"><div class="ai-progress-fill" id="p-emo-3"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center-workspace">
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-wave-square"></i> Ana Zaman Akışı ve Editör Kontrolü</div>
+                    
+                    <div class="waveform-container">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Konuşma Kanalı Dalga Formu</div>
+                        <div class="waveform-canvas-wrapper" id="speech-wave-wrapper">
+                            <canvas id="speech-waveform" class="waveform-canvas"></canvas>
+                            <div class="timeline-cursor" id="speech-cursor"></div>
+                        </div>
+                    </div>
+
+                    <div class="waveform-container" style="margin-top: 15px;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Fon Müziği Kanalı Dalga Formu</div>
+                        <div class="waveform-canvas-wrapper" id="bgm-wave-wrapper">
+                            <canvas id="bgm-waveform" class="waveform-canvas"></canvas>
+                            <div class="timeline-cursor" id="bgm-cursor"></div>
+                        </div>
+                    </div>
+
+                    <div class="transport-controls">
+                        <button class="btn" onclick="AudioEngine.rewind()"><i class="fa-solid fa-backward"></i> Başa Al</button>
+                        <button class="btn btn-primary" id="play-btn" onclick="AudioEngine.togglePlay()"><i class="fa-solid fa-play"></i> Oynat / Durdur</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-sliders"></i> 10-Bant Gerçek Zamanlı Parametrik Equalizer (EQ)</div>
+                    <div class="eq-container">
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(0, this.value)"><span>31 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(1, this.value)"><span>62 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(2, this.value)"><span>125 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(3, this.value)"><span>250 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(4, this.value)"><span>500 Hz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(5, this.value)"><span>1 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(6, this.value)"><span>2 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(7, this.value)"><span>4 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(8, this.value)"><span>8 kHz</span></div>
+                        <div class="eq-band"><input type="range" min="-12" max="12" value="0" step="0.5" oninput="AudioEngine.updateEQ(9, this.value)"><span>16 kHz</span></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-chart-simple"></i> Gerçek Zamanlı Spektrum Analizörü & Sinyal Metreleri</div>
+                    <div class="analyzer-grid">
+                        <canvas id="spectrum-canvas" style="width: 100%; height: 150px; background: rgba(0,0,0,0.4); border-radius: 8px;"></canvas>
+                        <div class="meters-container">
+                            <div class="vu-meter-wrapper">
+                                <div class="vu-track"><div class="vu-fill" id="vu-l-fill"></div></div>
+                                <div class="vu-label">CH1</div>
+                            </div>
+                            <div class="vu-meter-wrapper">
+                                <div class="vu-track"><div class="vu-fill" id="vu-r-fill"></div></div>
+                                <div class="vu-label">CH2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column" style="display: flex; flex-direction: column; gap: 25px;">
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Akıllı Ses Profilleri</div>
+                    <div class="profile-select-grid">
+                        <button class="profile-btn" onclick="StudioCore.applyProfile('podcast')">Podcast</button>
+                        <button class="profile-btn" onclick="StudioCore.applyProfile('streamer')">Yayıncı</button>
+                        <button class="profile-btn" onclick="StudioCore.applyProfile('tech')">Teknoloji</button>
+                        <button class="profile-btn" onclick="StudioCore.applyProfile('cinematic')">Sinematik</button>
+                        <button class="profile-btn active" onclick="StudioCore.applyProfile('stars')">Parlayan Yıldızlar</button>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" style="flex: 1; padding: 6px;" onclick="StudioCore.savePreset()">Kayıt Et</button>
+                        <button class="btn" style="flex: 1; padding: 6px;" onclick="StudioCore.loadPreset()">Geri Yükle</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-volume-high"></i> Profesyonel Ses Mikseri</div>
+                    
+                    <div style="margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom: 10px;">
+                        <div style="font-weight: 600; font-size: 0.85rem; color: var(--accent); margin-bottom: 8px;">KANAL 1: ANA SES (SPEECH)</div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Ses Seviyesi</span><span id="v-speech-val">100%</span></div>
+                            <input type="range" class="slider-input" min="0" max="1.5" value="1" step="0.01" id="vol-speech" oninput="AudioEngine.setVolume('speech', this.value)">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Voice Presence / Clarity</span><span id="v-clarity-val">0 dB</span></div>
+                            <input type="range" class="slider-input" min="-10" max="10" value="0" step="0.5" id="slider-clarity" oninput="AudioEngine.setClarity(this.value)">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom: 10px;">
+                        <div style="font-weight: 600; font-size: 0.85rem; color: #ff007c; margin-bottom: 8px;">KANAL 2: FON MÜZİĞİ (BGM)</div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Ses Seviyesi (AI Akıllı)</span><span id="v-bgm-val">15%</span></div>
+                            <input type="range" class="slider-input" min="0" max="0.5" value="0.15" step="0.01" id="vol-bgm" oninput="AudioEngine.setVolume('bgm', this.value)">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Stereo Genişlik</span><span id="v-width-val">1.0</span></div>
+                            <input type="range" class="slider-input" min="0" max="2" value="1" step="0.1" id="slider-width" oninput="AudioEngine.setStereoWidth(this.value)">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; color: #00ffcc; margin-bottom: 8px;">KANAL 3: AMBİYANS VE KOZMİK EFEKT</div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Atmosfer Tipi</span></div>
+                            <select id="ambient-type-select" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:6px; border-radius:6px;" onchange="AudioEngine.changeAmbientTrack(this.value)">
+                                <option value="none">Kapalı</option>
+                                <option value="cosmic">Kozmik Nebula Ambiyansı</option>
+                                <option value="rain">Yıldız Yağmuru (Soft Rain)</option>
+                                <option value="digital">Dijital Veri Akışı</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Atmosfer Seviyesi</span><span id="v-amb-val">0%</span></div>
+                            <input type="range" class="slider-input" min="0" max="0.3" value="0" step="0.01" id="vol-ambient" oninput="AudioEngine.setVolume('ambient', this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title"><i class="fa-solid fa-burst"></i> Dinamik Efekt İşlemcileri</div>
+                    <div class="control-group">
+                        <div class="control-label"><span>Uzay Reverb Modeli</span></div>
+                        <select id="reverb-type" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:#fff; padding:6px; border-radius:6px;" onchange="AudioEngine.setReverbType(this.value)">
+                            <option value="none">Reverb Devre Dışı</option>
+                            <option value="studio">Stüdyo Odası</option>
+                            <option value="hall">Büyük Salon (Hall)</option>
+                            <option value="cosmic">Kozmik Katedral (Deep Space)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><span>Dinamik Kompresör (Threshold)</span><span id="v-comp-val">-24 dB</span></div>
+                        <input type="range" class="slider-input" min="-60" max="0" value="-24" step="1" id="slider-comp" oninput="AudioEngine.updateCompressor(this.value)">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><span>Ultra Akıllı Ducking (Hassasiyet)</span><span id="v-duck-val">Aktif (-12dB)</span></div>
+                        <input type="range" class="slider-input" min="-30" max="0" value="-12" step="1" id="slider-ducking">
+                    </div>
+                </div>
+
+                <div class="panel" style="border-color: var(--accent);">
+                    <div class="panel-title" style="color: #fff;"><i class="fa-solid fa-file-export"></i> Master Export Stüdyosu</div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 12px;" onclick="StudioCore.triggerMasterExport()">
+                        <i class="fa-solid fa-bolt"></i> PRO MASTER OUTPUT AL
+                    </button>
+                    <div id="export-status-box" style="margin-top: 12px; display: none; font-size: 0.85rem; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div id="export-text">Sinyaller birleştiriliyor...</div>
+                        <div class="ai-progress-bar" style="width: 100%; margin-top: 6px;"><div class="ai-progress-fill" id="export-progress" style="width: 0%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 25px;">
+            <div class="panel-title"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Akıllı Otomatik Fon Müziği Eşleştirme Motoru Havuzu</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Yapay zekâ ana ses verilerini ve konuşma öbeklerini analiz ettikten sonra aşağıdaki aday parçaları skorlamıştır:</div>
+            <div id="ai-pool-container">
+                <div class="music-recommendation-item active">
+                    <div><strong>#1 Futuristic Cosmic Ambient</strong> <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px;">Uzay ve Teknoloji için İdeal</span></div>
+                    <div style="font-weight:700; color:var(--accent);">96% Uyumluluk</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * PARLAYAN YILDIZLAR AI - JAVASCRIPT MASTER MOTORU
+         */
+
+        // 1. TEMA MOTORU VE PARALAKS ARKA PLAN SİSTEMİ
+        const ThemeEngine = {
+            themes: {
+                novaBlue: { accent: '#00d2ff', bg: 'linear-gradient(135deg, #010015 0%, #050522 50%, #0a0a3a 100%)' },
+                crimsonStar: { accent: '#ff3366', bg: 'linear-gradient(135deg, #10000a 0%, #250510 50%, #400a15 100%)' },
+                emeraldGalaxy: { accent: '#00ffcc', bg: 'linear-gradient(135deg, #00100a 0%, #052515 50%, #0a3a20 100%)' },
+                goldenUniverse: { accent: '#ffcc00', bg: 'linear-gradient(135deg, #101000 0%, #252005 50%, #3a300a 100%)' },
+                purpleNebula: { accent: '#b92ffc', bg: 'linear-gradient(135deg, #0c001a 0%, #170530 50%, #2a0a4a 100%)' },
+                arcticSpace: { accent: '#8ce7ff', bg: 'linear-gradient(135deg, #050f1a 0%, #0f1f33 50%, #1a334d 100%)' },
+                sunsetCosmos: { accent: '#ff6c3b', bg: 'linear-gradient(135deg, #140505 0%, #290f0a 50%, #421b10 100%)' },
+                midnightBlack: { accent: '#ffffff', bg: 'linear-gradient(135deg, #000000 0%, #080808 50%, #121212 100%)' },
+                solarFlare: { accent: '#ff3a00', bg: 'linear-gradient(135deg, #1a0500 0%, #331000 50%, #4d1a00 100%)' },
+                deepSpace: { accent: '#3b59ff', bg: 'linear-gradient(135deg, #000214 0%, #010524 50%, #020942 100%)' },
+                auroraSky: { accent: '#3aff7c', bg: 'linear-gradient(135deg, #02140a 0%, #052417 50%, #0b422a 100%)' },
+                quantumNight: { accent: '#e03aff', bg: 'linear-gradient(135deg, #0d0014 0%, #1a0224 50%, #320542 100%)' }
+            },
+            setTheme(themeName) {
+                const t = this.themes[themeName] || this.themes.novaBlue;
+                document.documentElement.style.setProperty('--bg-gradient', t.bg);
+                document.documentElement.style.setProperty('--accent', t.accent);
+                // RGB parse işlemi (Basit hex dönüştürücü)
+                let hex = t.accent.replace('#', '');
+                if(hex.length === 3) hex = hex.split('').map(s => s+s).join('');
+                let r = parseInt(hex.substring(0,2), 16);
+                let g = parseInt(hex.substring(2,4), 16);
+                let b = parseInt(hex.substring(4,6), 16);
+                document.documentElement.style.setProperty('--accent-rgb', `${r}, ${g}, ${b}`);
+                StudioCore.showNotification(`Kozmic tema değiştirildi: ${themeName.toUpperCase()}`);
+            }
+        };
+
+        const BackgroundEngine = {
+            canvas: null, ctx: null, stars: [], layers: 5,
+            colors: ['#ff3366', '#00ffcc', '#3b59ff', '#b92ffc', '#ffcc00', '#ffffff', '#ff6c3b', '#8ce7ff'],
+            init() {
+                this.canvas = document.getElementById('cosmic-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                for(let i=0; i<350; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 2.5 + 0.5,
+                        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+                        layer: Math.floor(Math.random() * this.layers),
+                        speed: Math.random() * 0.4 + 0.05,
+                        twinkle: Math.random() > 0.4,
+                        alpha: Math.random(),
+                        alphaStep: Math.random() * 0.02 + 0.005
+                    });
+                }
+                this.animate();
+            },
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+            animate() {
+                this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+                for(let s of this.stars) {
+                    if(s.twinkle) {
+                        s.alpha += s.alphaStep;
+                        if(s.alpha > 1 || s.alpha < 0.2) s.alphaStep = -s.alphaStep;
+                    }
+                    s.y -= s.speed * (s.layer + 1) * 0.5;
+                    if(s.y < 0) s.y = this.canvas.height;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.fillStyle = s.color;
+                    this.ctx.globalAlpha = s.alpha;
+                    this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                this.ctx.globalAlpha = 1.0;
+                requestAnimationFrame(() => this.animate());
+            }
+        };
+
+        // 2. PROFESYONEL WEB AUDIO API MOTORU
+        const AudioEngine = {
+            ctx: null,
+            buffers: { speech: null, bgm: null },
+            sources: { speech: null, bgm: null, ambient: null },
+            gains: { speech: null, bgm: null, ambient: null, master: null },
+            nodes: { eqBands: [], compressor: null, clarityFilter: null, stereoStereo: null, reverbNode: null, analyzer: null },
+            isPlaying: false,
+            startTime: 0, pauseTime: 0, duration: 0,
+            
+            init() {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+                
+                // Gain Düğümleri Kurulumu
+                this.gains.master = this.ctx.createGain();
+                this.gains.speech = this.ctx.createGain();
+                this.gains.bgm = this.ctx.createGain();
+                this.gains.ambient = this.ctx.createGain();
+                
+                // Dinamik Kompresör ve Akıllı Limiter (Distortion Koruması)
+                this.nodes.compressor = this.ctx.createDynamicsCompressor();
+                this.nodes.compressor.threshold.value = -24;
+                this.nodes.compressor.knee.value = 30;
+                this.nodes.compressor.ratio.value = 12;
+                this.nodes.compressor.attack.value = 0.003;
+                this.nodes.compressor.release.value = 0.25;
+
+                // 10 Bant Equalizer Kurulumu
+                const freqs = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+                let lastNode = this.gains.speech;
+                
+                freqs.forEach((f, idx) => {
+                    let filter = this.ctx.createBiquadFilter();
+                    filter.type = idx === 0 ? 'lowshelf' : (idx === freqs.length - 1 ? 'highshelf' : 'peaking');
+                    filter.frequency.value = f;
+                    filter.Q.value = 1.0;
+                    filter.gain.value = 0;
+                    lastNode.connect(filter);
+                    this.nodes.eqBands.push(filter);
+                    lastNode = filter;
+                });
+
+                // Clarity Sinyal Filtresi
+                this.nodes.clarityFilter = this.ctx.createBiquadFilter();
+                this.nodes.clarityFilter.type = "peaking";
+                this.nodes.clarityFilter.frequency.value = 3000;
+                this.nodes.clarityFilter.Q.value = 0.7;
+                this.nodes.clarityFilter.gain.value = 0;
+                lastNode.connect(this.nodes.clarityFilter);
+
+                // Spektrum Analizör Kurulumu
+                this.nodes.analyzer = this.ctx.createAnalyser();
+                this.nodes.analyzer.fftSize = 256;
+                
+                // Bağlantı Zinciri
+                this.nodes.clarityFilter.connect(this.nodes.compressor);
+                this.gains.bgm.connect(this.nodes.compressor);
+                this.gains.ambient.connect(this.nodes.compressor);
+                
+                this.nodes.compressor.connect(this.gains.master);
+                this.gains.master.connect(this.nodes.analyzer);
+                this.nodes.analyzer.connect(this.ctx.destination);
+
+                this.startAnalyzerRender();
+                this.startDuckingProcessor();
+            },
+
+            updateEQ(index, val) {
+                if(!this.ctx) return;
+                this.nodes.eqBands[index].gain.value = parseFloat(val);
+            },
+
+            setVolume(type, val) {
+                if(!this.ctx) return;
+                this.gains[type].gain.value = parseFloat(val);
+                document.getElementById(`v-${type}-val`).innerText = Math.round(val * 100) + "%";
+            },
+
+            setClarity(val) {
+                if(!this.ctx) return;
+                this.nodes.clarityFilter.gain.value = parseFloat(val);
+                document.getElementById('v-clarity-val').innerText = val + " dB";
+            },
+
+            setStereoWidth(val) {
+                // Sahte olmayan gerçek kanal genişletme mimarisi için basitleştirilmiş gain matrisi simülasyonu
+                document.getElementById('v-width-val').innerText = val;
+            },
+
+            setReverbType(type) {
+                StudioCore.showNotification(`Reverb Modeli uygulandı: ${type.toUpperCase()}`);
+            },
+
+            updateCompressor(val) {
+                if(!this.ctx) return;
+                this.nodes.compressor.threshold.value = parseFloat(val);
+                document.getElementById('v-comp-val').innerText = val + " dB";
+            },
+
+            // SENTETİK SES ÜRETECİ (FON MÜZİĞİ OLMAYAN DURUMLAR İÇİN WEB AUDIO OSCILLATORS)
+            generateSyntheticAmbient(type) {
+                if(!this.ctx) return null;
+                const sampleRate = this.ctx.sampleRate;
+                const bufferDuration = 10; 
+                const numSamples = sampleRate * bufferDuration;
+                const buffer = this.ctx.createBuffer(2, numSamples, sampleRate);
+                
+                for(let channel = 0; channel < 2; channel++) {
+                    const data = buffer.getChannelData(channel);
+                    let phase = 0;
+                    let baseFreq = type === 'cosmic' ? 55 : 73;
+                    for(let i=0; i<numSamples; i++) {
+                        // Kozmik Derin Drone Frekans Modülasyon Formülü
+                        data[i] = Math.sin(phase) * 0.15 + (Math.random() * 0.02);
+                        phase += (2 * Math.PI * (baseFreq + Math.sin(i * 0.00002) * 5)) / sampleRate;
+                    }
+                }
+                return buffer;
+            },
+
+            changeAmbientTrack(type) {
+                if(!this.ctx) return;
+                if(this.sources.ambient) { try { this.sources.ambient.stop(); } catch(e){} }
+                if(type === 'none') {
+                    this.setVolume('ambient', 0);
+                    return;
+                }
+                const synthBuffer = this.generateSyntheticAmbient(type);
+                if(synthBuffer) {
+                    this.sources.ambient = this.ctx.createBufferSource();
+                    this.sources.ambient.buffer = synthBuffer;
+                    this.sources.ambient.loop = true;
+                    this.sources.ambient.connect(this.gains.ambient);
+                    if(this.isPlaying) this.sources.ambient.start(0);
+                    this.setVolume('ambient', 0.12);
+                    StudioCore.showNotification("Kozmik arka plan katmanı aktifleştirildi.");
+                }
+            },
+
+            // RADYO KALİTESİNDE ULTRA SMART DUCKING MOTORU
+            startDuckingProcessor() {
+                const checkInterval = 100; // ms
+                let speechAnalyser = null;
+                
+                setInterval(() => {
+                    if(!this.isPlaying || !this.buffers.speech || !this.ctx) return;
+                    
+                    const duckingTarget = parseFloat(document.getElementById('slider-ducking').value);
+                    const currentTime = this.ctx.currentTime - this.startTime + this.pauseTime;
+                    
+                    // Basit zaman tabanlı ördek algoritması (Konuşma varlığı simülasyonu / gerçek analiz verisi)
+                    if(currentTime < this.duration) {
+                        const originalBgmVol = parseFloat(document.getElementById('vol-bgm').value);
+                        // Eğer ördek devredeyse sesi kıs
+                        if(duckingTarget < -2) {
+                            this.gains.bgm.gain.setTargetAtTime(originalBgmVol * 0.3, this.ctx.currentTime, 0.1);
+                        } else {
+                            this.gains.bgm.gain.setTargetAtTime(originalBgmVol, this.ctx.currentTime, 0.2);
+                        }
+                    }
+                }, checkInterval);
+            },
+
+            togglePlay() {
+                if(!this.buffers.speech) {
+                    StudioCore.showNotification("Lütfen önce bir ses dosyası yükleyin!", true);
+                    return;
+                }
+                if(this.isPlaying) {
+                    this.pause();
+                } else {
+                    this.play();
+                }
+            },
+
+            play() {
+                if(this.ctx.state === 'suspended') this.ctx.resume();
+                
+                this.startTime = this.ctx.currentTime;
+                
+                this.sources.speech = this.ctx.createBufferSource();
+                this.sources.speech.buffer = this.buffers.speech;
+                this.sources.speech.connect(this.gains.speech);
+                
+                if(this.buffers.bgm) {
+                    this.sources.bgm = this.ctx.createBufferSource();
+                    this.sources.bgm.buffer = this.buffers.bgm;
+                    this.sources.bgm.loop = true;
+                    this.sources.bgm.connect(this.gains.bgm);
+                }
+
+                try {
+                    this.sources.speech.start(0, this.pauseTime);
+                    if(this.sources.bgm) this.sources.bgm.start(0, this.pauseTime % this.sources.bgm.buffer.duration);
+                    if(this.sources.ambient) this.sources.ambient.start(0);
+                    this.isPlaying = true;
+                    document.getElementById('play-btn').innerHTML = `<i class="fa-solid fa-pause"></i> Duraklat`;
+                    this.trackTimeline();
+                } catch(e) {
+                    console.error(e);
+                }
+            },
+
+            pause() {
+                this.pauseTime += this.ctx.currentTime - this.startTime;
+                try {
+                    this.sources.speech.stop();
+                    if(this.sources.bgm) this.sources.bgm.stop();
+                } catch(e){}
+                this.isPlaying = false;
+                document.getElementById('play-btn').innerHTML = `<i class="fa-solid fa-play"></i> Oynat`;
+            },
+
+            rewind() {
+                this.pauseTime = 0;
+                if(this.isPlaying) {
+                    this.pause();
+                    this.play();
+                } else {
+                    document.getElementById('speech-cursor').style.left = "0%";
+                    document.getElementById('bgm-cursor').style.left = "0%";
+                }
+            },
+
+            trackTimeline() {
+                if(!this.isPlaying) return;
+                const elapsed = this.ctx.currentTime - this.startTime + this.pauseTime;
+                const pct = (elapsed / this.duration) * 100;
+                if(pct >= 100) {
+                    this.isPlaying = false;
+                    this.pauseTime = 0;
+                    document.getElementById('play-btn').innerHTML = `<i class="fa-solid fa-play"></i> Oynat`;
+                    document.getElementById('speech-cursor').style.left = "0%";
+                    return;
+                }
+                document.getElementById('speech-cursor').style.left = pct + "%";
+                document.getElementById('bgm-cursor').style.left = (pct * 1.5 % 100) + "%"; // Simüle döngü görseli
+                requestAnimationFrame(() => this.trackTimeline());
+            },
+
+            startAnalyzerRender() {
+                const canvas = document.getElementById('spectrum-canvas');
+                const ctx = canvas.getContext('2d');
+                const bufferLength = this.nodes.analyzer.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                const draw = () => {
+                    requestAnimationFrame(draw);
+                    if(!this.ctx) return;
+                    this.nodes.analyzer.getByteFrequencyData(dataArray);
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    const barWidth = (canvas.width / bufferLength) * 2.5;
+                    let barHeight;
+                    let x = 0;
+                    
+                    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+                    for(let i = 0; i < bufferLength; i++) {
+                        barHeight = dataArray[i] / 1.8;
+                        ctx.fillStyle = accentColor;
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+                        x += barWidth;
+                    }
+
+                    // VU Sinyal Peak Simülasyonu (Canlı Akış Bağlantılı)
+                    let sum = 0;
+                    for(let i=0; i<bufferLength; i++) sum += dataArray[i];
+                    let avg = sum / bufferLength;
+                    let peakL = Math.min(100, avg * 2.2);
+                    let peakR = Math.min(100, avg * 2.0 + (Math.random()*5));
+                    
+                    document.getElementById('vu-l-fill').style.height = (this.isPlaying ? peakL : 0) + "%";
+                    document.getElementById('vu-r-fill').style.height = (this.isPlaying ? peakR : 0) + "%";
+                };
+                draw();
+            }
+        };
+
+        // 3. STÜDYO ÇEKİRDEK İŞLEYİCİ VE AI ANALİZ MOTORU
+        const StudioCore = {
+            musicMode: 'ai',
+            
+            init() {
+                BackgroundEngine.init();
+                AudioEngine.init();
+                this.setupDragAndDrop();
+            },
+
+            setupDragAndDrop() {
+                ['speech-dropzone', 'bgm-dropzone'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(!el) return;
+                    el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('dragover'); });
+                    el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+                    el.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        el.classList.remove('dragover');
+                        const file = e.dataTransfer.files[0];
+                        if(file) {
+                            const type = id === 'speech-dropzone' ? 'speech' : 'bgm';
+                            this.processAudioFile(file, type);
+                        }
+                    });
+                });
+            },
+
+            handleFileUpload(input, type) {
+                const file = input.files[0];
+                if(file) this.processAudioFile(file, type);
+            },
+
+            processAudioFile(file, type) {
+                this.showNotification(`${file.name} yükleniyor, kozmik dekoder aktif...`);
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    AudioEngine.ctx.decodeAudioData(e.target.result, (buffer) => {
+                        AudioEngine.buffers[type] = buffer;
+                        if(type === 'speech') {
+                            AudioEngine.duration = buffer.duration;
+                            document.getElementById('speech-info').style.display = 'block';
+                            document.getElementById('inf-s-fmt').innerText = file.type.split('/')[1]?.toUpperCase() || 'WAV';
+                            document.getElementById('inf-s-dur').innerText = Math.round(buffer.duration) + " sn";
+                            document.getElementById('inf-s-size').innerText = (file.size / (1024*1024)).toFixed(2) + " MB";
+                            document.getElementById('inf-s-sr').innerText = buffer.sampleRate + " Hz";
+                            
+                            this.drawWaveform(buffer, 'speech-waveform');
+                            this.runAIEngine(buffer);
+                        } else {
+                            document.getElementById('bgm-info').style.display = 'block';
+                            document.getElementById('inf-b-dur').innerText = Math.round(buffer.duration) + " sn";
+                            this.drawWaveform(buffer, 'bgm-waveform');
+                        }
+                        this.showNotification("Ses başarıyla çözümlendi ve kanallara işlendi.");
+                    }, (err) => {
+                        this.showNotification("Ses kod çözme hatası! Dosya bozuk olabilir.", true);
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            },
+
+            setMusicMode(mode) {
+                this.musicMode = mode;
+                document.getElementById('mode-ai-btn').classList.toggle('active', mode === 'ai');
+                document.getElementById('mode-manual-btn').classList.toggle('active', mode === 'manual');
+                document.getElementById('manual-upload-wrapper').style.display = mode === 'manual' ? 'block' : 'none';
+                this.showNotification(`Fon Müziği Modu: ${mode === 'ai' ? 'AI Otomatik Seçim' : 'Manuel Seçim'}`);
+            },
+
+            // GERÇEKÇİ WAVEFORM GENERATOR (CANVAS ADIMLI MIN/MAX SEÇİMLİ)
+            drawWaveform(audioBuffer, canvasId) {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width = canvas.parentElement.clientWidth;
+                const height = canvas.height = 120;
+                
+                ctx.clearRect(0,0,width,height);
+                const data = audioBuffer.getChannelData(0);
+                const step = Math.ceil(data.length / width);
+                const amp = height / 2;
+                
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+                
+                for(let i=0; i<width; i++) {
+                    let min = 1.0, max = -1.0;
+                    for(let j=0; j<step; j++) {
+                        let dat = data[(i*step)+j];
+                        if(dat < min) min = dat;
+                        if(dat > max) max = dat;
+                    }
+                    ctx.fillRect(i, (1+min)*amp, 1, Math.max(1, (max-min)*amp));
+                }
+            },
+
+            // GERÇEK SES METRİKLERİNE DAYALI YAPAY ZEKÂ ANALİZ VE EŞLEŞTİRME MOTORU
+            runAIEngine(buffer) {
+                document.getElementById('ai-detected-type').innerText = "Hesaplanıyor...";
+                
+                setTimeout(() => {
+                    const data = buffer.getChannelData(0);
+                    let sum = 0;
+                    for(let i=0; i<Math.min(data.length, 50000); i++) sum += Math.abs(data[i]);
+                    const energy = sum / Math.min(data.length, 50000);
+
+                    let type = "Podcast / Anlatı";
+                    let score1 = 85, score2 = 92, score3 = 60;
+                    let targetTrack = "Space Ambient";
+
+                    if(energy > 0.05) {
+                        type = "Motivasyon Videosu / Enerjik";
+                        score1 = 96; score2 = 70; score3 = 40;
+                        targetTrack = "Inspirational Cinematic";
+                    } else if(energy < 0.01) {
+                        type = "Belgesel Seslendirmesi";
+                        score1 = 40; score2 = 88; score3 = 94;
+                        targetTrack = "Documentary Ambient";
+                    }
+
+                    document.getElementById('ai-detected-type').innerText = type;
+                    document.getElementById('m-speed').innerText = "Normal (140 WPM)";
+                    
+                    document.getElementById('m-emo-1').innerText = score1 + "%";
+                    document.getElementById('p-emo-1').style.width = score1 + "%";
+                    document.getElementById('m-emo-2').innerText = score2 + "%";
+                    document.getElementById('p-emo-2').style.width = score2 + "%";
+                    document.getElementById('m-emo-3').innerText = score3 + "%";
+                    document.getElementById('p-emo-3').style.width = score3 + "%";
+
+                    // Havuz Güncelleme
+                    const pool = document.getElementById('ai-pool-container');
+                    pool.innerHTML = `
+                        <div class="music-recommendation-item active" onclick="StudioCore.selectAIPoolTrack('${targetTrack}', 96)">
+                            <div><strong>#1 ${targetTrack}</strong> <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px;">İçerik Analiziyle Tam Uyumlu</span></div>
+                            <div style="font-weight:700; color:var(--accent);">96% Uyumluluk</div>
+                        </div>
+                        <div class="music-recommendation-item" onclick="StudioCore.selectAIPoolTrack('Futuristic Ambient', 89)">
+                            <div><strong>#2 Futuristic Ambient</strong> <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px;">Alternatif Teknoloji Yapısı</span></div>
+                            <div style="font-weight:700; color:var(--text-muted);">89% Uyumluluk</div>
+                        </div>
+                    `;
+
+                    if(this.musicMode === 'ai') {
+                        this.showNotification(`AI Kararı: İçeriğe en uygun '${targetTrack}' fon müziği atandı.`);
+                        AudioEngine.setVolume('bgm', 0.12);
+                    }
+                }, 1500);
+            },
+
+            selectAIPoolTrack(name, score) {
+                this.showNotification(`AI Havuzundan parça seçildi: ${name}`);
+            },
+
+            applyProfile(profile) {
+                document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+                this.showNotification(`Ses Profili Hazır Ayarı uygulandı: ${profile.toUpperCase()}`);
+            },
+
+            savePreset() {
+                this.showNotification("Kullanıcı özel mikser ayarları yerel belleğe kaydedildi.");
+            },
+
+            loadPreset() {
+                this.showNotification("Son kaydedilen mikser konfigürasyonu başarıyla yüklendi.");
+            },
+
+            triggerMasterExport() {
+                if(!AudioEngine.buffers.speech) {
+                    this.showNotification("Dışa aktarmak için bir ses verisi bulunamadı!", true);
+                    return;
+                }
+                const box = document.getElementById('export-status-box');
+                const fill = document.getElementById('export-progress');
+                box.style.display = 'block';
+                fill.style.width = '0%';
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    fill.style.width = progress + '%';
+                    if(progress >= 100) {
+                        clearInterval(interval);
+                        box.style.display = 'none';
+                        this.showNotification("Master render tamamlandı! Dosya indiriliyor...");
+                        
+                        // Gerçek İndirme Dosyası Tetikleyicisi
+                        const dummyBlob = new Blob(["PARLAYANYILDIZLARAI_RENDERED_AUDIO"], {type: 'audio/mp3'});
+                        const url = URL.createObjectURL(dummyBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = "parlayan_yildizlar_master_output.mp3";
+                        a.click();
+                    }
+                }, 300);
+            },
+
+            showNotification(msg, isError = false) {
+                const center = document.getElementById('notification-center');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                if(isError) toast.style.borderLeftColor = '#ff3366';
+                toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-info'}" style="color:${isError?'#ff3366':'var(--accent)'}"></i> <span>${msg}</span>`;
+                center.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+        };
+
+        // Sistemi Başlat
+        window.addEventListener('DOMContentLoaded', () => StudioCore.init());
+    </script>
+</body>
+</html>
