@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ece Anime Ses Portalı</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- TEMA DEĞİŞKENLERİ --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0b001a 0%, #050515 100%);
+            --overlay-color: rgba(11, 0, 26, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #b3b3cc;
+            --accent: #ffd700;
+            --accent-glow: rgba(255, 215, 0, 0.6);
+            --star-colors: ['#fff', '#ffd700', '#e0b0ff'];
+            --neon-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        [data-theme="kiraz"] {
+            --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+            --overlay-color: rgba(255, 240, 245, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --card-border: rgba(255, 182, 193, 0.4);
+            --text-main: #4a2c34;
+            --text-muted: #8b5f65;
+            --accent: #ff69b4;
+            --accent-glow: rgba(255, 105, 180, 0.6);
+            --star-colors: ['#ffb6c1', '#ffc0cb', '#fff'];
+        }
+
+        [data-theme="neon"] {
+            --bg-gradient: linear-gradient(135deg, #000000 0%, #0d0d0d 100%);
+            --overlay-color: rgba(0, 0, 0, 0.5);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(0, 243, 255, 0.2);
+            --text-main: #ffffff;
+            --text-muted: #a6a6a6;
+            --accent: #00f3ff;
+            --accent-glow: rgba(0, 243, 255, 0.8);
+            --star-colors: ['#00f3ff', '#ff007f', '#fff'];
+        }
+
+        [data-theme="gunbatimi"] {
+            --bg-gradient: linear-gradient(135deg, #3d153a 0%, #da4453 50%, #f77737 100%);
+            --overlay-color: rgba(61, 21, 58, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-muted: #ffd3b6;
+            --accent: #ff8b94;
+            --accent-glow: rgba(255, 139, 148, 0.7);
+            --star-colors: ['#ff8b94', '#ffaaa5', '#fff'];
+        }
+
+        [data-theme="nane"] {
+            --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+            --overlay-color: rgba(224, 242, 241, 0.3);
+            --card-bg: rgba(255, 255, 255, 0.45);
+            --card-border: rgba(0, 150, 136, 0.2);
+            --text-main: #004d40;
+            --text-muted: #00796b;
+            --accent: #00bfa5;
+            --accent-glow: rgba(0, 191, 165, 0.5);
+            --star-colors: ['#00bfa5', '#a7ffeb', '#fff'];
+        }
+
+        /* --- SIFIRLAMA VE ANA STILLER --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.8s ease, color 0.8s ease;
+            position: relative;
+        }
+
+        /* Açılış Fade-in Efekti */
+        .portal-wrapper {
+            opacity: 0;
+            transform: scale(0.98);
+            animation: portalGiris 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        @keyframes portalGiris {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- CANVAS VE OVERLAY --- */
+        #starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay-color);
+            z-index: 2;
+            transition: background 0.8s ease;
+            pointer-events: none;
+        }
+
+        /* --- ÖZEL MERCEK/AURA GLOW --- */
+        .cursor-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 3;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            mix-blend-mode: screen;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* --- TEMA SEÇİCİ --- */
+        .theme-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .theme-btn {
+            background: none;
+            border: 2px solid var(--card-border);
+            padding: 8px 14px;
+            border-radius: 20px;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .theme-btn:hover, .theme-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        /* --- OYNATICI KART (GLASSMORPHISM) --- */
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 35px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: border 0.8s ease, background 0.8s ease;
+        }
+
+        /* LOGO ANİMASYONU */
+        .brand-logo {
+            font-size: 3.5rem;
+            display: inline-block;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 12px var(--accent-glow));
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px var(--accent-glow)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 20px var(--accent)); }
+        }
+
+        /* GÖRSEL VİZÜALİZÖR SİMÜLASYONU */
+        .visualizer-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+            height: 30px;
+            margin-bottom: 25px;
+        }
+
+        .bar {
+            width: 4px;
+            height: 5px;
+            background-color: var(--accent);
+            border-radius: 2px;
+            transition: height 0.1s ease, background-color 0.8s ease;
+        }
+
+        /* ANA BUTON VE MORPH ANIMASYONU */
+        .play-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .play-btn {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: var(--text-main);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .play-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .play-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* İkon Morphing (SVG Kısmı) */
+        .play-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--bg-gradient);
+            transition: fill 0.8s ease;
+        }
+
+        .play-btn .pause-icon {
+            display: none;
+        }
+
+        .play-btn.playing .play-icon {
+            display: none;
+        }
+
+        .play-btn.playing .pause-icon {
+            display: block;
+        }
+
+        /* --- KONTROLLER (BARLAR VE SÜRE) --- */
+        .progress-container {
+            margin-bottom: 15px;
+        }
+
+        .timeline-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.15);
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Dinamik doluluk göstermek için */
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+            transition: transform 0.1s;
+        }
+
+        .timeline-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* SES KONTROLÜ */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 80px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.15);
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-main);
+            cursor: pointer;
+        }
+
+        /* --- METİN ALANI (SAMİMİ & SNARKY) --- */
+        .snarky-text {
+            margin-top: 30px;
+            border-top: 1px dashed var(--card-border);
+            padding-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .snarky-text span {
+            display: block;
+            margin-top: 8px;
+            font-weight: 600;
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        /* RESPONSIVE DÜZENLEMELER */
+        @media (max-width: 480px) {
+            .player-card {
+                padding: 25px 20px;
+            }
+            .theme-container {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .theme-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starfield"></canvas>
+    <div class="overlay"></div>
+    <div class="cursor-glow" id="mouseGlow"></div>
+
+    <div class="portal-wrapper">
+        
+        <div class="theme-container">
+            <button class="theme-btn active" onclick="setTheme('galaksi', this)">Galaksi</button>
+            <button class="theme-btn" onclick="setTheme('kiraz', this)">Kiraz Çiçeği</button>
+            <button class="theme-btn" onclick="setTheme('neon', this)">Neon Tokyo</button>
+            <button class="theme-btn" onclick="setTheme('gunbatimi', this)">Gün Batımı</button>
+            <button class="theme-btn" onclick="setTheme('nane', this)">Nane Rüyası</button>
+        </div>
+
+        <div class="player-card">
+            
+            <div class="brand-logo">🌟</div>
+            
+            <div class="visualizer-container" id="visualizer">
+                </div>
+
+            <audio id="mainAudio" src="EceAnime_Ses.mp3" preload="auto"></audio>
+
+            <div class="play-btn-wrapper">
+                <button class="play-btn" id="playBtn" aria-label="Oynat/Duraklat">
+                    <svg class="play-icon" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg class="pause-icon" viewBox="0 0 24 24">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="progress-container">
+                <input type="range" class="timeline-slider" id="timeline" min="0" value="0" step="0.1">
+                <div class="time-info">
+                    <span id="currentTime">00:00</span>
+                    <span id="totalDuration">00:00</span>
+                </div>
+            </div>
+
+            <div class="volume-container">
+                <span>Ses</span>
+                <input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.05" value="0.7">
+            </div>
+
+            <div class="snarky-text">
+                "Kulaklığı taktıysan derin bir nefes al. Yanlışlıkla ya da merakına yenik düşüp buraya tıkladın ama dürüst olalım, artık geri dönüş portalın kapandı."
+                <span>Komşular anime kızı ece hayranı olduğunu öğrenmeye hazır mı acaba? 🌌</span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* --- SES SİSTEMİ VE ARAYÜZ --- */
+        const audio = document.getElementById('mainAudio');
+        const playBtn = document.getElementById('playBtn');
+        const timeline = document.getElementById('timeline');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalDurationEl = document.getElementById('totalDuration');
+        const volumeSlider = document.getElementById('volume');
+        const visualizer = document.getElementById('visualizer');
+
+        // Sanal Vizüalizör Barlarını Oluşturma
+        const barCount = 15;
+        const bars = [];
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('bar');
+            visualizer.appendChild(bar);
+            bars.push(bar);
+        }
+
+        // Play/Pause Tetikleyici
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playBtn.classList.add('playing');
+            } else {
+                audio.pause();
+                playBtn.classList.add('playing');
+                playBtn.classList.remove('playing');
+            }
+        });
+
+        // Süre Formatlama (00:00)
+        function formatTime(secs) {
+            let m = Math.floor(secs / 60);
+            let s = Math.floor(secs % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Meta veri yüklendiğinde toplam süreyi yaz
+        audio.addEventListener('loadedmetadata', () => {
+            timeline.max = audio.duration;
+            totalDurationEl.textContent = formatTime(audio.duration);
+        });
+
+        // Zaman güncellendikçe ilerleme çubuğunu oynat
+        audio.addEventListener('timeupdate', () => {
+            if (!timeline.seeking) {
+                timeline.value = audio.currentTime;
+            }
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+            
+            // Çubuğun arkasındaki doluluk efektini CSS ile destekle
+            const pct = (audio.currentTime / audio.duration) * 100;
+            timeline.style.background = `linear-gradient(to right, var(--accent) ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
+        });
+
+        // Kullanıcı çubuğu kaydırdığında (Seeking)
+        timeline.addEventListener('input', () => {
+            timeline.seeking = true;
+        });
+        
+        timeline.addEventListener('change', () => {
+            audio.currentTime = timeline.value;
+            timeline.seeking = false;
+        });
+
+        // Ses Seviyesi Değişimi
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+        });
+
+        // Sanal Vizüalizör Animasyonu (Audio çalarken tetiklenir)
+        let visualizerAnimation;
+        function updateVisualizer() {
+            if (!audio.paused) {
+                bars.forEach(bar => {
+                    // Ritme göre rastgele yükseklik simülasyonu
+                    const height = Math.random() * 25 + 4;
+                    bar.style.height = `${height}px`;
+                });
+            } else {
+                bars.forEach(bar => {
+                    bar.style.height = `5px`;
+                });
+            }
+            visualizerAnimation = requestAnimationFrame(updateVisualizer);
+        }
+        audio.addEventListener('play', () => { updateVisualizer(); });
+        audio.addEventListener('pause', () => { cancelAnimationFrame(visualizerAnimation); bars.forEach(b => b.style.height = '5px'); });
+
+
+        /* --- TEMA YÖNETİMİ --- */
+        let currentThemeName = 'galaksi';
+        function setTheme(themeName, element) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            currentThemeName = themeName;
+            
+            // Aktif buton değiştirme
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+            
+            // Canvas yıldız renklerini güncellemek için konfigürasyon gönderimi
+            updateStarColors(themeName);
+        }
+
+
+        /* --- CANVAS STARFIELD & PARALLAX SİSTEMİ --- */
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        let shootingStars = [];
+        let starColors = ['#ffffff', '#ffd700', '#e0b0ff']; // Default Galaksi renkleri
+
+        function updateStarColors(theme) {
+            if (theme === 'kiraz') starColors = ['#ffb6c1', '#ffc0cb', '#ffffff'];
+            else if (theme === 'neon') starColors = ['#00f3ff', '#ff007f', '#ffffff'];
+            else if (theme === 'gunbatimi') starColors = ['#ff8b94', '#ffaaa5', '#ffffff'];
+            else if (theme === 'nane') starColors = ['#00bfa5', '#a7ffeb', '#ffffff'];
+            else starColors = ['#ffffff', '#ffd700', '#e0b0ff'];
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        class Star {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height; // İlk kurulumda ekrana dağılsınlar
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = 0;
+                this.size = Math.random() * 1.8 + 0.4;
+                this.speed = Math.random() * 0.6 + 0.1;
+                this.opacity = Math.random() * 0.8 + 0.2;
+                this.color = starColors[Math.floor(Math.random() * starColors.length)];
+            }
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class ShootingStar {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * (canvas.height / 2);
+                this.length = Math.random() * 80 + 40;
+                this.speedX = Math.random() * 4 + 4;
+                this.speedY = Math.random() * 2 + 2;
+                this.opacity = 1;
+                this.active = false;
+            }
+            trigger() {
+                this.active = true;
+            }
+            update() {
+                if (!this.active) return;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= 0.015;
+                if (this.opacity <= 0 || this.x > canvas.width || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                if (!this.active) return;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.length, this.y - this.length * (this.speedY / this.speedX));
+                ctx.stroke();
+            }
+        }
+
+        function initStars() {
+            stars = [];
+            const count = Math.floor((canvas.width * canvas.height) / 3000); // Yoğunluk formülü
+            for (let i = 0; i < count; i++) {
+                stars.push(new Star());
+            }
+            shootingStars = [new ShootingStar(), new ShootingStar()];
+        }
+
+        // Kayan yıldızları belirli aralıklarla tetikle
+        setInterval(() => {
+            let inactiveStar = shootingStars.find(s => !s.active);
+            if (inactiveStar && Math.random() > 0.3) {
+                inactiveStar.trigger();
+            }
+        }, 4000);
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            shootingStars.forEach(sStar => {
+                sStar.update();
+                sStar.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animate();
+
+
+        /* --- MOUSE GLOW EFEKTİ --- */
+        const mouseGlow = document.getElementById('mouseGlow');
+        window.addEventListener('mousemove', (e) => {
+            mouseGlow.style.left = e.clientX + 'px';
+            mouseGlow.style.top = e.clientY + 'px';
+        });
+    </script>
+</body>
+</html>
