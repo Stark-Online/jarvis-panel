@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zeynep - Premium Surprise v2.1</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- RESET & GLOBAL STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #020005; /* Derin kontrast için saf karanlık taban */
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- BACKGROUND LIGHTING (OPTIMIZED) --- */
+        .bg-glow-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            will-change: transform;
+            transform: translate3d(0,0,0);
+            animation: floatBlobs 16s infinite alternate ease-in-out;
+        }
+        .blob-1 { width: 350px; height: 350px; background: #ff007f; top: 15%; left: 10%; }
+        .blob-2 { width: 450px; height: 450px; background: #00f0ff; bottom: 15%; right: 10%; animation-delay: -4s; }
+        .blob-3 { width: 300px; height: 300px; background: #7000ff; top: 35%; left: 45%; animation-delay: -8s; }
+
+        @keyframes floatBlobs {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(30px, -40px, 0) scale(1.1); }
+        }
+
+        /* --- CANVAS --- */
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* --- SCENE FRAME --- */
+        .scene {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%; height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* CINEMATIC INITIAL INTRO */
+        .cinematic-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 999;
+            pointer-events: none;
+            animation: introBurst 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes introBurst {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* --- AŞAMA 1: GİRİŞ BUTONU --- */
+        .intro-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translate3d(0, 30px, 0);
+            animation: slideUpFadeIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards;
+            will-change: transform, opacity;
+        }
+        @keyframes slideUpFadeIn {
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 45px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 2px;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.1);
+        }
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #ff007f, #7000ff, #00f0ff, #ff007f);
+            background-size: 400%;
+            z-index: -1;
+            border-radius: 50px;
+            opacity: 0.4;
+            filter: blur(6px);
+            animation: neonBreathe 6s linear infinite;
+        }
+        .glass-btn:hover {
+            transform: scale(1.06) translate3d(0,0,0);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+        @keyframes neonBreathe {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
+        }
+
+        /* --- AŞAMA 2: MAIN CONTAINER --- */
+        .main-container {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%; height: 100%;
+            will-change: transform, opacity;
+        }
+
+        /* BUTTER SMOOTH GPU ACCELERATED ENTRANCE */
+        .pop-entrance {
+            display: flex;
+            animation: zeynepPop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes zeynepPop {
+            0% { transform: scale3d(0.4, 0.4, 1) translate3d(0,0,0); opacity: 0; }
+            35% { filter: brightness(2.5); } 
+            100% { transform: scale3d(1, 1, 1) translate3d(0,0,0); opacity: 1; filter: brightness(1); }
+        }
+
+        /* --- ULTRA PREMIUM RGB GRADIENT TEXT --- */
+        .neon-title-wrap {
+            position: relative;
+            display: inline-block;
+            transform: translate3d(0,0,0);
+        }
+
+        .neon-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: clamp(4.2rem, 17vw, 12.5rem);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin: 0;
+            padding: 10px 0;
+            
+            /* Gelişmiş Sinematik RGB Akış Maskesi */
+            background: linear-gradient(90deg, 
+                #ffffff, #ffd700, #ff0055, #9d00ff, #0046ff, #00f0ff, #00ff7f, #ff0033, #ff7b00, #ffffff
+            );
+            background-size: 800% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            
+            /* DEĞİŞİKLİK: Akış hızı 12 saniyeden 32 saniyeye çıkarılarak ultra yavaşlatıldı */
+            animation: 
+                rgbWave 32s infinite linear,
+                subtlePulse 2.5s infinite alternate ease-in-out;
+            will-change: background-position, transform;
+            transform: translate3d(0,0,0);
+        }
+
+        @keyframes rgbWave {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 800% 50%; }
+        }
+        @keyframes subtlePulse {
+            0% { transform: scale3d(0.98, 0.98, 1); }
+            100% { transform: scale3d(1.02, 1.02, 1); }
+        }
+
+        /* LUXURY LIGHT SWEEP (Rolex / Mercedes Tarzı Metalik Işık Geçişi) */
+        .light-sweep-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: clamp(4.2rem, 17vw, 12.5rem);
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin: 0; padding: 10px 0;
+            pointer-events: none;
+            color: transparent;
+            background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.9) 50%, transparent 58%);
+            background-size: 250% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: premiumSweep 5s infinite cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        @keyframes premiumSweep {
+            0% { background-position: -150% 0; }
+            15% { background-position: 150% 0; }
+            100% { background-position: 150% 0; }
+        }
+
+        /* --- ALT YAZI: MALSİN --- */
+        .subtitle {
+            margin-top: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translate3d(0, 15px, 0);
+            will-change: transform, opacity;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+        }
+        .subtitle-fade-in {
+            animation: subFade 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes subFade {
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+
+        /* --- REPLAY BUTTON --- */
+        .replay-btn {
+            position: fixed;
+            bottom: 35px;
+            right: 35px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10;
+            display: none;
+            transition: all 0.3s;
+        }
+        .replay-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .hide-out {
+            animation: popOut 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards !important;
+        }
+        @keyframes popOut {
+            0% { transform: scale3d(1, 1, 1); opacity: 1; }
+            100% { transform: scale3d(0.7, 0.7, 1); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cinematic-overlay"></div>
+
+    <div class="bg-glow-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <canvas id="mainCanvas"></canvas>
+
+    <div class="scene">
+        <div class="intro-container" id="introContainer">
+            <button class="glass-btn" id="triggerBtn">Zeynep</button>
+        </div>
+
+        <div class="main-container" id="mainContainer">
+            <div class="neon-title-wrap" id="titleWrap">
+                <h1 class="neon-title" id="zeynepText">Zeynep</h1>
+                <div class="light-sweep-overlay">Zeynep</div>
+            </div>
+            <p class="subtitle" id="subtitleText">Malsin</p>
+        </div>
+    </div>
+
+    <button class="replay-btn" id="replayBtn">BAŞTAN OYNAT</button>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || width < 768;
+        const maxAmbient = isMobile ? 30 : 90;
+        
+        let particles = [];
+        let lastTime = performance.now();
+        let showGlowSystem = false;
+        let glowPulseValue = 1.0;
+        let glowPulseDirection = 1;
+
+        const colorSampleGradient = [
+            '#ffffff', '#ffd700', '#ff0055', '#9d00ff', '#0046ff', '#00f0ff', '#00ff7f', '#ff0033', '#ff7b00', '#ffffff'
+        ];
+        let gradientProgress = 0;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        // --- HIGH PERFORMANCE PARTICLE SYSTEM ---
+        class Particle {
+            constructor(x, y, type = 'ambient') {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.markedForDeath = false;
+
+                if (type === 'ambient') {
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = -Math.random() * 0.4 - 0.1;
+                    this.size = Math.random() * 2 + 0.4;
+                    this.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.1})`;
+                } else { 
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * (isMobile ? 6 : 11) + 4;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    this.size = type === 'confetti' ? Math.random() * 5 + 4 : Math.random() * 2.5 + 1;
+                    
+                    const sampleHues = [0, 45, 340, 275, 225, 185, 145, 350, 28];
+                    this.color = `hsl(${sampleHues[Math.floor(Math.random() * sampleHues.length)]}, 100%, 65%)`;
+                    
+                    this.gravity = 0.16;
+                    this.drag = 0.95;
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.012 + 0.008;
+                    this.rotation = Math.random() * Math.PI;
+                    this.rotSpeed = (Math.random() - 0.5) * 0.15;
+                }
+            }
+
+            update(f) {
+                if (this.type === 'ambient') {
+                    this.x += this.vx * f;
+                    this.y += this.vy * f;
+                    if (this.y < -10) this.y = height + 10;
+                    if (this.x < -10 || this.x > width + 10) this.x = Math.random() * width;
+                } else {
+                    this.vy += this.gravity * f;
+                    this.vx *= Math.pow(this.drag, f);
+                    this.vy *= Math.pow(this.drag, f);
+                    this.x += this.vx * f;
+                    this.y += this.vy * f;
+                    this.rotation += this.rotSpeed * f;
+                    this.alpha -= this.decay * f;
+                    if (this.alpha <= 0) this.markedForDeath = true;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                if (this.type === 'ambient') {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                } else if (this.type === 'sparkle') {
+                    ctx.translate(this.x, this.y);
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    for (let i = 0; i < 4; i++) {
+                        ctx.lineTo(0, -this.size * 1.6);
+                        ctx.lineTo(this.size * 0.4, -this.size * 0.4);
+                        ctx.rotate(Math.PI / 2);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (this.type === 'confetti') {
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation);
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 1.4);
+                }
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < maxAmbient; i++) {
+            particles.push(new Particle(Math.random() * width, Math.random() * height, 'ambient'));
+        }
+
+        // --- ANLIK GLOW RENGİNİ HESAPLAYAN MOTOR ---
+        function getCurrentGlowColors() {
+            const totalColors = colorSampleGradient.length;
+            const floatIndex = (gradientProgress * (totalColors - 1));
+            const baseIndex = Math.floor(floatIndex);
+            const nextIndex = (baseIndex + 1) % totalColors;
+            const factor = floatIndex - baseIndex;
+
+            const c1 = hexToRgb(colorSampleGradient[baseIndex]);
+            const c2 = hexToRgb(colorSampleGradient[nextIndex]);
+
+            const r = Math.round(c1.r + (c2.r - c1.r) * factor);
+            const g = Math.round(c1.g + (c2.g - c1.g) * factor);
+            const b = Math.round(c1.b + (c2.b - c1.b) * factor);
+
+            return `rgba(${r}, ${g}, ${b}, `;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 255, g: 255, b: 255 };
+        }
+
+        // --- CORE RENDER LOOP ---
+        function tick(timestamp) {
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            const f = deltaTime / 16.666;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // DEĞİŞİKLİK: Canvas renk motoru da CSS ile tam senkronize olması için 32000ms (32sn) değerine çekildi
+            gradientProgress += (deltaTime / 32000);
+            if (gradientProgress > 1) gradientProgress -= 1;
+
+            if (showGlowSystem) {
+                glowPulseValue += (deltaTime / 1250) * glowPulseDirection;
+                if (glowPulseValue > 1.45) { glowPulseValue = 1.45; glowPulseDirection = -1; }
+                if (glowPulseValue < 1.0) { glowPulseValue = 1.0; glowPulseDirection = 1; }
+
+                const baseColorStr = getCurrentGlowColors();
+                
+                ctx.save();
+                ctx.shadowBlur = isMobile ? 40 : 85;
+                ctx.shadowColor = baseColorStr + '0.85)';
+                
+                const radialGlow = ctx.createRadialGradient(width/2, height/2, 10, width/2, height/2, isMobile ? 180 : 320);
+                radialGlow.addColorStop(0, baseColorStr + (0.28 * glowPulseValue) + ')');
+                radialGlow.addColorStop(0.5, baseColorStr + (0.12 * glowPulseValue) + ')');
+                radialGlow.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = radialGlow;
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+            }
+
+            particles = particles.filter(p => !p.markedForDeath);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(f);
+                particles[i].draw();
+            }
+
+            requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+
+        // --- INTERACTION LOGIC ---
+        const introContainer = document.getElementById('introContainer');
+        const mainContainer = document.getElementById('mainContainer');
+        const triggerBtn = document.getElementById('triggerBtn');
+        const subtitleText = document.getElementById('subtitleText');
+        const replayBtn = document.getElementById('replayBtn');
+
+        triggerBtn.addEventListener('click', () => {
+            triggerBtn.classList.add('hide-out');
+
+            setTimeout(() => {
+                introContainer.style.display = 'none';
+                
+                const burstCount = isMobile ? 45 : 110;
+                const centerX = width / 2;
+                const centerY = height / 2;
+
+                for (let i = 0; i < burstCount; i++) {
+                    particles.push(new Particle(centerX, centerY, Math.random() > 0.45 ? 'sparkle' : 'confetti'));
+                }
+
+                mainContainer.style.display = 'flex';
+                mainContainer.classList.add('pop-entrance');
+                showGlowSystem = true;
+
+                setTimeout(() => {
+                    subtitleText.classList.add('subtitle-fade-in');
+                }, 900);
+
+                setTimeout(() => {
+                    replayBtn.style.display = 'block';
+                }, 1800);
+
+            }, 300);
+        });
+
+        replayBtn.addEventListener('click', () => {
+            replayBtn.style.display = 'none';
+            showGlowSystem = false;
+            mainContainer.classList.remove('pop-entrance');
+            subtitleText.classList.remove('subtitle-fade-in');
+            mainContainer.style.display = 'none';
+            
+            triggerBtn.classList.remove('hide-out');
+            introContainer.style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
