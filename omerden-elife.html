@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Ömerden Elif'e 💖</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#f9a8d4;
+  --pink-deep:#ec4899;
+  --purple:#c084fc;
+  --purple-deep:#9333ea;
+  --blue:#818cf8;
+  --navy:#0a0618;
+  --navy-mid:#110925;
+  --white:#ffffff;
+  --glow-pink:rgba(249,168,212,0.6);
+  --glow-purple:rgba(192,132,252,0.6);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--navy);
+  color:#f0e6ff;
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+#bg-canvas{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:0;
+}
+#main{position:relative;z-index:2}
+
+/* ── INTRO ─────────────────────────────────── */
+#intro{
+  position:fixed;inset:0;z-index:100;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,#1d0d40 0%,#0a0618 100%);
+  transition:opacity 1.4s ease,visibility 1.4s ease;
+}
+#intro.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#bunny{
+  font-size:5.5rem;line-height:1;
+  filter:drop-shadow(0 0 25px var(--glow-pink)) drop-shadow(0 0 50px var(--glow-purple));
+  opacity:0;transform:scale(0.3) translateY(20px);
+  transition:opacity 0.9s ease,transform 1.1s cubic-bezier(0.34,1.56,0.64,1);
+  animation:none;
+}
+#bunny.visible{opacity:1;transform:scale(1) translateY(0);animation:bunnyFloat 2.4s ease-in-out infinite 0.5s,bunnyGlow 2.4s ease-in-out infinite 0.5s}
+#bunny.exit{opacity:0!important;transform:translateY(-100px) scale(0.5)!important;transition:opacity 0.8s ease,transform 0.9s cubic-bezier(0.55,0,1,0.45)!important;animation:none!important}
+#intro-sparks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+@keyframes bunnyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes bunnyGlow{
+  0%,100%{filter:drop-shadow(0 0 25px var(--glow-pink)) drop-shadow(0 0 50px var(--glow-purple))}
+  50%{filter:drop-shadow(0 0 45px var(--glow-pink)) drop-shadow(0 0 80px var(--glow-purple)) drop-shadow(0 0 100px rgba(249,168,212,0.3))}
+}
+
+/* ── HERO ──────────────────────────────────── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:2rem;position:relative;overflow:hidden;
+}
+#main-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.4rem,6vw,5.5rem);
+  font-weight:600;letter-spacing:-0.01em;
+  background:linear-gradient(135deg,#f9a8d4 0%,#c084fc 40%,#818cf8 70%,#f9a8d4 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:gradShift 5s ease infinite;
+  filter:drop-shadow(0 0 30px rgba(249,168,212,0.5));
+  opacity:0;transform:translateY(40px) scale(0.95);
+  transition:opacity 1.2s ease,transform 1.2s cubic-bezier(0.34,1.2,0.64,1);
+  line-height:1.25;
+}
+#main-title.visible{opacity:1;transform:translateY(0) scale(1)}
+#hero-sub{
+  font-family:'Lora',serif;font-style:italic;
+  font-size:clamp(1rem,2.5vw,1.4rem);
+  color:rgba(240,230,255,0.65);margin-top:1.8rem;letter-spacing:0.06em;
+  opacity:0;transform:translateY(20px);
+  transition:opacity 0.9s ease 1.4s,transform 0.9s ease 1.4s;
+}
+#hero-sub.visible{opacity:1;transform:translateY(0)}
+.scroll-hint{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+  color:rgba(192,132,252,0.6);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;
+  animation:shintBounce 2.2s ease-in-out infinite;
+}
+.scroll-hint::after{content:'';width:1px;height:36px;background:linear-gradient(to bottom,rgba(192,132,252,0.5),transparent)}
+@keyframes shintBounce{0%,100%{transform:translateX(-50%) translateY(0);opacity:0.6}50%{transform:translateX(-50%) translateY(8px);opacity:1}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* ── DIVIDER ───────────────────────────────── */
+.divider{
+  width:50%;max-width:280px;height:1px;margin:0 auto 4rem;
+  background:linear-gradient(90deg,transparent,rgba(249,168,212,0.4),rgba(192,132,252,0.4),transparent);
+}
+
+/* ── SECTIONS ──────────────────────────────── */
+.section{max-width:900px;margin:0 auto;padding:4rem 1.5rem}
+.sec-title{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1.4rem,3.5vw,2rem);text-align:center;
+  color:var(--pink);filter:drop-shadow(0 0 14px rgba(249,168,212,0.5));
+  margin-bottom:3rem;
+}
+
+/* ── CARDS ─────────────────────────────────── */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.5rem}
+.msg-card{
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(249,168,212,0.18);border-radius:22px;
+  padding:2rem 1.8rem;position:relative;overflow:hidden;
+  cursor:default;transform-style:preserve-3d;will-change:transform;
+  transition:transform 0.4s ease,box-shadow 0.4s ease,border-color 0.4s ease;
+  opacity:0;transform:translateY(50px) scale(0.95);
+}
+.msg-card.revealed{opacity:1;transform:translateY(0) scale(1);transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.34,1.2,0.64,1),box-shadow 0.4s ease,border-color 0.4s ease}
+.msg-card:hover{
+  border-color:rgba(249,168,212,0.45);
+  box-shadow:0 20px 60px rgba(249,168,212,0.12),0 0 40px rgba(192,132,252,0.08);
+}
+.card-bg{
+  position:absolute;inset:0;border-radius:22px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(249,168,212,0.07),rgba(192,132,252,0.05),rgba(129,140,248,0.04));
+}
+.card-glow{
+  position:absolute;top:-40%;right:-40%;width:90%;height:90%;
+  background:radial-gradient(circle,rgba(249,168,212,0.1) 0%,transparent 70%);
+  pointer-events:none;animation:cgFloat 4.5s ease-in-out infinite;
+}
+.card-glow:nth-child(2){top:auto;right:auto;bottom:-30%;left:-30%;animation-delay:2s;background:radial-gradient(circle,rgba(192,132,252,0.08) 0%,transparent 70%)}
+@keyframes cgFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(-12px,12px)}}
+.card-icon{font-size:1.6rem;margin-bottom:1rem;display:block;animation:iconPop 3.5s ease-in-out infinite}
+@keyframes iconPop{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.1)}}
+.card-text{
+  font-family:'Lora',serif;font-style:italic;
+  font-size:clamp(0.9rem,2.2vw,1.05rem);line-height:1.85;
+  color:rgba(240,230,255,0.9);position:relative;z-index:1;
+}
+.card-sparkle{
+  position:absolute;bottom:1rem;right:1.2rem;font-size:0.75rem;
+  opacity:0.45;animation:spkRot 4s linear infinite;
+}
+@keyframes spkRot{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.4)}100%{transform:rotate(360deg) scale(1)}}
+
+/* ── LETTER ────────────────────────────────── */
+#letter-section{max-width:700px;margin:0 auto;padding:4rem 1.5rem}
+.letter-wrap{
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);
+  border:1px solid rgba(249,168,212,0.14);border-radius:26px;
+  padding:3rem 2.5rem;position:relative;overflow:hidden;
+  box-shadow:0 0 60px rgba(192,132,252,0.07),inset 0 0 40px rgba(249,168,212,0.03);
+}
+.letter-wrap::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(249,168,212,0.045) 60deg,transparent 120deg,rgba(192,132,252,0.035) 180deg,transparent 240deg,rgba(129,140,248,0.04) 300deg,transparent 360deg);
+  animation:letterBgRot 22s linear infinite;pointer-events:none;
+}
+@keyframes letterBgRot{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.letter-head{
+  font-family:'Dancing Script',cursive;font-size:clamp(1.5rem,4vw,2.2rem);
+  color:var(--pink);text-align:center;margin-bottom:2rem;
+  filter:drop-shadow(0 0 10px rgba(249,168,212,0.5));
+}
+.letter-body{
+  font-family:'Lora',serif;
+  font-size:clamp(1rem,2.2vw,1.15rem);line-height:2;
+  color:rgba(240,230,255,0.93);position:relative;z-index:1;white-space:pre-wrap;
+}
+#lcursor{
+  display:inline-block;width:2px;height:1.15em;
+  background:var(--pink);margin-left:2px;vertical-align:middle;
+  animation:curBlink 0.85s ease-in-out infinite;
+}
+@keyframes curBlink{0%,100%{opacity:1}50%{opacity:0}}
+.letter-foot{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1rem,2.5vw,1.25rem);color:rgba(240,230,255,0.55);
+  text-align:right;margin-top:2rem;font-style:italic;
+  opacity:0;transform:translateY(10px);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+}
+.letter-foot.show{opacity:1;transform:translateY(0)}
+
+/* ── FINAL ─────────────────────────────────── */
+#final-section{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:4rem 1.5rem;text-align:center;position:relative;
+}
+.final-q{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1.05rem,2.5vw,1.4rem);line-height:1.95;
+  color:rgba(240,230,255,0.92);max-width:680px;margin:0 auto 3rem;
+  background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);
+  border:1px solid rgba(249,168,212,0.15);border-radius:26px;
+  padding:2.8rem 2.2rem;
+  box-shadow:0 0 50px rgba(192,132,252,0.07);
+  opacity:0;transform:translateY(50px);
+  transition:opacity 0.9s ease,transform 0.9s cubic-bezier(0.34,1.2,0.64,1);
+}
+.final-q.revealed{opacity:1;transform:translateY(0)}
+.btns-row{
+  display:flex;flex-wrap:wrap;gap:1.5rem;
+  justify-content:center;align-items:center;
+  opacity:0;transform:translateY(30px);
+  transition:opacity 0.8s ease 0.35s,transform 0.8s ease 0.35s;
+}
+.btns-row.revealed{opacity:1;transform:translateY(0)}
+
+.btn-yes{
+  font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,#ec4899,#9333ea,#6366f1);
+  border:none;border-radius:50px;padding:1.05rem 3rem;cursor:pointer;
+  position:relative;overflow:hidden;
+  animation:yesFloat 3.2s ease-in-out infinite,yesPulse 2.5s ease-in-out infinite;
+  transition:transform 0.3s ease;
+}
+.btn-yes::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.25),transparent);
+  opacity:0;transition:opacity 0.3s ease;
+}
+.btn-yes:hover::before{opacity:1}
+.btn-yes:hover{transform:scale(1.07) translateY(-4px)}
+.btn-yes:active{transform:scale(0.97)}
+@keyframes yesFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes yesPulse{
+  0%,100%{box-shadow:0 6px 35px rgba(236,72,153,0.5),0 0 0 0 rgba(236,72,153,0.35)}
+  50%{box-shadow:0 6px 35px rgba(236,72,153,0.7),0 0 0 14px rgba(236,72,153,0)}
+}
+.btn-maybe{
+  font-family:'Playfair Display',serif;font-size:1.05rem;
+  color:rgba(240,230,255,0.8);
+  background:rgba(255,255,255,0.06);backdrop-filter:blur(12px);
+  border:1px solid rgba(249,168,212,0.25);border-radius:50px;
+  padding:0.95rem 2.2rem;cursor:pointer;
+  transition:all 0.35s ease;
+}
+.btn-maybe:hover{
+  background:rgba(255,255,255,0.11);border-color:rgba(249,168,212,0.5);
+  color:#fff;box-shadow:0 4px 24px rgba(249,168,212,0.15);transform:translateY(-3px);
+}
+.btn-maybe.fade-out{
+  animation:maybeExit 0.9s ease forwards;pointer-events:none;
+}
+@keyframes maybeExit{to{opacity:0;transform:scale(0.45) translateY(20px);filter:blur(8px)}}
+
+.btn-yes.center-final{
+  animation:yesCenter 0.9s cubic-bezier(0.34,1.3,0.64,1) forwards,yesPulseStrong 2s ease-in-out infinite 0.9s;
+}
+@keyframes yesCenter{to{transform:scale(1.18) translateY(0)}}
+@keyframes yesPulseStrong{
+  0%,100%{box-shadow:0 0 70px rgba(236,72,153,0.9),0 0 110px rgba(192,132,252,0.6)}
+  50%{box-shadow:0 0 90px rgba(236,72,153,1),0 0 140px rgba(192,132,252,0.9),0 0 0 25px rgba(236,72,153,0)}
+}
+
+/* ── FLOATING MSG ──────────────────────────── */
+.flt-msg{
+  position:fixed;pointer-events:none;z-index:500;
+  background:rgba(15,8,35,0.75);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(249,168,212,0.3);border-radius:18px;
+  padding:1.2rem 1.8rem;
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(0.88rem,2.2vw,1.08rem);color:#fff;
+  max-width:min(310px,78vw);text-align:center;
+  box-shadow:0 8px 40px rgba(192,132,252,0.25),0 0 20px rgba(249,168,212,0.1);
+  animation:fltIn 0.65s cubic-bezier(0.34,1.3,0.64,1) forwards;
+}
+.flt-msg.exit{animation:fltOut 0.9s ease forwards}
+@keyframes fltIn{from{opacity:0;transform:scale(0.65) translateY(25px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes fltOut{to{opacity:0;transform:scale(0.75) translateY(-25px);filter:blur(5px)}}
+
+/* ── CELEBRATION ───────────────────────────── */
+#celebration{
+  position:fixed;inset:0;z-index:300;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;
+  background:radial-gradient(ellipse at 50% 40%,#3b0d6e 0%,#18063a 45%,#0a0618 100%);
+  opacity:0;pointer-events:none;transition:opacity 1.2s ease;
+}
+#celebration.active{opacity:1;pointer-events:all}
+.cel-text{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1.35rem,3.5vw,2.1rem);line-height:1.95;
+  color:#fff;max-width:620px;
+  filter:drop-shadow(0 0 30px rgba(249,168,212,0.7));
+  opacity:0;transform:scale(0.82);
+}
+.cel-text.in{animation:celIn 1.3s cubic-bezier(0.34,1.2,0.64,1) forwards}
+@keyframes celIn{to{opacity:1;transform:scale(1)}}
+.cel-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 50%,rgba(236,72,153,0.18) 0%,transparent 70%);
+  animation:celGlow 2.5s ease-in-out infinite;pointer-events:none;
+}
+@keyframes celGlow{0%,100%{opacity:1}50%{opacity:0.45}}
+
+/* ── SIGNATURE ─────────────────────────────── */
+#sig-section{text-align:center;padding:3rem 1rem 6rem}
+.sig{
+  font-family:'Dancing Script',cursive;font-weight:700;
+  font-size:clamp(2rem,6vw,3.8rem);
+  background:linear-gradient(135deg,#f9a8d4,#c084fc,#818cf8,#f9a8d4);
+  background-size:300% 300%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:gradShift 4.5s ease infinite;
+  filter:drop-shadow(0 0 22px rgba(249,168,212,0.65)) drop-shadow(0 0 45px rgba(192,132,252,0.45));
+  display:inline-block;
+}
+
+/* ── REVEAL ────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(35px);transition:opacity 0.85s ease,transform 0.85s cubic-bezier(0.34,1.1,0.64,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── TOUCH PARTICLES ───────────────────────── */
+.tp{
+  position:fixed;pointer-events:none;z-index:1000;user-select:none;
+  font-size:1rem;animation:tpAnim var(--d,1.4s) ease-out forwards;
+}
+@keyframes tpAnim{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
+  100%{opacity:0;transform:translate(var(--tx,0),var(--ty,-80px)) scale(var(--ts,0.3)) rotate(var(--r,200deg))}
+}
+
+/* ── HERO SPARKLES ─────────────────────────── */
+.hs{
+  position:absolute;pointer-events:none;
+  animation:hsAnim var(--dur,3s) ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
+@keyframes hsAnim{0%,100%{opacity:0;transform:scale(0.5) rotate(0deg)}50%{opacity:var(--opa,0.6);transform:scale(1.3) rotate(180deg)}}
+
+/* ── RESPONSIVE ────────────────────────────── */
+@media(max-width:600px){
+  .cards-grid{grid-template-columns:1fr}
+  .letter-wrap{padding:2rem 1.4rem}
+  .final-q{padding:1.8rem 1.4rem}
+  .btn-yes,.btn-maybe{font-size:1rem;padding:0.88rem 1.8rem}
+  .btns-row{flex-direction:column}
+}
+    </style>
+  </head>
+  <body>
+
+<!-- BG Canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Intro -->
+<div id="intro">
+  <div id="intro-sparks"></div>
+  <div id="bunny">🐰</div>
+</div>
+
+<!-- Main -->
+<div id="main">
+
+  <!-- Hero -->
+  <section id="hero">
+    <h1 id="main-title"></h1>
+    <div id="title-emo" style="font-size:clamp(1.8rem,4vw,2.8rem);margin-top:0.5rem;opacity:0;transform:translateY(12px) scale(0.8);transition:opacity 0.8s ease,transform 0.8s cubic-bezier(0.34,1.3,0.64,1);line-height:1">💖🌟</div>
+    <p id="hero-sub">küçük bir mektup, büyük bir his ✨</p>
+    <div class="scroll-hint">aşağı kaydır</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Cards -->
+  <section class="section">
+    <h2 class="sec-title reveal">Söylemek istediklerim... 💌</h2>
+    <div class="cards-grid" id="cards-grid">
+
+      <div class="msg-card">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+        <div class="card-glow"></div>
+        <span class="card-icon">🌙</span>
+        <p class="card-text">Geçmişte bazı şeyleri doğru yönetemedim. Bunu çok geç fark etmek insanı ağır düşündürüyor.</p>
+        <span class="card-sparkle">✦</span>
+      </div>
+
+      <div class="msg-card">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+        <div class="card-glow"></div>
+        <span class="card-icon">🌸</span>
+        <p class="card-text">Bazen seni istemeden kırdığımı biliyorum. Keşke bazı cümleleri çok daha dikkatli kurabilseydim.</p>
+        <span class="card-sparkle">✦</span>
+      </div>
+
+      <div class="msg-card">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+        <div class="card-glow"></div>
+        <span class="card-icon">🎨</span>
+        <p class="card-text">Bana gönderdiğin çizimlerin hâlâ aklımda. O ince detaylara verdiğin emek, sana ne kadar şeylerin özel geldiğini hissettiriyordu.</p>
+        <span class="card-sparkle">✦</span>
+      </div>
+
+      <div class="msg-card">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+        <div class="card-glow"></div>
+        <span class="card-icon">💬</span>
+        <p class="card-text">Mesajlaşırken hissettirdiğin o huzuru başka hiçbir yerde bulamadım. O sohbetlerin güzelliği hiç aklımdan çıkmadı.</p>
+        <span class="card-sparkle">✦</span>
+      </div>
+
+      <div class="msg-card">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+        <div class="card-glow"></div>
+        <span class="card-icon">☕</span>
+        <p class="card-text">Küçük şeyler insanı daha iyi tanımlandırır. Kakaolu sütten bahsederken bile ne kadar samimi biri olduğunu düşünürdüm.</p>
+        <span class="card-sparkle">✦</span>
+      </div>
+
+      <div class="msg-card">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+        <div class="card-glow"></div>
+        <span class="card-icon">✨</span>
+        <p class="card-text">Her şeyi değiştiremem. Ama bundan sonrasını daha güzel yapabilmek için elimden geleni yapmak istiyorum.</p>
+        <span class="card-sparkle">✦</span>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Letter -->
+  <section id="letter-section">
+    <h2 class="sec-title reveal">Bir mektup... 📝</h2>
+    <div class="letter-wrap reveal" id="letter-wrap">
+      <div class="letter-head">Elif'e,</div>
+      <div class="letter-body" id="lbody"><span id="lcursor"></span></div>
+      <div class="letter-foot" id="lfoot"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Final -->
+  <section id="final-section">
+    <div class="final-q reveal" id="final-q">
+      Geçmişte istemeden seni kırdığım ve sana hissettirmek istediğim sevgiyi yeterince gösteremediğim için gerçekten özür dilerim.
+
+      Eğer kalbinde hâlâ küçücük de olsa bir umut varsa, birlikte yeni bir hikâye yazmayı dener miyiz? 🥹💖
+    </div>
+    <div class="btns-row reveal" id="btns-row">
+      <button class="btn-yes" id="btn-yes">💖 Evet</button>
+      <button class="btn-maybe" id="btn-maybe">🤍 Biraz Daha Düşünmek İstiyorum</button>
+    </div>
+  </section>
+
+  <!-- Signature -->
+  <section id="sig-section">
+    <div class="divider"></div>
+    <div class="sig reveal">~ Ömer</div>
+  </section>
+
+</div>
+
+<!-- Celebration -->
+<div id="celebration">
+  <div class="cel-glow"></div>
+  <div class="cel-text" id="cel-text">
+    Teşekkür ederim... 💖<br><br>
+    Bana bu şansı verdiğin için gerçekten çok mutluyum.<br><br>
+    Sana verdiğim değeri bundan sonra sözlerimden çok davranışlarımla göstermeye çalışacağım.<br><br>
+    Umarım birlikte daha güzel anılar biriktirebiliriz. 🥹✨
+  </div>
+</div>
+
+<script>
+/* ═══ BACKGROUND CANVAS ═══════════════════════════════ */
+const cv = document.getElementById('bg-canvas');
+const cx = cv.getContext('2d');
+function rsz(){ cv.width=innerWidth; cv.height=innerHeight; }
+rsz(); addEventListener('resize',rsz);
+
+const BG_EMO=['💖','✨','⭐','🌸','🦋','💫','🌟','✦','♡','❋','🫧','🩷'];
+
+class P {
+  constructor(l){ this.l=l; this.rst(true); }
+  rst(ini=false){
+    this.x=Math.random()*cv.width;
+    this.y=ini?Math.random()*cv.height:cv.height+30;
+    this.e=BG_EMO[Math.floor(Math.random()*BG_EMO.length)];
+    this.sz=(0.6+Math.random()*1.3)*(this.l===1?.55:this.l===2?1:1.45);
+    this.sp=(0.12+Math.random()*0.22)*this.l;
+    this.dr=(Math.random()-.5)*.35;
+    this.al=0.12+Math.random()*.4;
+    this.rot=Math.random()*Math.PI*2;
+    this.rs=(Math.random()-.5)*.012;
+    this.wv=Math.random()*Math.PI*2;
+    this.wa=0.3+Math.random()*.9;
+    this.wf=0.004+Math.random()*.009;
+  }
+  tick(sy){
+    this.wv+=this.wf;
+    this.x+=this.dr+Math.sin(this.wv)*this.wa*.08;
+    this.y-=this.sp;
+    this.rot+=this.rs;
+    if(this.y<-35) this.rst();
+    this._dy=this.y-sy*(0.015*this.l);
+  }
+  draw(){
+    cx.save();
+    cx.globalAlpha=this.al;
+    cx.translate(this.x,this._dy??this.y);
+    cx.rotate(this.rot);
+    cx.font=`${this.sz*13}px serif`;
+    cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText(this.e,0,0);
+    cx.restore();
+  }
+}
+
+class Bokeh {
+  constructor(){ this.rst(true); }
+  rst(ini=false){
+    this.x=Math.random()*cv.width;
+    this.y=ini?Math.random()*cv.height:Math.random()*cv.height;
+    this.r=18+Math.random()*65;
+    this.col=Math.random()<.5?'249,168,212':'192,132,252';
+    this.sp=0.04+Math.random()*.09;
+    this.dr=(Math.random()-.5)*.12;
+    this.ph=Math.random()*Math.PI*2;
+  }
+  tick(){ this.ph+=.007; this.x+=this.dr; this.y-=this.sp; if(this.y<-120)this.rst(); }
+  draw(){
+    const g=cx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r);
+    const a=0.025+Math.sin(this.ph)*.025;
+    g.addColorStop(0,`rgba(${this.col},${a})`);
+    g.addColorStop(1,`rgba(${this.col},0)`);
+    cx.fillStyle=g;
+    cx.beginPath();cx.arc(this.x,this.y,this.r,0,Math.PI*2);cx.fill();
+  }
+}
+
+const pts=[];
+[1,2,3].forEach(l=>{ for(let i=0;i<(l===1?35:l===2?24:14);i++) pts.push(new P(l)); });
+const bkh=Array.from({length:14},()=>new Bokeh());
+
+let scrollY=0;
+addEventListener('scroll',()=>{scrollY=window.scrollY},{passive:true});
+
+function bgLoop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  const bg=cx.createLinearGradient(0,0,cv.width,cv.height);
+  bg.addColorStop(0,'#09061a');bg.addColorStop(.4,'#0d0820');bg.addColorStop(.7,'#100924');bg.addColorStop(1,'#09061a');
+  cx.fillStyle=bg;cx.fillRect(0,0,cv.width,cv.height);
+  bkh.forEach(b=>{b.tick();b.draw();});
+  [1,2,3].forEach(l=>pts.filter(p=>p.l===l).forEach(p=>{p.tick(scrollY);p.draw();}));
+  requestAnimationFrame(bgLoop);
+}
+bgLoop();
+
+/* ═══ TOUCH PARTICLES ═══════════════════════════════════ */
+const TP_EMO=['💖','🌸','✨','⭐','🦋','💫','🌟','✿','♡','💕','🌺','✦','🩷','🫧'];
+let lastTP=0;
+
+function spawnTP(x,y,n=8){
+  const now=Date.now();
+  if(now-lastTP<35)return;
+  lastTP=now;
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    el.className='tp';
+    const ang=(Math.PI*2*i/n)+(Math.random()-.5)*.9;
+    const dist=35+Math.random()*85;
+    const tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist-55;
+    const d=0.85+Math.random()*.85;
+    el.style.cssText=`left:${x}px;top:${y}px;--tx:${tx}px;--ty:${ty}px;--ts:${0.15+Math.random()*.4};--r:${(Math.random()-.5)*380}deg;--d:${d}s;font-size:${0.65+Math.random()*1.1}rem`;
+    el.textContent=TP_EMO[Math.floor(Math.random()*TP_EMO.length)];
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),d*1000+100);
+  }
+}
+
+document.addEventListener('mousemove',e=>{if(Math.random()<.22)spawnTP(e.clientX,e.clientY,3)},{passive:true});
+document.addEventListener('touchmove',e=>{const t=e.touches[0];spawnTP(t.clientX,t.clientY,5)},{passive:true});
+document.addEventListener('click',e=>spawnTP(e.clientX,e.clientY,10));
+
+/* ═══ CARD TILT ════════════════════════════════════════ */
+document.querySelectorAll('.msg-card').forEach(c=>{
+  c.addEventListener('mousemove',e=>{
+    const r=c.getBoundingClientRect();
+    const dx=(e.clientX-r.left-r.width/2)/(r.width/2);
+    const dy=(e.clientY-r.top-r.height/2)/(r.height/2);
+    c.style.transform=`perspective(900px) rotateX(${-dy*7}deg) rotateY(${dx*7}deg) translateY(-5px)`;
+  });
+  c.addEventListener('mouseleave',()=>{ c.style.transform=''; });
+});
+
+/* ═══ INTRO SEQUENCE ═══════════════════════════════════ */
+const intro=document.getElementById('intro');
+const bunny=document.getElementById('bunny');
+const title=document.getElementById('main-title');
+const sub=document.getElementById('hero-sub');
+
+// Intro sparkles
+const isEl=document.getElementById('intro-sparks');
+const iSty=document.createElement('style');
+iSty.textContent='@keyframes iSpk{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.7;transform:scale(1.25)}}';
+document.head.appendChild(iSty);
+for(let i=0;i<32;i++){
+  const s=document.createElement('div');
+  const sk=['✦','✧','⭐','💫','✨','🌟'];
+  s.style.cssText=`position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;font-size:${.5+Math.random()*1.1}rem;opacity:0;pointer-events:none;animation:iSpk ${1.2+Math.random()*2.2}s ease-in-out infinite;animation-delay:${Math.random()*2.5}s`;
+  s.textContent=sk[Math.floor(Math.random()*sk.length)];
+  isEl.appendChild(s);
+}
+
+// Hero sparkles
+const hero=document.getElementById('hero');
+for(let i=0;i<20;i++){
+  const s=document.createElement('div');
+  const sk=['✦','✧','⭐','💫','✨'];
+  s.className='hs';
+  s.style.cssText=`left:${5+Math.random()*90}%;top:${15+Math.random()*70}%;font-size:${.45+Math.random()*.8}rem;--dur:${2+Math.random()*3.5}s;--del:${Math.random()*3}s;--opa:${.35+Math.random()*.45}`;
+  s.textContent=sk[Math.floor(Math.random()*sk.length)];
+  hero.appendChild(s);
+}
+
+// Typewriter
+function typewrite(el,txt,spd=62){
+  return new Promise(res=>{
+    let i=0;
+    const iv=setInterval(()=>{
+      if(i<=txt.length){ el.textContent=txt.slice(0,i); i++; }
+      else { clearInterval(iv); res(); }
+    },spd);
+  });
+}
+
+setTimeout(()=>bunny.classList.add('visible'),350);
+setTimeout(()=>{
+  bunny.classList.add('exit');
+  setTimeout(()=>{
+    intro.classList.add('hidden');
+    title.classList.add('visible');
+    typewrite(title,"Ömerden Elif'e",60).then(()=>{
+      const emo=document.getElementById('title-emo');
+      emo.style.opacity='1';emo.style.transform='translateY(0) scale(1)';
+      sub.classList.add('visible');
+    });
+  },950);
+},3000);
+
+
+/* ═══ SCROLL REVEAL ════════════════════════════════════ */
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.14});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+let cardsRev=false;
+const cobs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting&&!cardsRev){
+    cardsRev=true;
+    document.querySelectorAll('.msg-card').forEach((c,i)=>setTimeout(()=>c.classList.add('revealed'),i*160));
+  }
+}),{threshold:.08});
+cobs.observe(document.getElementById('cards-grid'));
+
+let letRev=false;
+const lobs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting&&!letRev){ letRev=true; startLetter(); }
+}),{threshold:.28});
+lobs.observe(document.getElementById('letter-wrap'));
+
+let finRev=false;
+const fobs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting&&!finRev){
+    finRev=true;
+    setTimeout(()=>{
+      document.getElementById('final-q').classList.add('revealed');
+      document.getElementById('btns-row').classList.add('revealed');
+      for(let i=0;i<18;i++) setTimeout(()=>spawnTP(Math.random()*innerWidth,Math.random()*innerHeight,4),i*110);
+    },200);
+  }
+}),{threshold:.18});
+fobs.observe(document.getElementById('final-q'));
+
+/* ═══ LETTER TYPEWRITER ═════════════════════════════════ */
+const LETTER=`Hayat bazen insanlara ikinci bir şans istemeyi öğretiyor.
+
+Ben de bugün tam olarak bunu yapıyorum.
+
+Geçmişte seni istemeden kırdığım anlar oldu. Belki hissettirmek istediğim şeyleri her zaman doğru şekilde aktaramadım. Mesajlaşırken hissettiğim o sıcaklığı, bazen korktum; yeterince iyi ifade edemedim.
+
+Bunun için gerçekten üzgünüm.
+
+Geçmişi değiştiremeyeceğimi biliyorum. Ama gelecekte daha anlayışlı, daha sabırlı ve daha dikkatli biri olabileceğime inanıyorum.
+
+Bana bir şans daha verirsen, bu kez sözlerden çok davranışlarımla güven vermek isterim.
+
+Kararın ne olursa olsun, hayatıma kattığın güzel sohbetler ve hissettirdiğin huzur için sana içtenlikle teşekkür ederim.`;
+
+function startLetter(){
+  const body=document.getElementById('lbody');
+  const cur=document.getElementById('lcursor');
+  const foot=document.getElementById('lfoot');
+  const chars=[...LETTER];
+  let i=0,html='';
+  function type(){
+    if(i<chars.length){
+      const ch=chars[i];
+      html+=(ch==='\n'?'\n':ch);
+      body.textContent=html;
+      body.appendChild(cur);
+      i++;
+      const delay='.!?,'.includes(ch)?190:ch==='\n'?140:26;
+      setTimeout(type,delay);
+    } else {
+      cur.style.display='none';
+      foot.textContent='— Ömer, kalbinin derinliklerinden 🌙';
+      setTimeout(()=>foot.classList.add('show'),80);
+    }
+  }
+  setTimeout(type,600);
+}
+
+/* ═══ MAYBE BUTTON ══════════════════════════════════════ */
+const MSGS=[
+  "Belki bana son bir şans verebilirsin... 🥹",
+  "Bu kez seni gerçekten daha iyi anlamaya çalışacağım.",
+  "Geçmişi değiştiremem ama geleceği birlikte değiştirebiliriz.",
+  "İçimdekileri söylemeden vazgeçmek istemedim.",
+  "Bir kez daha konuşmayı hak ettiğimizi düşünüyorum.",
+  "Bu kez seni kırmamak için elimden geleni yapacağım.",
+  "Kalbinde küçücük de olsa bana yer kaldıysa, bunu değerlendirmek isterim.",
+  "Belki yeniden başlamamız için küçük bir umut vardır.",
+  "Sana verdiğim değeri bu kez davranışlarımla göstermek istiyorum.",
+  "Lütfen bunu son bir şans istemem olarak gör... 🤍"
+];
+const POS=[
+  {top:'18%',left:'8%'},{top:'28%',right:'6%'},{top:'12%',left:'38%'},
+  {bottom:'22%',left:'10%'},{top:'48%',right:'8%'},{top:'58%',left:'6%'},
+  {bottom:'28%',right:'10%'},{top:'22%',left:'18%'},{bottom:'18%',left:'32%'},
+  {top:'38%',left:'28%'}
+];
+
+let mCnt=0,curFlt=null;
+
+document.getElementById('btn-maybe').addEventListener('click',()=>{
+  if(mCnt>=10)return;
+  // spawn particles
+  for(let i=0;i<10;i++) setTimeout(()=>spawnTP(innerWidth/2+(Math.random()-.5)*220,innerHeight*.75+(Math.random()-.5)*90,4),i*70);
+  // remove previous
+  if(curFlt){ curFlt.classList.add('exit'); const f=curFlt; setTimeout(()=>f.remove(),950); }
+  const m=document.createElement('div');
+  m.className='flt-msg';
+  const p=POS[mCnt%POS.length];
+  Object.entries(p).forEach(([k,v])=>m.style[k]=v);
+  m.textContent=MSGS[mCnt];
+  document.body.appendChild(m);
+  curFlt=m;
+  mCnt++;
+  setTimeout(()=>{ if(m.parentNode){ m.classList.add('exit'); setTimeout(()=>m.remove(),950); if(curFlt===m)curFlt=null; } },3000);
+  if(mCnt>=10) setTimeout(cinematicTransition,2800);
+});
+
+function cinematicTransition(){
+  const bm=document.getElementById('btn-maybe');
+  const by=document.getElementById('btn-yes');
+  bm.classList.add('fade-out');
+  for(let i=0;i<30;i++) setTimeout(()=>spawnTP(Math.random()*innerWidth,Math.random()*innerHeight,5),i*55);
+  setTimeout(()=>{ bm.style.display='none'; by.classList.add('center-final'); },900);
+}
+
+/* ═══ YES BUTTON ════════════════════════════════════════ */
+document.getElementById('btn-yes').addEventListener('click',()=>{
+  const cel=document.getElementById('celebration');
+  const ct=document.getElementById('cel-text');
+  cel.classList.add('active');
+  for(let i=0;i<70;i++) setTimeout(()=>spawnTP(Math.random()*innerWidth,Math.random()*innerHeight,8),i*35);
+  setTimeout(()=>ct.classList.add('in'),350);
+  const iv=setInterval(()=>spawnTP(Math.random()*innerWidth,Math.random()*innerHeight,5),180);
+  setTimeout(()=>clearInterval(iv),9000);
+  cel.addEventListener('click',e=>spawnTP(e.clientX,e.clientY,12));
+});
+</script>
+  </body>
+</html>
