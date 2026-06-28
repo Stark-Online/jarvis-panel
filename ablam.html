@@ -1,602 +1,987 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cemile Ablam - Premium Surprise</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cemile Ablam 💖</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  width:100%; min-height:100vh;
+  background:#000;
+  font-family:'Georgia',serif;
+  color:#fff;
+  overflow-x:hidden;
+  cursor:none;
+  user-select:none;
+}
 
-    <style>
-        /* --- RESET & GLOBAL STYLES --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+/* CANVAS — fixed bg */
+#bgCanvas {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  z-index:0;
+}
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #020005; /* Derin kontrast için saf karanlık taban */
-            font-family: 'Poppins', sans-serif;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+/* CURSOR */
+#cursor {
+  position:fixed;
+  width:16px; height:16px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,200,220,.9),rgba(255,150,200,.2));
+  box-shadow:0 0 16px rgba(255,180,210,.7);
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width .1s,height .1s;
+}
 
-        /* --- BACKGROUND LIGHTING (OPTIMIZED) --- */
-        .bg-glow-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0; left: 0;
-            overflow: hidden;
-            z-index: 1;
-            pointer-events: none;
-        }
+/* OVERLAY */
+#revealOverlay {
+  position:fixed;
+  inset:0; z-index:200;
+  background:#000;
+  pointer-events:none;
+  transition:opacity 2s ease;
+}
 
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.12;
-            will-change: transform;
-            transform: translate3d(0,0,0);
-            animation: floatBlobs 16s infinite alternate ease-in-out;
-        }
-        .blob-1 { width: 350px; height: 350px; background: #ff007f; top: 15%; left: 10%; }
-        .blob-2 { width: 450px; height: 450px; background: #00f0ff; bottom: 15%; right: 10%; animation-delay: -4s; }
-        .blob-3 { width: 300px; height: 300px; background: #7000ff; top: 35%; left: 45%; animation-delay: -8s; }
+/* ── RIPPLE ── */
+.ripple {
+  position:fixed;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:500;
+  transform:translate(-50%,-50%) scale(0);
+  border:2px solid rgba(255,180,220,.8);
+  box-shadow:0 0 20px rgba(255,150,200,.5);
+  animation:ripOut .7s ease-out forwards;
+}
+@keyframes ripOut {
+  to { transform:translate(-50%,-50%) scale(3); opacity:0; }
+}
 
-        @keyframes floatBlobs {
-            0% { transform: translate3d(0, 0, 0) scale(1); }
-            100% { transform: translate3d(30px, -40px, 0) scale(1.1); }
-        }
+/* ══════════════════════════
+   SECTIONS
+══════════════════════════ */
+.section {
+  position:relative;
+  z-index:10;
+  width:100%;
+  padding:80px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 
-        /* --- CANVAS --- */
-        canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 2;
-            pointer-events: none;
-        }
+/* ── HERO ── */
+#hero {
+  min-height:100vh;
+  justify-content:center;
+  padding-top:0;
+}
 
-        /* --- SCENE FRAME --- */
-        .scene {
-            position: relative;
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%; height: 100%;
-            text-align: center;
-            padding: 20px;
-        }
+#kittyWrap {
+  position:relative;
+  width:110px; height:110px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:20px;
+  animation:floatK 3s ease-in-out infinite;
+}
+@keyframes floatK {
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+.kGlow {
+  position:absolute; inset:-18px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,200,230,.35) 0%,transparent 70%);
+  animation:kPulse 2.4s ease-in-out infinite;
+}
+@keyframes kPulse {
+  0%,100%{transform:scale(1);opacity:.5}
+  50%{transform:scale(1.25);opacity:1}
+}
 
-        /* CINEMATIC INITIAL INTRO */
-        .cinematic-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 999;
-            pointer-events: none;
-            animation: introBurst 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-        @keyframes introBurst {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
+#mainTitle {
+  font-size:clamp(2.2rem,7vw,5rem);
+  font-weight:700;
+  text-align:center;
+  background:linear-gradient(135deg,#ffd6e8,#fff0f5,#ffc3e0,#ffe8f5);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 18px rgba(255,150,200,.7));
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity 1.4s ease,transform 1.4s ease;
+  margin-bottom:14px;
+  letter-spacing:.04em;
+}
+#heroSub {
+  font-size:clamp(.8rem,2.5vw,1.05rem);
+  color:rgba(255,220,240,.8);
+  text-align:center;
+  letter-spacing:.1em;
+  opacity:0;
+  transform:translateY(10px);
+  transition:opacity 1.4s ease .4s,transform 1.4s ease .4s;
+  max-width:380px;
+  line-height:1.7;
+  min-height:1.8em;
+}
+#twCursor {
+  display:inline-block;
+  width:2px; height:.9em;
+  background:rgba(255,200,230,.9);
+  margin-left:2px;
+  animation:blink .8s step-end infinite;
+  vertical-align:middle;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-        /* --- AŞAMA 1: GİRİŞ BUTONU --- */
-        .intro-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transform: translate3d(0, 30px, 0);
-            animation: slideUpFadeIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards;
-            will-change: transform, opacity;
-        }
-        @keyframes slideUpFadeIn {
-            to { opacity: 1; transform: translate3d(0, 0, 0); }
-        }
+#scrollHint {
+  margin-top:50px;
+  color:rgba(255,200,230,.4);
+  font-size:.72rem;
+  letter-spacing:.2em;
+  animation:bounce 2s ease-in-out infinite;
+  opacity:0;
+  transition:opacity 1s ease 3s;
+}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 
-        .glass-btn {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px 45px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: 2px;
-            border-radius: 50px;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.1);
-        }
-        .glass-btn::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, #ff007f, #7000ff, #00f0ff, #ff007f);
-            background-size: 400%;
-            z-index: -1;
-            border-radius: 50px;
-            opacity: 0.4;
-            filter: blur(6px);
-            animation: neonBreathe 6s linear infinite;
-        }
-        .glass-btn:hover {
-            transform: scale(1.06) translate3d(0,0,0);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
-        }
-        @keyframes neonBreathe {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity:0;
+  transform:translateY(40px);
+  transition:opacity .9s ease, transform .9s ease;
+}
+.reveal.visible {
+  opacity:1;
+  transform:translateY(0);
+}
 
-        /* --- AŞAMA 2: MAIN CONTAINER --- */
-        .main-container {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%; height: 100%;
-            will-change: transform, opacity;
-        }
+/* ── SECTION TITLES ── */
+.sectionTitle {
+  font-size:clamp(1.3rem,4vw,2.2rem);
+  text-align:center;
+  color:rgba(255,220,240,.9);
+  letter-spacing:.08em;
+  margin-bottom:12px;
+  filter:drop-shadow(0 0 12px rgba(255,150,200,.5));
+}
+.sectionLine {
+  width:80px; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,180,220,.6),transparent);
+  margin:0 auto 48px;
+}
 
-        /* BUTTER SMOOTH GPU ACCELERATED ENTRANCE */
-        .pop-entrance {
-            display: flex;
-            animation: mainPop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        @keyframes mainPop {
-            0% { transform: scale3d(0.4, 0.4, 1) translate3d(0,0,0); opacity: 0; }
-            35% { filter: brightness(2.5); } 
-            100% { transform: scale3d(1, 1, 1) translate3d(0,0,0); opacity: 1; filter: brightness(1); }
-        }
+/* ── SÖZLER ── */
+#sozler { background:transparent; gap:32px; }
+.sozCard {
+  max-width:540px; width:100%;
+  padding:28px 30px;
+  border-radius:22px;
+  background:rgba(255,240,250,.06);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,200,230,.2);
+  box-shadow:0 0 40px rgba(255,130,190,.08),inset 0 0 20px rgba(255,200,230,.04);
+  text-align:center;
+  transition:transform .3s ease,box-shadow .3s ease;
+  cursor:none;
+}
+.sozCard:hover {
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 0 60px rgba(255,130,190,.2),inset 0 0 20px rgba(255,200,230,.08);
+  border-color:rgba(255,200,230,.4);
+}
+.sozEmoji { font-size:1.8rem; margin-bottom:12px; display:block; }
+.sozText {
+  font-size:clamp(.9rem,2.5vw,1.1rem);
+  color:rgba(255,230,245,.88);
+  line-height:1.8;
+  font-style:italic;
+}
 
-        /* --- ULTRA PREMIUM RGB GRADIENT TEXT --- */
-        .neon-title-wrap {
-            position: relative;
-            display: inline-block;
-            transform: translate3d(0,0,0);
-        }
+/* ── HATIRALAR ── */
+#hatiralar { gap:24px; }
+.stickyGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  max-width:700px;
+  width:100%;
+}
+.stickyNote {
+  padding:22px 20px;
+  border-radius:4px 20px 20px 20px;
+  font-size:.9rem;
+  line-height:1.7;
+  color:rgba(30,10,20,.85);
+  box-shadow:4px 6px 24px rgba(0,0,0,.3),0 0 20px rgba(255,150,200,.15);
+  cursor:none;
+  transition:transform .3s ease;
+  position:relative;
+  overflow:hidden;
+}
+.stickyNote::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; height:28px;
+  background:rgba(0,0,0,.08);
+  border-radius:4px 20px 0 0;
+}
+.stickyNote:hover { transform:rotate(0deg) scale(1.04) !important; }
+.stickyNote p { position:relative; z-index:1; }
+.snEmoji { font-size:1.3rem; display:block; margin-bottom:8px; }
+.note1 { background:#ffd6e8; transform:rotate(-2deg); }
+.note2 { background:#ffe4f5; transform:rotate(1.5deg); }
+.note3 { background:#fce8ff; transform:rotate(-1deg); }
+.note4 { background:#fff0e0; transform:rotate(2deg); }
+.note5 { background:#e8f5ff; transform:rotate(-1.5deg); }
+.note6 { background:#ffeaf3; transform:rotate(1deg); }
 
-        .neon-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 900;
-            font-size: clamp(3rem, 11vw, 8.5rem); /* İki kelime olduğu için taşmayı önlemek adına optimize edildi */
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            margin: 0;
-            padding: 10px 0;
-            
-            background: linear-gradient(90deg, 
-                #ffffff, #ffd700, #ff0055, #9d00ff, #0046ff, #00f0ff, #00ff7f, #ff0033, #ff7b00, #ffffff
-            );
-            background-size: 800% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            
-            animation: 
-                rgbWave 32s infinite linear,
-                subtlePulse 2.5s infinite alternate ease-in-out;
-            will-change: background-position, transform;
-            transform: translate3d(0,0,0);
-        }
+/* ── MEKTUP ── */
+#mektup { }
+.letterWrap {
+  max-width:580px; width:100%;
+  background:rgba(255,248,252,.05);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,200,230,.22);
+  border-radius:4px 24px 24px 24px;
+  padding:40px 36px;
+  box-shadow:0 0 60px rgba(255,130,190,.1),inset 0 0 30px rgba(255,200,230,.04);
+  position:relative;
+}
+.letterWrap::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; height:48px;
+  background:linear-gradient(135deg,rgba(255,200,230,.15),rgba(255,180,210,.1));
+  border-radius:4px 24px 0 0;
+}
+.letterHeader {
+  font-size:.78rem;
+  color:rgba(255,200,230,.5);
+  letter-spacing:.15em;
+  margin-bottom:22px;
+  padding-top:12px;
+  text-transform:uppercase;
+}
+#letterBody {
+  font-size:clamp(.88rem,2.2vw,1rem);
+  color:rgba(255,235,245,.88);
+  line-height:2;
+  min-height:120px;
+}
+.letterSign {
+  margin-top:28px;
+  text-align:right;
+  color:rgba(255,200,230,.6);
+  font-size:.85rem;
+  letter-spacing:.08em;
+}
 
-        @keyframes rgbWave {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 800% 50%; }
-        }
-        @keyframes subtlePulse {
-            0% { transform: scale3d(0.98, 0.98, 1); }
-            100% { transform: scale3d(1.02, 1.02, 1); }
-        }
+/* ── FİNAL ── */
+#final {
+  min-height:60vh;
+  justify-content:center;
+  text-align:center;
+  gap:20px;
+}
+#finalTitle {
+  font-size:clamp(1.8rem,5vw,3.5rem);
+  font-weight:700;
+  background:linear-gradient(135deg,#ffd6e8,#fff,#ffc3e0);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(255,150,200,.8));
+  letter-spacing:.06em;
+}
+#finalSub {
+  font-size:clamp(.85rem,2vw,1.05rem);
+  color:rgba(255,220,240,.7);
+  letter-spacing:.1em;
+}
+#finalQuote {
+  font-size:clamp(1.1rem,3vw,1.6rem);
+  color:rgba(255,200,230,.9);
+  font-style:italic;
+  filter:drop-shadow(0 0 12px rgba(255,150,200,.5));
+  letter-spacing:.05em;
+}
 
-        /* LUXURY LIGHT SWEEP */
-        .light-sweep-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 900;
-            font-size: clamp(3rem, 11vw, 8.5rem);
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            margin: 0; padding: 10px 0;
-            pointer-events: none;
-            color: transparent;
-            background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.9) 50%, transparent 58%);
-            background-size: 250% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: premiumSweep 5s infinite cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        @keyframes premiumSweep {
-            0% { background-position: -150% 0; }
-            15% { background-position: 150% 0; }
-            100% { background-position: 150% 0; }
-        }
+/* ── SURPRISE ── */
+#surpriseBtn {
+  position:fixed;
+  bottom:24px; right:22px;
+  z-index:100;
+  width:54px; height:54px;
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 40%,#ff9cc8,#ff5ba8);
+  border:2px solid rgba(255,200,230,.5);
+  box-shadow:0 0 24px rgba(255,100,180,.45);
+  font-size:1.4rem;
+  display:flex; align-items:center; justify-content:center;
+  cursor:none;
+  opacity:0;
+  transition:opacity 1s ease 4s, transform .2s ease, box-shadow .2s ease;
+  animation:btnF 2.5s ease-in-out infinite;
+}
+@keyframes btnF{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#surpriseBtn:hover{box-shadow:0 0 44px rgba(255,100,180,.7)}
 
-        /* --- RE-DESIGNED SUBTITLE CONTAINER --- */
-        .subtitle-container {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 650px;
-            padding: 0 15px;
-        }
+#surprisePopup {
+  position:fixed; inset:0; z-index:300;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.55);
+  opacity:0; pointer-events:none;
+  transition:opacity .35s ease;
+  backdrop-filter:blur(4px);
+}
+#surprisePopup.active{opacity:1;pointer-events:auto}
+#surpriseBox {
+  max-width:320px; width:90%;
+  padding:32px 26px;
+  border-radius:22px;
+  background:rgba(8,0,18,.88);
+  border:1px solid rgba(255,180,220,.35);
+  box-shadow:0 0 70px rgba(255,100,180,.25);
+  text-align:center;
+  transform:scale(.8);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+}
+#surprisePopup.active #surpriseBox{transform:scale(1)}
+#surpriseBig{font-size:2.4rem;margin-bottom:14px}
+#surpriseMsg{font-size:1rem;color:rgba(255,220,240,.9);line-height:1.8;min-height:60px}
+#closeS {
+  margin-top:18px;
+  padding:9px 26px;
+  border-radius:30px;
+  background:linear-gradient(135deg,#ff7ab8,#ff4da0);
+  border:none; color:#fff;
+  font-size:.88rem; cursor:none;
+  box-shadow:0 0 18px rgba(255,80,160,.35);
+  transition:transform .2s ease;
+}
+#closeS:hover{transform:scale(1.05)}
 
-        /* SATIR BAZLI SİNEMATİK AKIŞ ELEMANLARI */
-        .sub-line {
-            font-size: clamp(0.85rem, 3.5vw, 1.05rem);
-            font-weight: 500;
-            line-height: 1.5;
-            letter-spacing: 0.5px;
-            text-align: center;
-            opacity: 0;
-            transform: translate3d(0, 20px, 0);
-            will-change: transform, opacity;
-            
-            /* Pastel renk geçişi ve nefes alma animasyonu */
-            animation: 
-                pastelColorAnimation 14s infinite ease-in-out,
-                textBreathe 3s infinite alternate ease-in-out;
-        }
+/* ── NAV ── */
+#nav {
+  position:fixed; top:0; left:0; right:0; z-index:50;
+  display:flex; justify-content:center; gap:24px;
+  padding:14px 20px;
+  opacity:0;
+  transition:opacity 1s ease 3.5s;
+  pointer-events:none;
+}
+#nav.show{pointer-events:auto}
+.navBtn {
+  padding:6px 18px;
+  border-radius:20px;
+  background:rgba(255,240,250,.07);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,200,230,.2);
+  color:rgba(255,220,240,.7);
+  font-size:.72rem;
+  letter-spacing:.1em;
+  text-decoration:none;
+  cursor:none;
+  transition:background .25s ease, color .25s ease, border-color .25s ease;
+}
+.navBtn:hover{
+  background:rgba(255,200,230,.15);
+  color:rgba(255,235,245,.95);
+  border-color:rgba(255,200,230,.45);
+}
 
-        /* JS ile eklenecek tetikleyici animasyon sınıfı */
-        .sub-line.reveal {
-            animation: 
-                subLineFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                pastelColorAnimation 14s infinite ease-in-out,
-                textBreathe 3s infinite alternate ease-in-out;
-        }
-
-        @keyframes subLineFadeIn {
-            to { opacity: 1; transform: translate3d(0, 0, 0); }
-        }
-
-        /* Pastel Pembe, Mor, Turkuaz ve Altın Arası Lüks Akış */
-        @keyframes pastelColorAnimation {
-            0%, 100% { color: #ffb6c1; text-shadow: 0 0 10px rgba(255,182,193,0.4); }
-            25% { color: #e6e6fa; text-shadow: 0 0 10px rgba(230,230,250,0.4); }
-            50% { color: #afeeee; text-shadow: 0 0 10px rgba(175,238,238,0.4); }
-            75% { color: #ffe4b5; text-shadow: 0 0 10px rgba(255,228,181,0.4); }
-        }
-
-        @keyframes textBreathe {
-            0% { transform: scale3d(0.99, 0.99, 1); opacity: 0.9; }
-            100% { transform: scale3d(1.01, 1.01, 1); opacity: 1; }
-        }
-
-        /* --- REPLAY BUTTON --- */
-        .replay-btn {
-            position: fixed;
-            bottom: 35px;
-            right: 35px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.5);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 10;
-            display: none;
-            transition: all 0.3s;
-        }
-        .replay-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            transform: scale(1.05);
-        }
-
-        .hide-out {
-            animation: popOut 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards !important;
-        }
-        @keyframes popOut {
-            0% { transform: scale3d(1, 1, 1); opacity: 1; }
-            100% { transform: scale3d(0.7, 0.7, 1); opacity: 0; }
-        }
-    </style>
+@media(max-width:600px){
+  #nav{gap:10px;padding:10px 12px}
+  .navBtn{padding:5px 12px;font-size:.66rem}
+  .letterWrap{padding:28px 20px}
+  .stickyGrid{grid-template-columns:1fr 1fr}
+  #surpriseBtn{width:46px;height:46px;font-size:1.2rem;bottom:16px;right:14px}
+}
+</style>
 </head>
 <body>
 
-    <div class="cinematic-overlay"></div>
+<canvas id="bgCanvas"></canvas>
+<div id="revealOverlay"></div>
+<div id="cursor"></div>
 
-    <div class="bg-glow-container">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+<!-- NAV -->
+<nav id="nav">
+  <a class="navBtn" href="#hero">✦ Ana</a>
+  <a class="navBtn" href="#sozler">💫 Sözler</a>
+  <a class="navBtn" href="#hatiralar">🌸 Hatıralar</a>
+  <a class="navBtn" href="#mektup">💌 Mektup</a>
+  <a class="navBtn" href="#final">💖 Final</a>
+</nav>
+
+<!-- ① HERO -->
+<section class="section" id="hero">
+  <div id="kittyWrap">
+    <div class="kGlow"></div>
+    <svg width="96" height="96" viewBox="0 0 100 100" fill="none" style="position:relative;z-index:1;filter:drop-shadow(0 0 10px rgba(255,180,210,.85)) drop-shadow(0 0 28px rgba(255,100,180,.45))">
+      <ellipse cx="50" cy="53" rx="35" ry="32" fill="#fff5f8"/>
+      <ellipse cx="23" cy="26" rx="12" ry="10" fill="#fff5f8" transform="rotate(-14 23 26)"/>
+      <ellipse cx="23" cy="26" rx="7" ry="6" fill="#ffb8d4" transform="rotate(-14 23 26)"/>
+      <ellipse cx="77" cy="26" rx="12" ry="10" fill="#fff5f8" transform="rotate(14 77 26)"/>
+      <ellipse cx="77" cy="26" rx="7" ry="6" fill="#ffb8d4" transform="rotate(14 77 26)"/>
+      <ellipse cx="37" cy="49" rx="4.5" ry="5" fill="#180a13"/>
+      <ellipse cx="63" cy="49" rx="4.5" ry="5" fill="#180a13"/>
+      <circle cx="38.5" cy="47.5" r="1.4" fill="#fff"/>
+      <circle cx="64.5" cy="47.5" r="1.4" fill="#fff"/>
+      <ellipse cx="50" cy="56" rx="2.3" ry="1.8" fill="#ff8ab8"/>
+      <line x1="20" y1="52" x2="42" y2="56" stroke="#c8a0b8" stroke-width="1" opacity=".55"/>
+      <line x1="20" y1="57" x2="42" y2="58" stroke="#c8a0b8" stroke-width="1" opacity=".55"/>
+      <line x1="80" y1="52" x2="58" y2="56" stroke="#c8a0b8" stroke-width="1" opacity=".55"/>
+      <line x1="80" y1="57" x2="58" y2="58" stroke="#c8a0b8" stroke-width="1" opacity=".55"/>
+      <path d="M61 32 Q67 27 72 32 Q67 37 61 32Z" fill="#ff6aad"/>
+      <path d="M83 32 Q77 27 72 32 Q77 37 83 32Z" fill="#ff6aad"/>
+      <circle cx="72" cy="32" r="2.8" fill="#ff9cc8"/>
+      <ellipse cx="30" cy="59" rx="7.5" ry="4.5" fill="#ffb8d4" opacity=".38"/>
+      <ellipse cx="70" cy="59" rx="7.5" ry="4.5" fill="#ffb8d4" opacity=".38"/>
+    </svg>
+  </div>
+  <div id="mainTitle">Cemile Ablam</div>
+  <div id="heroSub"><span id="twText"></span><span id="twCursor"></span></div>
+  <div id="scrollHint">↓ &nbsp; aşağı kaydır &nbsp; ↓</div>
+</section>
+
+<!-- ② SÖZLER -->
+<section class="section" id="sozler">
+  <h2 class="sectionTitle reveal">Sana yazmak istediklerim</h2>
+  <div class="sectionLine reveal"></div>
+
+  <div class="sozCard reveal">
+    <span class="sozEmoji">🌸</span>
+    <p class="sozText">İyi ki varsın. Gerçekten. Bazen bunu söylemeyi unutuyoruz ama hep böyle hissediyorum.</p>
+  </div>
+  <div class="sozCard reveal">
+    <span class="sozEmoji">✨</span>
+    <p class="sozText">Bazı günler sadece iyi hissettiriyorsun. Nedenini tam açıklayamasam da, hep öyle.</p>
+  </div>
+  <div class="sozCard reveal">
+    <span class="sozEmoji">🦋</span>
+    <p class="sozText">Yanında olmak iyi geliyor. Sıradan bir şeymiş gibi görünse de, bu aslında çok büyük bir şey.</p>
+  </div>
+  <div class="sozCard reveal">
+    <span class="sozEmoji">💫</span>
+    <p class="sozText">Bunu sana hazırlamak istedim. Kelimeler bazen yetmez, ama denedim işte.</p>
+  </div>
+</section>
+
+<!-- ③ HATIRALAR -->
+<section class="section" id="hatiralar">
+  <h2 class="sectionTitle reveal">Küçük hatıralar 🌺</h2>
+  <div class="sectionLine reveal"></div>
+
+  <div class="stickyGrid">
+    <div class="stickyNote note1 reveal">
+      <span class="snEmoji">☕</span>
+      <p>Birlikte geçirilen o sessiz anlar. Hiç konuşmak gerekmiyordu bazen.</p>
     </div>
-
-    <canvas id="mainCanvas"></canvas>
-
-    <div class="scene">
-        <div class="intro-container" id="introContainer">
-            <button class="glass-btn" id="triggerBtn">Cemile Ablam</button>
-        </div>
-
-        <div class="main-container" id="mainContainer">
-            <div class="neon-title-wrap" id="titleWrap">
-                <h1 class="neon-title">Cemile Ablam</h1>
-                <div class="light-sweep-overlay">Cemile Ablam</div>
-            </div>
-            
-            <div class="subtitle-container" id="subContainer">
-                <p class="sub-line">💖 Ablaların birtanesi, hep beni desteklediğin için teşekkür ederim.</p>
-                <p class="sub-line">🌸 İyi ki varsın, senin gibi bir ablam olduğu için gerçekten çok şanslıyım.</p>
-                <p class="sub-line">✨ Gülüşünle etrafına güzellik katan en değerli insanlardan birisin.</p>
-                <p class="sub-line">🌷 Umarım hayatın boyunca yüzünden gülümseme hiç eksik olmaz.</p>
-                <p class="sub-line">🩷 Her zaman mutlu ol, çünkü sen mutlu olmayı fazlasıyla hak ediyorsun.</p>
-                <p class="sub-line">🌹 İyi ki benim ablamsın. Seni çok seviyorum. ❤️</p>
-            </div>
-        </div>
+    <div class="stickyNote note2 reveal">
+      <span class="snEmoji">🌙</span>
+      <p>Geç saatlerde bile hep orada olduğunu bilmek, çok iyi hissettiriyordu.</p>
     </div>
+    <div class="stickyNote note3 reveal">
+      <span class="snEmoji">😄</span>
+      <p>O aniden patlayan gülüşler. Nedeni neydi bile hatırlamıyorum artık ama yüzüm hâlâ gülüyor.</p>
+    </div>
+    <div class="stickyNote note4 reveal">
+      <span class="snEmoji">🌸</span>
+      <p>Küçük iyiliklerin en büyük izleri bıraktığını senden öğrendim.</p>
+    </div>
+    <div class="stickyNote note5 reveal">
+      <span class="snEmoji">🎵</span>
+      <p>Bir şarkı duyunca aklıma düştüğün o anlar. İstemeden, ama güzelce.</p>
+    </div>
+    <div class="stickyNote note6 reveal">
+      <span class="snEmoji">⭐</span>
+      <p>Sen olmasan eksik kalırdı bir şeyler. Hep.</p>
+    </div>
+  </div>
+</section>
 
-    <button class="replay-btn" id="replayBtn">BAŞTAN OYNAT</button>
+<!-- ④ MEKTUP -->
+<section class="section" id="mektup">
+  <h2 class="sectionTitle reveal">Sana bir mektup 💌</h2>
+  <div class="sectionLine reveal"></div>
 
-    <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
+  <div class="letterWrap reveal">
+    <div class="letterHeader">Özel · Sadece sana</div>
+    <div id="letterBody"></div>
+    <div class="letterSign">— Seninle gurur duyan biri 💖</div>
+  </div>
+</section>
 
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || width < 768;
-        const maxAmbient = isMobile ? 30 : 90;
-        
-        let particles = [];
-        let lastTime = performance.now();
-        let showGlowSystem = false;
-        let glowPulseValue = 1.0;
-        let glowPulseDirection = 1;
+<!-- ⑤ FİNAL -->
+<section class="section" id="final">
+  <div id="finalTitle" class="reveal">Cemile Ablam</div>
+  <div id="finalSub" class="reveal">Sana hazırladığım küçük bir dijital hediye 💖</div>
+  <div id="finalQuote" class="reveal">"İyi ki varsın."</div>
+</section>
 
-        const colorSampleGradient = [
-            '#ffffff', '#ffd700', '#ff0055', '#9d00ff', '#0046ff', '#00f0ff', '#00ff7f', '#ff0033', '#ff7b00', '#ffffff'
-        ];
-        let gradientProgress = 0;
+<!-- SURPRISE -->
+<div id="surpriseBtn">🎁</div>
+<div id="surprisePopup">
+  <div id="surpriseBox">
+    <div id="surpriseBig">💌</div>
+    <div id="surpriseMsg"></div>
+    <button id="closeS">Teşekkürler ✨</button>
+  </div>
+</div>
 
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
+<script>
+(()=>{
+'use strict';
 
-        // --- HIGH PERFORMANCE PARTICLE SYSTEM ---
-        class Particle {
-            constructor(x, y, type = 'ambient') {
-                this.x = x;
-                this.y = y;
-                this.type = type;
-                this.markedForDeath = false;
+// ─── PERF CONFIG ─────────────────────────────────────
+const CFG = {
+  stars: 80,
+  fireflies: 6,
+  butterflies: 4,
+  ambientChance: 0.022,
+  touchCount: 6,
+  poolSize: 180,
+};
 
-                if (type === 'ambient') {
-                    this.vx = (Math.random() - 0.5) * 0.3;
-                    this.vy = -Math.random() * 0.4 - 0.1;
-                    this.size = Math.random() * 2 + 0.4;
-                    this.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.1})`;
-                } else { 
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * (isMobile ? 6 : 11) + 4;
-                    this.vx = Math.cos(angle) * speed;
-                    this.vy = Math.sin(angle) * speed;
-                    this.size = type === 'confetti' ? Math.random() * 5 + 4 : Math.random() * 2.5 + 1;
-                    
-                    const sampleHues = [0, 45, 340, 275, 225, 185, 145, 350, 28];
-                    this.color = `hsl(${sampleHues[Math.floor(Math.random() * sampleHues.length)]}, 100%, 65%)`;
-                    
-                    this.gravity = 0.16;
-                    this.drag = 0.95;
-                    this.alpha = 1;
-                    this.decay = Math.random() * 0.012 + 0.008;
-                    this.rotation = Math.random() * Math.PI;
-                    this.rotSpeed = (Math.random() - 0.5) * 0.15;
-                }
-            }
+// ─── CANVAS ─────────────────────────────────────────
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize, {passive:true});
+resize();
 
-            update(f) {
-                if (this.type === 'ambient') {
-                    this.x += this.vx * f;
-                    this.y += this.vy * f;
-                    if (this.y < -10) this.y = height + 10;
-                    if (this.x < -10 || this.x > width + 10) this.x = Math.random() * width;
-                } else {
-                    this.vy += this.gravity * f;
-                    this.vx *= Math.pow(this.drag, f);
-                    this.vy *= Math.pow(this.drag, f);
-                    this.x += this.vx * f;
-                    this.y += this.vy * f;
-                    this.rotation += this.rotSpeed * f;
-                    this.alpha -= this.decay * f;
-                    if (this.alpha <= 0) this.markedForDeath = true;
-                }
-            }
+// ─── UTILS ──────────────────────────────────────────
+const rand = (a,b)=>a+Math.random()*(b-a);
+const lerp = (a,b,t)=>a+(b-a)*t;
+const easeOut3 = t=>1-Math.pow(1-t,3);
+const hsl = (h,s,l,a=1)=>`hsla(${h|0},${s}%,${l}%,${a})`;
 
-            draw() {
-                ctx.save();
-                if (this.type === 'ambient') {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.fill();
-                } else if (this.type === 'sparkle') {
-                    ctx.translate(this.x, this.y);
-                    ctx.globalAlpha = this.alpha;
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    for (let i = 0; i < 4; i++) {
-                        ctx.lineTo(0, -this.size * 1.6);
-                        ctx.lineTo(this.size * 0.4, -this.size * 0.4);
-                        ctx.rotate(Math.PI / 2);
-                    }
-                    ctx.closePath();
-                    ctx.fill();
-                } else if (this.type === 'confetti') {
-                    ctx.translate(this.x, this.y);
-                    ctx.rotate(this.rotation);
-                    ctx.globalAlpha = this.alpha;
-                    ctx.fillStyle = this.color;
-                    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 1.4);
-                }
-                ctx.restore();
-            }
-        }
+// ─── STARS ──────────────────────────────────────────
+const stars = Array.from({length:CFG.stars},()=>({
+  x:rand(0,1), y:rand(0,.65),
+  r:rand(.5,2.2),
+  bright:rand(.3,1),
+  phase:rand(0,Math.PI*2),
+  speed:rand(.012,.04),
+}));
 
-        for (let i = 0; i < maxAmbient; i++) {
-            particles.push(new Particle(Math.random() * width, Math.random() * height, 'ambient'));
-        }
+// ─── FIREFLIES ──────────────────────────────────────
+const flies = Array.from({length:CFG.fireflies},()=>({
+  x:rand(0,1), y:rand(.3,.9),
+  vx:rand(-.0008,.0008), vy:rand(-.0005,.0005),
+  phase:rand(0,Math.PI*2), spd:rand(.025,.06),
+  r:rand(2,5), hue:rand(50,90),
+}));
 
-        // --- ANLIK GLOW RENGİNİ HESAPLAYAN MOTOR ---
-        function getCurrentGlowColors() {
-            const totalColors = colorSampleGradient.length;
-            const floatIndex = (gradientProgress * (totalColors - 1));
-            const baseIndex = Math.floor(floatIndex);
-            const nextIndex = (baseIndex + 1) % totalColors;
-            const factor = floatIndex - baseIndex;
+// ─── BUTTERFLIES ────────────────────────────────────
+const bflies = Array.from({length:CFG.butterflies},()=>({
+  x:rand(.05,.95), y:rand(.15,.85),
+  vx:0, vy:0,
+  tx:rand(.05,.95), ty:rand(.15,.85),
+  wp:rand(0,Math.PI*2), ws:rand(.09,.17),
+  r:rand(10,20), hue:rand(300,340), opa:rand(.45,.8),
+}));
 
-            const c1 = hexToRgb(colorSampleGradient[baseIndex]);
-            const c2 = hexToRgb(colorSampleGradient[nextIndex]);
+// ─── PARTICLE POOL ──────────────────────────────────
+class P {
+  constructor(){ this.alive=false; }
+  init(x,y,type){
+    this.alive=true; this.x=x; this.y=y;
+    this.type=type||['heart','star','spark','petal','bubble'][Math.floor(rand(0,5))];
+    this.vx=rand(-2,2); this.vy=rand(-3.5,-.4);
+    this.life=0; this.max=rand(70,160);
+    this.r=rand(5,16); this.rot=rand(0,Math.PI*2);
+    this.rs=rand(-.05,.05);
+    this.hue=rand(300,355);
+    this.sw=rand(-.025,.025); this.swO=rand(0,Math.PI*2);
+    this.grav=.04;
+    return this;
+  }
+}
+const pool=Array.from({length:CFG.poolSize},()=>new P());
+let pIdx=0;
+function spawn(x,y,type){
+  for(let i=0;i<CFG.poolSize;i++){
+    const p=pool[(pIdx+i)%CFG.poolSize];
+    if(!p.alive){pIdx=(pIdx+i+1)%CFG.poolSize;return p.init(x,y,type);}
+  }
+  const p=pool[pIdx%CFG.poolSize];
+  pIdx=(pIdx+1)%CFG.poolSize;
+  return p.init(x,y,type);
+}
 
-            const r = Math.round(c1.r + (c2.r - c1.r) * factor);
-            const g = Math.round(c1.g + (c2.g - c1.g) * factor);
-            const b = Math.round(c1.b + (c2.b - c1.b) * factor);
+// ─── PARTICLE RENDER (NO shadowBlur — performance) ──
+function renderP(p){
+  const t=p.life/p.max;
+  const alpha=(1-easeOut3(t))*.88;
+  if(alpha<.02){p.alive=false;return;}
+  p.x+=p.vx+Math.sin(p.swO+p.life*.03)*.35;
+  p.y+=p.vy; p.vy+=p.grav; p.rot+=p.rs;
+  const a32=alpha.toFixed(2);
+  ctx.globalAlpha=alpha;
+  switch(p.type){
+    case 'heart':{
+      const s=p.r*(1-t*.3)*.5;
+      ctx.fillStyle=`hsla(${p.hue|0},85%,75%,1)`;
+      ctx.beginPath();
+      ctx.moveTo(p.x,p.y+s*.8);
+      ctx.bezierCurveTo(p.x-s*1.2,p.y-s*.5,p.x-s*2,p.y+s,p.x,p.y+s*2);
+      ctx.bezierCurveTo(p.x+s*2,p.y+s,p.x+s*1.2,p.y-s*.5,p.x,p.y+s*.8);
+      ctx.fill();
+      break;}
+    case 'star':{
+      const r=p.r*(1-t*.2);
+      ctx.fillStyle=`hsla(${p.hue|0},90%,85%,1)`;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.beginPath();
+      for(let i=0;i<5;i++){
+        const ang=(i*4*Math.PI/5)-Math.PI/2;
+        i===0?ctx.moveTo(Math.cos(ang)*r,Math.sin(ang)*r)
+             :ctx.lineTo(Math.cos(ang)*r,Math.sin(ang)*r);
+      }
+      ctx.closePath(); ctx.fill(); ctx.restore();
+      break;}
+    case 'spark':{
+      ctx.fillStyle=`hsla(${p.hue|0},80%,80%,1)`;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r*.42*(1-t*.4),0,Math.PI*2);
+      ctx.fill();
+      break;}
+    case 'petal':{
+      ctx.fillStyle=`hsla(${p.hue|0},80%,78%,1)`;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.beginPath();
+      ctx.ellipse(0,0,p.r*.32,p.r*.7*(1-t*.3),0,0,Math.PI*2);
+      ctx.fill(); ctx.restore();
+      break;}
+    case 'bubble':{
+      ctx.globalAlpha=alpha*.55;
+      ctx.strokeStyle=`rgba(255,200,230,.7)`;
+      ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*.75,0,Math.PI*2);
+      ctx.stroke();
+      break;}
+  }
+  ctx.globalAlpha=1;
+}
 
-            return `rgba(${r}, ${g}, ${b}, `;
-        }
+function drawButterfly(x,y,r,hue,wp,opa){
+  const flap=Math.abs(Math.sin(wp));
+  ctx.globalAlpha=opa;
+  ctx.fillStyle=hsl(hue,72,68,.8);
+  ctx.beginPath();
+  ctx.ellipse(x-r*flap,y,r*flap*1.1,r*.6,-.3,0,Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x+r*flap,y,r*flap*1.1,r*.6,.3,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle=hsl(hue+20,55,30,.7);
+  ctx.beginPath(); ctx.ellipse(x,y,1.4,r*.42,0,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+}
 
-        function hexToRgb(hex) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : { r: 255, g: 255, b: 255 };
-        }
+// ─── AURORA (2 passes, sparse points) ───────────────
+let aPhase=0;
+function drawAurora(){
+  aPhase+=.002;
+  for(let i=0;i<2;i++){
+    const yB=H*(.13+i*.1);
+    const h=168+i*28+Math.sin(aPhase+i)*15;
+    const g=ctx.createLinearGradient(0,yB-45,0,yB+65);
+    g.addColorStop(0,`hsla(${h},60%,55%,0)`);
+    g.addColorStop(.45,`hsla(${h},60%,55%,.048)`);
+    g.addColorStop(1,`hsla(${h},60%,55%,0)`);
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.moveTo(0,yB);
+    for(let x=0;x<=W;x+=50){
+      const w=Math.sin(x*.0045+aPhase*1.3)*36+Math.sin(x*.0025+aPhase*.65)*20;
+      ctx.lineTo(x,yB+w);
+    }
+    ctx.lineTo(W,yB-90); ctx.lineTo(0,yB-90);
+    ctx.closePath(); ctx.fill();
+  }
+}
 
-        // --- CORE RENDER LOOP ---
-        function tick(timestamp) {
-            const deltaTime = timestamp - lastTime;
-            lastTime = timestamp;
-            const f = deltaTime / 16.666;
+// ─── SHOOTING STARS ─────────────────────────────────
+const shoots=[];
+function tryShoot(){
+  if(shoots.length<2&&Math.random()<.0015)
+    shoots.push({x:rand(.1,.9)*W,y:rand(0,.25)*H,vx:rand(4,9),vy:rand(2,5),life:0,max:rand(35,70)});
+}
 
-            ctx.clearRect(0, 0, width, height);
+// ─── MAIN LOOP ───────────────────────────────────────
+let frame=0;
+function loop(){
+  requestAnimationFrame(loop);
+  frame++;
+  ctx.clearRect(0,0,W,H);
 
-            gradientProgress += (deltaTime / 32000);
-            if (gradientProgress > 1) gradientProgress -= 1;
+  // Sky
+  const t=.5+.5*Math.sin(frame*.0004);
+  const r1=lerp(3,20,t), g1=lerp(0,4,t), b1=lerp(15,45,t);
+  const r2=lerp(8,45,t), g2=lerp(3,12,t), b2=lerp(30,65,t);
+  const r3=lerp(14,90,t), g3=lerp(4,32,t), b3=lerp(38,75,t);
+  const grd=ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,`rgb(${r1|0},${g1|0},${b1|0})`);
+  grd.addColorStop(.5,`rgb(${r2|0},${g2|0},${b2|0})`);
+  grd.addColorStop(1,`rgb(${r3|0},${g3|0},${b3|0})`);
+  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
 
-            if (showGlowSystem) {
-                glowPulseValue += (deltaTime / 1250) * glowPulseDirection;
-                if (glowPulseValue > 1.45) { glowPulseValue = 1.45; glowPulseDirection = -1; }
-                if (glowPulseValue < 1.0) { glowPulseValue = 1.0; glowPulseDirection = 1; }
+  drawAurora();
 
-                const baseColorStr = getCurrentGlowColors();
-                
-                ctx.save();
-                ctx.shadowBlur = isMobile ? 40 : 85;
-                ctx.shadowColor = baseColorStr + '0.85)';
-                
-                const radialGlow = ctx.createRadialGradient(width/2, height/2, 10, width/2, height/2, isMobile ? 180 : 320);
-                radialGlow.addColorStop(0, baseColorStr + (0.28 * glowPulseValue) + ')');
-                radialGlow.addColorStop(0.5, baseColorStr + (0.12 * glowPulseValue) + ')');
-                radialGlow.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = radialGlow;
-                ctx.fillRect(0, 0, width, height);
-                ctx.restore();
-            }
+  // Stars — no shadowBlur, plain alpha circles
+  ctx.fillStyle='rgba(255,232,242,1)';
+  for(const s of stars){
+    s.phase+=s.speed;
+    const b=s.bright*(.5+.5*Math.sin(s.phase));
+    ctx.globalAlpha=b*.85;
+    ctx.beginPath();
+    ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
 
-            particles = particles.filter(p => !p.markedForDeath);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update(f);
-                particles[i].draw();
-            }
+  // Shooting stars — no shadowBlur
+  tryShoot();
+  for(let i=shoots.length-1;i>=0;i--){
+    const s=shoots[i];
+    s.x+=s.vx; s.y+=s.vy; s.life++;
+    const a=(1-s.life/s.max)*.8;
+    if(a<=0){shoots.splice(i,1);continue;}
+    ctx.globalAlpha=a;
+    ctx.strokeStyle=`rgba(255,225,242,${a})`;
+    ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(s.x-s.vx*10,s.y-s.vy*10);
+    ctx.stroke();
+  }
+  ctx.globalAlpha=1;
 
-            requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
+  // Fireflies — no shadowBlur, radial gradient dot
+  for(const f of flies){
+    f.phase+=f.spd; f.x+=f.vx+Math.sin(f.phase*.5)*.0012; f.y+=f.vy+Math.cos(f.phase*.7)*.0008;
+    if(f.x<0)f.x=1;if(f.x>1)f.x=0;if(f.y<.05)f.y=.9;if(f.y>.97)f.y=.15;
+    const b=.35+.65*Math.abs(Math.sin(f.phase));
+    ctx.globalAlpha=b*.7;
+    ctx.fillStyle=hsl(f.hue,85,80);
+    ctx.beginPath(); ctx.arc(f.x*W,f.y*H,f.r*b,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
 
-        // --- INTERACTION LOGIC ---
-        const introContainer = document.getElementById('introContainer');
-        const mainContainer = document.getElementById('mainContainer');
-        const triggerBtn = document.getElementById('triggerBtn');
-        const replayBtn = document.getElementById('replayBtn');
-        const subLines = document.querySelectorAll('.sub-line');
+  // Butterflies
+  for(const b of bflies){
+    b.wp+=b.ws;
+    const dx=b.tx-b.x,dy=b.ty-b.y;
+    if(Math.sqrt(dx*dx+dy*dy)<.04){b.tx=rand(.05,.95);b.ty=rand(.12,.85);}
+    b.vx=lerp(b.vx,dx*.0008,.018); b.vy=lerp(b.vy,dy*.0008,.018);
+    b.x+=b.vx; b.y+=b.vy;
+    drawButterfly(b.x*W,b.y*H,b.r,b.hue,b.wp,b.opa);
+  }
 
-        let activeTimers = []; // Reset durumunda çakışmaları önlemek için id takibi
+  // Ambient particles — throttled
+  if(Math.random()<CFG.ambientChance){
+    const types=['petal','spark','bubble'];
+    const p=spawn(rand(0,W),rand(H*.6,H+10),types[Math.floor(rand(0,3))]);
+    p.vy=rand(-1,-.25); p.vx=rand(-.35,.35); p.max=rand(140,260); p.r=rand(4,11);
+  }
+  if(frame%6===0){
+    const p=spawn(rand(0,W),rand(H*.5,H),'heart');
+    p.vy=rand(-.6,-.15); p.vx=rand(-.25,.25); p.max=rand(180,300); p.r=rand(4,9); p.grav=.008;
+  }
 
-        triggerBtn.addEventListener('click', () => {
-            triggerBtn.classList.add('hide-out');
+  // Render particles
+  for(const p of pool){
+    if(!p.alive)continue;
+    p.life++;
+    if(p.life>=p.max){p.alive=false;continue;}
+    renderP(p);
+  }
 
-            setTimeout(() => {
-                introContainer.style.display = 'none';
-                
-                const burstCount = isMobile ? 45 : 110;
-                const centerX = width / 2;
-                const centerY = height / 2;
+  // Vignette — cached gradient reuse
+  const vg=ctx.createRadialGradient(W/2,H/2,H*.2,W/2,H/2,W*.72);
+  vg.addColorStop(0,'rgba(0,0,0,0)');
+  vg.addColorStop(1,'rgba(0,0,0,.6)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+}
 
-                for (let i = 0; i < burstCount; i++) {
-                    particles.push(new Particle(centerX, centerY, Math.random() > 0.45 ? 'sparkle' : 'confetti'));
-                }
+// Pre-fill world (light)
+for(let i=0;i<25;i++){
+  const types=['petal','spark','heart'];
+  const p=spawn(rand(0,W),rand(0,H),types[i%3]);
+  p.life=rand(0,60)|0; p.max=rand(100,220); p.r=rand(4,10);
+}
 
-                mainContainer.style.display = 'flex';
-                mainContainer.classList.add('pop-entrance');
-                showGlowSystem = true;
+// ─── TOUCH / CLICK ───────────────────────────────────
+function burst(x,y){
+  if(document.getElementById('surprisePopup').classList.contains('active'))return;
+  const types=['heart','star','spark','petal','bubble'];
+  for(let i=0;i<CFG.touchCount;i++){
+    const p=spawn(x+rand(-15,15),y+rand(-15,15),types[i%5]);
+    const ang=rand(0,Math.PI*2),spd=rand(1.5,5.5);
+    p.vx=Math.cos(ang)*spd; p.vy=Math.sin(ang)*spd-rand(.5,2.5);
+    p.r=rand(7,20); p.max=rand(55,120); p.grav=.055;
+  }
+  const rip=document.createElement('div');
+  rip.className='ripple';
+  rip.style.cssText=`left:${x}px;top:${y}px;width:50px;height:50px`;
+  document.body.appendChild(rip);
+  setTimeout(()=>rip.remove(),750);
+}
 
-                // --- STAGGERED REVEAL SİNEMATİK AKIŞ MOTORU ---
-                // Ana başlık geldikten sonra (0.9s), her satır 0.4s aralıklarla sırayla belirir
-                subLines.forEach((line, index) => {
-                    let timer = setTimeout(() => {
-                        line.classList.add('reveal');
-                    }, 900 + (index * 400));
-                    activeTimers.push(timer);
-                });
+window.addEventListener('click',e=>burst(e.clientX,e.clientY));
+window.addEventListener('touchstart',e=>{
+  for(const t of e.changedTouches)burst(t.clientX,t.clientY);
+},{passive:true});
 
-                // Replay butonunun en son zarifçe gelmesi
-                let replayTimer = setTimeout(() => {
-                    replayBtn.style.display = 'block';
-                }, 900 + (subLines.length * 400) + 600);
-                activeTimers.push(replayTimer);
+// Mouse trail (throttled)
+let lastMX=0,lastMY=0;
+window.addEventListener('mousemove',e=>{
+  document.getElementById('cursor').style.cssText=`left:${e.clientX}px;top:${e.clientY}px`;
+  if(Math.hypot(e.clientX-lastMX,e.clientY-lastMY)>10&&Math.random()>.55){
+    const p=spawn(e.clientX+rand(-4,4),e.clientY+rand(-4,4),'spark');
+    p.vx=rand(-.4,.4); p.vy=rand(-1.2,-.2); p.r=rand(2,7); p.max=rand(25,60); p.grav=.02;
+  }
+  lastMX=e.clientX; lastMY=e.clientY;
+},{passive:true});
 
-            }, 300);
-        });
+// ─── INTRO ───────────────────────────────────────────
+const overlay=document.getElementById('revealOverlay');
+overlay.style.opacity='0';
+setTimeout(()=>overlay.style.pointerEvents='none',2600);
 
-        // REPLAY BAŞTAN OYNATICI (Sıfırlama mantığı korundu)
-        replayBtn.addEventListener('click', () => {
-            // Aktif tüm zamanlayıcıları temizle
-            activeTimers.forEach(timer => clearTimeout(timer));
-            activeTimers = [];
+setTimeout(()=>{
+  const title=document.getElementById('mainTitle');
+  title.style.opacity='1'; title.style.transform='translateY(0)';
+},500);
+setTimeout(()=>{
+  const sub=document.getElementById('heroSub');
+  sub.style.opacity='1'; sub.style.transform='translateY(0)';
+  startTW();
+},800);
+setTimeout(()=>{
+  document.getElementById('scrollHint').style.opacity='1';
+  const nav=document.getElementById('nav');
+  nav.style.opacity='1'; nav.classList.add('show');
+  document.getElementById('surpriseBtn').style.opacity='1';
+},2800);
 
-            replayBtn.style.display = 'none';
-            showGlowSystem = false;
-            mainContainer.classList.remove('pop-entrance');
-            
-            // Alt satır sınıflarını temizle
-            subLines.forEach(line => line.classList.remove('reveal'));
-            
-            mainContainer.style.display = 'none';
-            triggerBtn.classList.remove('hide-out');
-            introContainer.style.display = 'flex';
-        });
-    </script>
+// ─── TYPEWRITER ─────────────────────────────────────
+const msgs=[
+  "Sana hazırlanmış küçük bir dijital hediye 💖",
+  "İyi ki varsın.",
+  "Bunu sana hazırlamak istedim.",
+  "Bazı günler sadece iyi hissettiriyorsun.",
+  "Yanında olmak iyi geliyor.",
+];
+let mIdx=0,cIdx=0,typing=true;
+function startTW(){
+  const el=document.getElementById('twText');
+  function tick(){
+    const msg=msgs[mIdx];
+    if(typing){
+      if(cIdx<msg.length){el.textContent=msg.slice(0,++cIdx);setTimeout(tick,rand(35,70));}
+      else{typing=false;setTimeout(tick,2100);}
+    }else{
+      if(cIdx>0){el.textContent=msg.slice(0,--cIdx);setTimeout(tick,rand(18,38));}
+      else{typing=true;mIdx=(mIdx+1)%msgs.length;setTimeout(tick,280);}
+    }
+  }
+  tick();
+}
+
+// ─── SCROLL REVEAL ──────────────────────────────────
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting)e.target.classList.add('visible');
+  });
+},{threshold:.18});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// ─── LETTER TYPEWRITER ───────────────────────────────
+const letterText=`Cemile Ablam,
+
+Bu satırları yazarken neyle başlayacağımı bilemedim biraz. Ama bazı şeyleri söylememek de olmuyor.
+
+Sen, çevresini farkında olmadan aydınlatan türden birisin. Orada olduğun için her şey biraz daha hafif hissettiriyor.
+
+Sana özel bir dünya kurmak istedim. Küçük bir dünya, ama içinde çiçekler, yıldızlar ve sana duyduğum her iyi his var.
+
+Umarım bu küçük dijital bahçe seni güldürür. Hak ediyorsun bunu ve daha fazlasını.
+
+İyi ki varsın.`;
+
+let letterVisible=false;
+const letterEl=document.getElementById('letterBody');
+const letterSec=document.getElementById('mektup');
+let lIdx=0,lTimer=null;
+function typeLetter(){
+  if(lIdx<letterText.length){
+    letterEl.textContent=letterText.slice(0,++lIdx);
+    lTimer=setTimeout(typeLetter,lIdx<30?60:28);
+  }
+}
+new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting&&!letterVisible){
+    letterVisible=true;
+    setTimeout(typeLetter,400);
+  }
+},{threshold:.35}).observe(letterSec);
+
+// ─── SURPRISE ────────────────────────────────────────
+const surpriseMsgs=[
+  "Bu gece bahçesi senin için büyüdü. 🌸",
+  "Her yıldız bir dilek. Sen çoktan bir tanesini aldın. ✨",
+  "Cemile ablam... Bazı insanlar sadece var olmakla her şeyi güzel yapar. 💫",
+  "Sana bakan biri var, hep. 🦋",
+  "Kalbinin en tatlı köşesine bir çiçek bıraktım. 🌺",
+  "Bugün iyi ki girdin hayatıma. 💖",
+  "Bu gece seninle birlikte yıldız sayan biri var. 🌟",
+  "Seni düşünen biri, bu küçük dünyayı kurdu. 🌙",
+  "Bazı anlar dondurulabilseydi... sen onların içinde olurdun. ✦",
+  "Cemile ablam, bu bahçe hep açık. Hep senin için. 🌸",
+];
+let sIdx=0;
+document.getElementById('surpriseBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('surpriseMsg').textContent=surpriseMsgs[sIdx%surpriseMsgs.length];
+  sIdx++;
+  document.getElementById('surprisePopup').classList.add('active');
+  burst(W/2,H/2);
+});
+document.getElementById('closeS').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('surprisePopup').classList.remove('active');
+});
+document.getElementById('surprisePopup').addEventListener('click',function(){
+  this.classList.remove('active');
+});
+
+// Card click bursts
+document.querySelectorAll('.sozCard,.stickyNote').forEach(el=>{
+  el.addEventListener('click',e=>{
+    e.stopPropagation();
+    const r=el.getBoundingClientRect();
+    burst(r.left+r.width/2,r.top+r.height/2);
+  });
+});
+
+loop();
+})();
+</script>
 </body>
 </html>
