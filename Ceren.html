@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+    <title>Ceren Rahel — Sinematik Deneyim</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --neon-pink: #ff2d78;
+        --neon-purple: #a855f7;
+        --neon-blue: #3b82f6;
+        --neon-gold: #fbbf24;
+        --deep-space: #020008;
+      }
+
+      html, body {
+        width: 100%;
+        min-height: 100vh;
+        background: var(--deep-space);
+        color: white;
+        font-family: 'Georgia', serif;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #app {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+      }
+
+      /* ─── SECTION 1: OPENING ─────────────────────────── */
+      #section-opening {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-title {
+        text-align: center;
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+        filter: blur(15px);
+        animation: heroReveal 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        max-width: 90%;
+        margin: 0 auto;
+        gap: 0px;
+      }
+
+      @keyframes heroReveal {
+        0%   { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(15px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+      }
+
+      .hero-title .letter {
+        display: inline-block;
+        font-size: clamp(3rem, 11vw, 9rem);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #ff2d78, #a855f7, #3b82f6, #fbbf24, #ff2d78);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation:
+          letterFloat 4s ease-in-out infinite,
+          gradientShift 6s ease infinite,
+          glowPulse 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 30px rgba(168,85,247,0.6));
+        will-change: transform;
+      }
+
+      .hero-title .space {
+        display: inline-block;
+        width: clamp(1.5rem, 5vw, 4rem);
+      }
+
+      .hero-title .letter:nth-child(1)  { animation-delay: 0s,    0s,    0s;    }
+      .hero-title .letter:nth-child(2)  { animation-delay: 0.1s,  0.3s,  0.2s;  }
+      .hero-title .letter:nth-child(3)  { animation-delay: 0.2s,  0.6s,  0.4s;  }
+      .hero-title .letter:nth-child(4)  { animation-delay: 0.3s,  0.9s,  0.6s;  }
+      .hero-title .letter:nth-child(5)  { animation-delay: 0.4s,  1.2s,  0.8s;  }
+      .hero-title .letter:nth-child(7)  { animation-delay: 0.5s,  1.5s,  1.0s;  }
+      .hero-title .letter:nth-child(8)  { animation-delay: 0.6s,  1.8s,  1.2s;  }
+      .hero-title .letter:nth-child(9)  { animation-delay: 0.7s,  2.1s,  1.4s;  }
+      .hero-title .letter:nth-child(10) { animation-delay: 0.8s,  2.4s,  1.6s;  }
+      .hero-title .letter:nth-child(11) { animation-delay: 0.9s,  2.7s,  1.8s;  }
+
+      @keyframes letterFloat {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25%       { transform: translateY(-8px) rotate(-0.5deg); }
+        75%       { transform: translateY(6px)  rotate(0.5deg); }
+      }
+
+      @keyframes gradientShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      @keyframes glowPulse {
+        0%, 100% { filter: drop-shadow(0 0 20px rgba(168,85,247,0.5)) drop-shadow(0 0 40px rgba(255,45,120,0.3)); }
+        50%       { filter: drop-shadow(0 0 40px rgba(168,85,247,0.8))   drop-shadow(0 0 70px rgba(255,45,120,0.5)); }
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        animation: fadeInHint 1s ease 3.5s forwards;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        z-index: 20;
+      }
+
+      @keyframes fadeInHint {
+        to { opacity: 0.7; }
+      }
+
+      .scroll-hint span {
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(168,85,247,0.9);
+      }
+
+      .scroll-arrow {
+        width: 20px;
+        height: 20px;
+        border-right: 2px solid rgba(168,85,247,0.8);
+        border-bottom: 2px solid rgba(168,85,247,0.8);
+        transform: rotate(45deg);
+        animation: bounceArrow 1.5s ease-in-out infinite;
+      }
+
+      @keyframes bounceArrow {
+        0%, 100% { transform: rotate(45deg) translateY(0); }
+        50%       { transform: rotate(45deg) translateY(6px); }
+      }
+
+      /* ─── SECTION 2: QUOTES ─────────────────────────── */
+      #section-quotes {
+        padding: 15vh 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25vh;
+        width: 100%;
+      }
+
+      .quote-card {
+        max-width: 680px;
+        width: 100%;
+        opacity: 0;
+        transform: translateY(60px);
+        filter: blur(5px);
+      }
+
+      .quote-card.revealed {
+        animation: cardReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes cardReveal {
+        0%   { opacity: 0; transform: translateY(60px); filter: blur(5px); }
+        100% { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+      }
+
+      .quote-card-inner {
+        position: relative;
+        padding: 3rem 2.5rem;
+        border-radius: 24px;
+        background: rgba(10, 0, 30, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(168,85,247,0.3);
+        box-shadow:
+          0 0 30px rgba(168,85,247,0.15),
+          inset 0 0 40px rgba(168,85,247,0.05);
+        overflow: hidden;
+        animation: cardFloat 5s ease-in-out infinite;
+        will-change: transform;
+      }
+
+      @keyframes cardFloat {
+        0%, 100% { transform: translateY(0px); }
+        50%       { transform: translateY(-8px); }
+      }
+
+      .quote-card-inner::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #ff2d78, #a855f7, #3b82f6, #fbbf24, #ff2d78);
+        background-size: 300% 300%;
+        animation: gradientBorder 4s ease infinite;
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      @keyframes gradientBorder {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      .quote-card-inner::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 23px;
+        background: rgba(4, 0, 16, 0.9);
+        z-index: -1;
+      }
+
+      .quote-number {
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(251,191,36,0.7);
+        margin-bottom: 1.2rem;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .quote-text {
+        font-size: clamp(1.15rem, 2.8vw, 1.65rem);
+        line-height: 1.7;
+        color: rgba(255,255,255,0.95);
+        font-style: italic;
+        text-align: center;
+        text-shadow: 0 0 15px rgba(168,85,247,0.3);
+      }
+
+      .quote-sparkles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        border-radius: 24px;
+      }
+
+      .sparkle-dot {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: white;
+        animation: sparkleFade 2s ease-in-out infinite;
+      }
+
+      @keyframes sparkleFade {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50%       { opacity: 1; transform: scale(1); }
+      }
+
+      /* ─── SECTION 3: LETTER ─────────────────────────── */
+      #section-letter {
+        padding: 10vh 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .letter-container {
+        max-width: 760px;
+        width: 100%;
+        opacity: 0;
+        transform: translateY(50px);
+        filter: blur(5px);
+      }
+
+      .letter-container.revealed {
+        animation: cardReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      .letter-box {
+        position: relative;
+        padding: 4rem 3rem;
+        border-radius: 28px;
+        background: rgba(8, 0, 25, 0.85);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid rgba(255,45,120,0.3);
+        box-shadow:
+          0 0 40px rgba(255,45,120,0.15),
+          inset 0 0 60px rgba(255,45,120,0.05);
+        overflow: hidden;
+        animation: letterFloat 6s ease-in-out infinite;
+      }
+
+      .letter-box::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 29px;
+        background: linear-gradient(135deg, #ff2d78, #fbbf24, #a855f7, #3b82f6, #ff2d78);
+        background-size: 400% 400%;
+        animation: gradientBorder 5s ease infinite;
+        z-index: -1;
+        opacity: 0.7;
+      }
+
+      .letter-box::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 27px;
+        background: rgba(4, 0, 16, 0.92);
+        z-index: -1;
+      }
+
+      .letter-title {
+        font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 2.5rem;
+        background: linear-gradient(135deg, #ff2d78, #fbbf24, #a855f7);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientShift 4s ease infinite;
+        filter: drop-shadow(0 0 15px rgba(255,45,120,0.4));
+      }
+
+      .letter-body {
+        font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+        line-height: 1.9;
+        color: rgba(255,255,255,0.9);
+        text-shadow: 0 0 8px rgba(168,85,247,0.15);
+        text-align: justify;
+      }
+
+      .letter-signature {
+        margin-top: 2.5rem;
+        text-align: right;
+        font-size: 1.15rem;
+        color: rgba(251,191,36,0.85);
+        font-style: italic;
+        font-weight: 600;
+      }
+
+      .letter-light-sweep {
+        position: absolute;
+        top: 0; left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+        animation: lightSweep 6s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      @keyframes lightSweep {
+        0%   { left: -60%; }
+        100% { left: 160%; }
+      }
+
+      /* ─── SECTION 4: HEART BUTTON ───────────────────── */
+      #section-button {
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%;
+      }
+
+      .heart-btn-wrap {
+        opacity: 0;
+        transform: scale(0.6);
+        filter: blur(5px);
+      }
+
+      .heart-btn-wrap.revealed {
+        animation: btnReveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+
+      @keyframes btnReveal {
+        0%   { opacity: 0; transform: scale(0.6); filter: blur(5px); }
+        100% { opacity: 1; transform: scale(1);   filter: blur(0);    }
+      }
+
+      .heart-btn {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        background: rgba(10, 0, 30, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3.2rem;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: btnBreath 3s ease-in-out infinite, btnFloating 4s ease-in-out infinite;
+        box-shadow:
+          0 0 25px rgba(255,45,120,0.4),
+          0 0 50px rgba(168,85,247,0.2);
+      }
+
+      .heart-btn::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, #ff2d78, #a855f7, #3b82f6, #fbbf24, #ff2d78);
+        animation: rotateBorder 4s linear infinite;
+        z-index: -1;
+      }
+
+      .heart-btn::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 50%;
+        background: rgba(4, 0, 16, 0.9);
+        z-index: -1;
+      }
+
+      @keyframes rotateBorder {
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes btnBreath {
+        0%, 100% { box-shadow: 0 0 25px rgba(255,45,120,0.4), 0 0 50px rgba(168,85,247,0.2); }
+        50%       { box-shadow: 0 0 45px rgba(255,45,120,0.8), 0 0 80px rgba(168,85,247,0.5); }
+      }
+
+      @keyframes btnFloating {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(-10px); }
+      }
+
+      .heart-btn:hover {
+        transform: scale(1.12) translateY(-3px);
+      }
+
+      .heart-btn:active {
+        transform: scale(0.96);
+      }
+
+      .btn-hint {
+        font-size: 0.8rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+        text-align: center;
+        font-weight: 500;
+      }
+
+      /* ─── TRANSITION OVERLAY ────────────────────────── */
+      #transition-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0;
+        background: radial-gradient(circle at center, white, rgba(255,45,120,0.8), rgba(168,85,247,0.6), transparent);
+      }
+
+      #transition-overlay.explode {
+        animation: overlayExplode 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        pointer-events: all;
+      }
+
+      @keyframes overlayExplode {
+        0%   { opacity: 0; transform: scale(0); }
+        30%  { opacity: 1; transform: scale(1); }
+        70%  { opacity: 1; }
+        100% { opacity: 0; transform: scale(3.5); }
+      }
+
+      /* ─── SECTION 5: FINAL SCENE ────────────────────── */
+      #section-final {
+        display: none;
+        min-height: 100vh;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background: #020008;
+      }
+
+      #section-final.active {
+        display: flex;
+        animation: sceneFadeIn 1s ease forwards;
+      }
+
+      @keyframes sceneFadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+
+      /* ─── HEART CANVAS ──────────────────────────────── */
+      #heart-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      /* ─── FINAL TEXT (PERFECTLY CENTERED) ────────────── */
+      .final-message-wrap {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10;
+        opacity: 0;
+        pointer-events: none;
+        width: 85vw;
+        max-width: 550px;
+      }
+
+      .final-message-wrap.show {
+        animation: finalTextReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes finalTextReveal {
+        0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.85); filter: blur(10px); }
+        100% { opacity: 1; transform: translate(-50%, -50%) scale(1);   filter: blur(0);    }
+      }
+
+      .final-love-text {
+        font-size: clamp(1.6rem, 5vw, 2.8rem);
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        line-height: 1.4;
+      }
+
+      .love-text-gradient {
+        background: linear-gradient(135deg, #ff2d78, #fbbf24, #a855f7, #ff2d78);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientShift 3s ease infinite;
+        filter: drop-shadow(0 0 25px rgba(255,45,120,0.7));
+      }
+
+      .love-emoji {
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 1em;
+        -webkit-text-fill-color: initial;
+        background: none;
+        -webkit-background-clip: unset;
+        background-clip: unset;
+        filter: none;
+        vertical-align: middle;
+      }
+
+      .final-sub-text {
+        font-size: clamp(1.05rem, 2.5vw, 1.4rem);
+        color: rgba(255,255,255,0.9);
+        line-height: 1.8;
+        text-shadow: 0 0 15px rgba(168,85,247,0.4);
+      }
+
+      .final-highlight {
+        background: linear-gradient(135deg, #ff2d78, #a855f7, #fbbf24);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 600;
+      }
+
+      /* ─── MOUSE SPARKLES ─────────────────────────────── */
+      .mouse-sparkle {
+        position: fixed;
+        pointer-events: none;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        z-index: 9998;
+        animation: sparkleLife 0.8s ease-out forwards;
+      }
+
+      @keyframes sparkleLife {
+        0%   { opacity: 1; transform: scale(1) translateY(0); }
+        100% { opacity: 0; transform: scale(0) translateY(-25px); }
+      }
+
+      /* ─── RESPONSIVE CONFIG ──────────────────────────── */
+      @media (max-width: 600px) {
+        .letter-box {
+          padding: 2.5rem 1.5rem;
+        }
+        .quote-card-inner {
+          padding: 2rem 1.5rem;
+        }
+        #section-quotes {
+          gap: 15vh;
+          padding: 10vh 16px;
+        }
+        #section-letter {
+          padding: 6vh 16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useEffect, useRef, useState, useCallback } = React;
+
+      // ─── HELPERS ───────────────────────────────────────────────────────────
+      const isMobile = () =>
+        typeof navigator !== "undefined" &&
+        (/Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768);
+
+      const ease = {
+        outExpo:    (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+        inOutQuart: (t) => t < 0.5 ? 8*t*t*t*t : 1 - Math.pow(-2*t+2, 4)/2,
+      };
+
+      // ─── UNIFIED BACKGROUND CANVAS ─────────────────────────────────────────
+      function useBgCanvas(canvasRef) {
+        useEffect(() => {
+          const canvas = canvasRef.current; if (!canvas) return;
+          const ctx = canvas.getContext("2d", { alpha: false }); if (!ctx) return;
+          let animId;
+          const mobile = isMobile();
+
+          const FPS_INTERVAL = mobile ? 1000 / 30 : 1000 / 60;
+          let lastTime = 0;
+
+          function resize() {
+            if(canvas) {
+              canvas.width  = window.innerWidth;
+              canvas.height = window.innerHeight;
+            }
+          }
+          resize();
+          window.addEventListener("resize", resize);
+
+          const STAR_COUNT = mobile ? 120 : 280;
+          const stars = Array.from({ length: STAR_COUNT }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            r: Math.random() * 1.3 + 0.2,
+            base: Math.random() * 0.6 + 0.2,
+            speed: Math.random() * 0.012 + 0.004,
+            offset: Math.random() * Math.PI * 2,
+          }));
+
+          const BLOB_COUNT = mobile ? 3 : 5;
+          const blobs = Array.from({ length: BLOB_COUNT }, (_, i) => ({
+            x: (window.innerWidth / BLOB_COUNT) * i + window.innerWidth / (BLOB_COUNT * 2),
+            y: window.innerHeight / 2 + (Math.random() - 0.5) * window.innerHeight * 0.4,
+            r: 160 + Math.random() * 180,
+            hue: [300, 260, 220, 40, 320][i] ?? 280,
+            speed: 0.00015 + Math.random() * 0.0002,
+            offset: Math.random() * Math.PI * 2,
+          }));
+
+          const PART_COUNT = mobile ? 15 : 35;
+          const PART_COLORS = ["#ff2d78","#a855f7","#3b82f6","#fbbf24","#ffffff"];
+          const parts = Array.from({ length: PART_COUNT }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            r: Math.random() * 1.6 + 0.4,
+            color: PART_COLORS[Math.floor(Math.random() * PART_COLORS.length)],
+            life: Math.random() * Math.PI * 2,
+            lifeSpeed: Math.random() * 0.006 + 0.003,
+          }));
+
+          let frame = 0;
+
+          function draw(now) {
+            animId = requestAnimationFrame(draw);
+            if (now - lastTime < FPS_INTERVAL) return;
+            lastTime = now;
+
+            if(!canvas || !ctx) return;
+            const W = canvas.width, H = canvas.height;
+            ctx.fillStyle = "#020008";
+            ctx.fillRect(0, 0, W, H);
+
+            // Nebula
+            for (const b of blobs) {
+              const drift = Math.sin(frame * b.speed * 60 + b.offset) * 25;
+              const grad = ctx.createRadialGradient(b.x + drift, b.y, 0, b.x + drift, b.y, b.r);
+              grad.addColorStop(0,   `hsla(${b.hue},100%,60%,0.1)`);
+              grad.addColorStop(0.5, `hsla(${b.hue},80%,50%,0.04)`);
+              grad.addColorStop(1,   `hsla(${b.hue},60%,40%,0)`);
+              ctx.beginPath();
+              ctx.arc(b.x + drift, b.y, b.r, 0, Math.PI * 2);
+              ctx.fillStyle = grad;
+              ctx.fill();
+            }
+
+            // Aurora
+            {
+              const BANDS = mobile ? 2 : 3;
+              for (let band = 0; band < BANDS; band++) {
+                const yBase = H * (0.2 + band * 0.25);
+                const hue   = [300, 260, 200][band];
+                ctx.beginPath();
+                ctx.moveTo(0, yBase);
+                const step = mobile ? 16 : 8;
+                for (let x = 0; x <= W; x += step) {
+                  const y = yBase
+                    + Math.sin(x * 0.0025 + frame * 0.006 + band)     * 60
+                    + Math.sin(x * 0.006 + frame * 0.004 + band * 2) * 25;
+                  ctx.lineTo(x, y);
+                }
+                ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+                const grad = ctx.createLinearGradient(0, yBase - 70, 0, yBase + 70);
+                grad.addColorStop(0,   `hsla(${hue},100%,65%,0)`);
+                grad.addColorStop(0.5, `hsla(${hue},100%,65%,0.07)`);
+                grad.addColorStop(1,   `hsla(${hue},100%,65%,0)`);
+                ctx.fillStyle = grad;
+                ctx.fill();
+              }
+            }
+
+            // Stars
+            for (const s of stars) {
+              const op = s.base * (0.6 + 0.4 * Math.sin(frame * s.speed * 60 + s.offset));
+              ctx.beginPath();
+              ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(255,255,255,${op})`;
+              ctx.fill();
+            }
+
+            // Particles
+            for (const p of parts) {
+              p.x += p.vx; p.y += p.vy; p.life += p.lifeSpeed;
+              if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+              if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+              ctx.globalAlpha = (0.25 + 0.35 * Math.sin(p.life));
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.fillStyle = p.color;
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            frame++;
+          }
+
+          animId = requestAnimationFrame(draw);
+          return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
+        }, [canvasRef]);
+      }
+
+      // ─── MOUSE SPARKLE ─────────────────────────────────────────────────────
+      function useMouseSparkle() {
+        useEffect(() => {
+          const mobile = isMobile();
+          const THROTTLE = mobile ? 140 : 60;
+          const COLORS = ["#ff2d78","#a855f7","#3b82f6","#fbbf24","#ffffff"];
+          let last = 0;
+
+          function onMove(e) {
+            const now = Date.now();
+            if (now - last < THROTTLE) return;
+            last = now;
+            const cx = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+            const cy = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+            
+            const el = document.createElement("div");
+            el.className = "mouse-sparkle";
+            const sz = Math.random() * 4 + 2;
+            el.style.cssText = `
+              left:${cx + (Math.random()-0.5)*12}px;
+              top:${cy  + (Math.random()-0.5)*12}px;
+              background:${COLORS[Math.floor(Math.random()*COLORS.length)]};
+              width:${sz}px;height:${sz}px;
+              box-shadow:0 0 4px currentColor;
+            `;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+          }
+          window.addEventListener("mousemove", onMove, { passive: true });
+          window.addEventListener("touchmove", onMove, { passive: true });
+          return () => {
+            window.removeEventListener("mousemove", onMove);
+            window.removeEventListener("touchmove", onMove);
+          };
+        }, []);
+      }
+
+      // ─── HEART FORMATION (YAZI ETRAFINDA OLUŞMA FORMÜLÜ) ───────────────────
+      function heartPoint(t, scale) {
+        const x =  scale * 16 * Math.pow(Math.sin(t), 3);
+        // Canvas Y ekseni aşağı doğru pozitif olduğundan kalbi düzeltmek için eksi ile çarpıyoruz
+        const y = -scale * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+        return [x, y];
+      }
+
+      function useHeartCanvas(canvasRef, active, onComplete) {
+        useEffect(() => {
+          if (!active) return;
+
+          let animId = 0;
+          let timerId = setTimeout(() => {
+            const canvas = canvasRef.current; if (!canvas) return;
+            const ctx = canvas.getContext("2d"); if (!ctx) return;
+
+            const mobile = isMobile();
+            const W = window.innerWidth;
+            const H = window.innerHeight;
+            canvas.width  = W;
+            canvas.height = H;
+
+            // KALP BURADA KUSURSUZ ŞEKİLDE EKRANIN VE YAZININ TAM MERKEZİNE BAĞLANIYOR
+            const cx = W / 2;
+            const cy = H / 2; 
+
+            // Ölçeklendirme yazının (.final-message-wrap) etrafını kusursuz sarması için ayarlandı
+            const scale = mobile ? Math.min(W / 24, H / 26) : Math.min(W / 26, H / 28);
+
+            const COLORS = ["#ff2d78","#a855f7","#3b82f6","#fbbf24","#ff88aa","#c084fc","#93c5fd"];
+
+            const PARTICLE_COUNT = mobile ? 150 : 240;
+            const targets = Array.from({ length: PARTICLE_COUNT }, (_, i) => {
+              const t = (i / PARTICLE_COUNT) * Math.PI * 2;
+              const [hx, hy] = heartPoint(t, scale);
+              // Kalp matematiksel olarak tam cx, cy merkezine yerleşiyor
+              return [cx + hx, cy + hy];
+            });
+
+            const particles = targets.map(([tx, ty]) => ({
+              x: Math.random() * W, y: Math.random() * H,
+              tx, ty,
+              vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5,
+              r: Math.random() * 2.2 + 1.5,
+              color: COLORS[Math.floor(Math.random() * COLORS.length)],
+              angle: Math.random() * Math.PI * 2,
+              angleSpeed: (Math.random() - 0.5) * 0.1,
+              progress: 0,
+            }));
+
+            const ambient = Array.from({ length: mobile ? 10 : 20 }, () => ({
+              x: Math.random() * W, y: Math.random() * H,
+              vx: (Math.random() - 0.5) * 1.0, vy: (Math.random() - 0.5) * 1.0,
+              r: Math.random() * 1.5 + 0.5,
+              color: COLORS[Math.floor(Math.random() * COLORS.length)],
+              opacity: Math.random() * 0.4 + 0.2,
+              life: Math.random() * Math.PI * 2,
+            }));
+
+            const WANDER_TIME  = mobile ? 1400 : 2000;
+            const GATHER_TIME  = mobile ? 2200 : 3000;
+            const COMPLETE_AT  = WANDER_TIME + GATHER_TIME;
+            const FPS_INTERVAL = mobile ? 1000 / 30 : 1000 / 60;
+
+            const GLOW_COUNT = mobile ? 45 : 75;
+            const glowDots = Array.from({ length: GLOW_COUNT }, (_, i) => {
+              const t = (i / GLOW_COUNT) * Math.PI * 2;
+              return heartPoint(t, scale);
+            });
+            const GLOW_COLORS = ["#ff2d78","#fbbf24","#a855f7","#93c5fd","#ff88aa"];
+
+            const startTime = Date.now();
+            let completed   = false;
+            let lastFrame   = 0;
+
+            function draw(now) {
+              animId = requestAnimationFrame(draw);
+              if (now - lastFrame < FPS_INTERVAL) return;
+              lastFrame = now;
+
+              ctx.clearRect(0, 0, W, H);
+              const elapsed = Date.now() - startTime;
+
+              // Arka plan parıltıları
+              for (const a of ambient) {
+                a.x += a.vx; a.y += a.vy; a.life += 0.02;
+                if (a.x < 0 || a.x > W) a.vx *= -1;
+                if (a.y < 0 || a.y > H) a.vy *= -1;
+                ctx.globalAlpha = a.opacity * (0.5 + 0.5 * Math.sin(a.life));
+                ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+                ctx.fillStyle = a.color; ctx.fill();
+              }
+              ctx.globalAlpha = 1;
+
+              const gatherProgress = elapsed > WANDER_TIME
+                ? Math.min(1, (elapsed - WANDER_TIME) / GATHER_TIME) : 0;
+
+              let allDone = true;
+              for (const p of particles) {
+                if (elapsed < WANDER_TIME) {
+                  p.angle += p.angleSpeed;
+                  const sr = 50 + 40 * Math.sin(elapsed / 600 + p.angle);
+                  p.x += Math.cos(p.angle) * sr * 0.02 + p.vx * 0.07;
+                  p.y += Math.sin(p.angle) * sr * 0.02 + p.vy * 0.07;
+                  p.x = ((p.x % W) + W) % W;
+                  p.y = ((p.y % H) + H) % H;
+                } else {
+                  p.progress = Math.min(1, (elapsed - WANDER_TIME) / GATHER_TIME);
+                  const eased = ease.inOutQuart(p.progress);
+                  p.x += (p.tx - p.x) * eased * 0.095;
+                  p.y += (p.ty - p.y) * eased * 0.095;
+                  if (p.progress < 0.999) allDone = false;
+                }
+
+                if (mobile) {
+                  ctx.globalAlpha = 0.2 * (0.4 + gatherProgress * 0.6);
+                  ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
+                  ctx.fillStyle = p.color; ctx.fill();
+                  ctx.globalAlpha = 1;
+                } else {
+                  ctx.save();
+                  ctx.shadowBlur  = 10 * (0.3 + gatherProgress * 0.7);
+                  ctx.shadowColor = p.color;
+                }
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color; ctx.fill();
+                if (!mobile) ctx.restore();
+              }
+
+              // Kalbin dış çeperinde parıldayan yıldızlar
+              if (gatherProgress > 0.65) {
+                const alpha = ease.outExpo((gatherProgress - 0.65) / 0.35);
+                const pulse = Math.sin(elapsed / 350) * 0.5 + 0.5;
+                for (let i = 0; i < GLOW_COUNT; i++) {
+                  const [hx, hy] = glowDots[i];
+                  const c = GLOW_COLORS[i % GLOW_COLORS.length];
+                  if (!mobile) {
+                    ctx.save();
+                    ctx.shadowBlur  = (12 + 12 * pulse) * alpha;
+                    ctx.shadowColor = c;
+                  }
+                  ctx.globalAlpha = alpha * (0.4 + 0.6 * pulse);
+                  ctx.beginPath(); ctx.arc(cx + hx, cy + hy, 1.6 + pulse * 1.4, 0, Math.PI * 2);
+                  ctx.fillStyle = c; ctx.fill();
+                  if (!mobile) ctx.restore();
+                }
+                ctx.globalAlpha = 1;
+              }
+
+              if (!completed && elapsed >= COMPLETE_AT && allDone) {
+                completed = true;
+                setTimeout(onComplete, 400);
+              }
+            }
+
+            animId = requestAnimationFrame(draw);
+          }, 80);
+
+          return () => {
+            clearTimeout(timerId);
+            cancelAnimationFrame(animId);
+          };
+        }, [active, canvasRef, onComplete]);
+      }
+
+      // ─── SCROLL REVEAL HOOK ────────────────────────────────────────────────
+      function useScrollReveal(ref, threshold = 0.2) {
+        const [revealed, setRevealed] = useState(false);
+        useEffect(() => {
+          const el = ref.current; if (!el) return;
+          const obs = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) setRevealed(true); },
+            { threshold }
+          );
+          obs.observe(el);
+          return () => obs.disconnect();
+        }, [ref, threshold]);
+        return revealed;
+      }
+
+      // ─── DATA ──────────────────────────────────────────────────────────────
+      const QUOTES = [
+        { n: "01", text: "hayatımda kimseye değişmeyeceğim tek kadın sensin 💖" },
+        { n: "02", text: "gördüğüm en güzel kadınsın 😋" },
+        { n: "03", text: "benim icin çok değerlisin 🎀" },
+        { n: "04", text: "seninle geçirdiğim her saniye benim icin hem çok keyifli, hemde çok muazzam hissettiriyor 🌟" },
+      ];
+
+      // ─── QUOTE CARD ────────────────────────────────────────────────────────
+      function QuoteCard({ quote }) {
+        const ref = useRef(null);
+        const revealed = useScrollReveal(ref, 0.25);
+        return (
+          <div ref={ref} className={`quote-card ${revealed ? "revealed" : ""}`}>
+            <div className="quote-card-inner">
+              {revealed && (
+                <div className="quote-sparkles">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <div key={i} className="sparkle-dot" style={{
+                      left: `${Math.random()*100}%`, top: `${Math.random()*100}%`,
+                      animationDelay: `${i*0.15}s`,
+                      animationDuration: `${1.5+Math.random()*0.5}s`,
+                      background: ["#ff2d78","#a855f7","#fbbf24","#3b82f6","#fff"][i%5],
+                      width: `${Math.random()*2+2}px`, height: `${Math.random()*2+2}px`,
+                    }}/>
+                  ))}
+                </div>
+              )}
+              <div className="quote-number">— {quote.n} —</div>
+              <p className="quote-text">{quote.text}</p>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── LETTER SECTION ────────────────────────────────────────────────────
+      function LetterSection() {
+        const ref = useRef(null);
+        const revealed = useScrollReveal(ref, 0.15);
+        return (
+          <div ref={ref} className={`letter-container ${revealed ? "revealed" : ""}`}>
+            <div className="letter-box">
+              <div className="letter-light-sweep"/>
+              <h2 className="letter-title">Özür Dilerim Rahel</h2>
+              <p className="letter-body">
+                bitanemmm özür dilerim. sen benim icin o deccal kadından (annen diye getirdiğim) çok çok daha değerli ve önemlisin.
+                tek bebeğim sensin. o kadını kovdumm sadece sen ve ben kaldıkk canım kızımmm.
+                gelirsen ve kabul edersen özrümü seninle beraber Spiderman Brand New Day izleriz.
+                sonrasında da Avengers Doomsday. hem seni parka götürürümm beraber dışarı çıkarızz eğleniriz yeriz içeriz oyunlar oynarızz çok çok daha güzel şeyler yapabiliriz.
+                evet esseklik ettim hemde çok esseklik. umarım beni affedersin bebeğimmm 💖🎀
+              </p>
+              <div className="letter-signature">~Stark</div>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── BUTTON SECTION ────────────────────────────────────────────────────
+      function ButtonSection({ onPress }) {
+        const ref = useRef(null);
+        const revealed = useScrollReveal(ref, 0.3);
+        return (
+          <div id="section-button" ref={ref}>
+            <div className={`heart-btn-wrap ${revealed ? "revealed" : ""}`}>
+              <button className="heart-btn" onClick={onPress} aria-label="Kalp butonu">
+                💖
+              </button>
+            </div>
+            <p className="btn-hint" style={{ opacity: revealed ? 1 : 0, transition: "opacity 1s ease 0.6s" }}>
+              tıkla bebeğim
+            </p>
+          </div>
+        );
+      }
+
+      // ─── FINAL SCENE ───────────────────────────────────────────────────────
+      function FinalScene({ active }) {
+        const heartCanvasRef = useRef(null);
+        const [showText, setShowText] = useState(false);
+        const handleComplete = useCallback(() => setShowText(true), []);
+        useHeartCanvas(heartCanvasRef, active, handleComplete);
+
+        return (
+          <div id="section-final" className={active ? "active" : ""}>
+            <canvas ref={heartCanvasRef} id="heart-canvas" />
+            <div className={`final-message-wrap ${showText ? "show" : ""}`}>
+              <div className="final-love-text">
+                <span className="love-text-gradient">I love you my little baby</span>
+                {" "}
+                <span className="love-emoji">😍💝</span>
+              </div>
+              <div className="final-sub-text">
+                seni kırmayacağım bebeğim,<br/>
+                <span className="final-highlight">sen Çok değerlisin.</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── ROOT APP ──────────────────────────────────────────────────────────
+      function App() {
+        const bgRef      = useRef(null);
+        const overlayRef = useRef(null);
+        const [finalActive, setFinalActive] = useState(false);
+
+        useBgCanvas(bgRef);
+        useMouseSparkle();
+
+        const handleHeartPress = useCallback(() => {
+          const overlay = overlayRef.current; if (!overlay) return;
+          overlay.classList.add("explode");
+          setTimeout(() => {
+            setFinalActive(true);
+            overlay.classList.remove("explode");
+          }, 1800);
+        }, []);
+
+        const letters = "Ceren Rahel".split("").map((ch, i) =>
+          ch === " "
+            ? <span key={i} className="space"/>
+            : <span key={i} className="letter">{ch}</span>
+        );
+
+        return (
+          <>
+            <canvas
+              ref={bgRef}
+              style={{ position:"fixed", top:0, left:0, width:"100%", height:"100%", zIndex:1, pointerEvents:"none" }}
+            />
+
+            <div id="transition-overlay" ref={overlayRef}/>
+            <FinalScene active={finalActive}/>
+
+            <div id="app" style={{ display: finalActive ? "none" : "block" }}>
+              {/* SECTION 1 */}
+              <section id="section-opening">
+                <div className="hero-title" role="heading" aria-level={1}>
+                  {letters}
+                </div>
+                <div className="scroll-hint" aria-hidden="true">
+                  <span>aşağı kaydır</span>
+                  <div className="scroll-arrow"/>
+                </div>
+              </section>
+
+              {/* SECTION 2 */}
+              <section id="section-quotes">
+                {QUOTES.map((q, i) => <QuoteCard key={i} quote={q}/>)}
+              </section>
+
+              {/* SECTION 3 */}
+              <section id="section-letter">
+                <LetterSection/>
+              </section>
+
+              {/* SECTION 4 */}
+              <ButtonSection onPress={handleHeartPress}/>
+            </div>
+          </>
+        );
+      }
+
+      // Render App inside Root Container safely
+      const container = document.getElementById("root");
+      if (container) {
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+      }
+    </script>
+  </body>
+</html>
