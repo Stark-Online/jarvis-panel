@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Özür Dilerim, Ceren Rahel 🕷️💖</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ====================================================
+           DEĞİŞKENLER VE TEMEL AYARLAR
+           ==================================================== */
+        :root {
+            --bg-dark: #06040f;
+            --bg-deep: #0b0820;
+            --spider-red: #e8324d;
+            --spider-blue: #2b6fde;
+            --romantic-pink: #ff6fae;
+            --gold-accent: #ffd166;
+            --text-white: #ffffff;
+            --font-main: 'Montserrat', sans-serif;
+            --font-hero: 'Cinzel', serif;
+            --font-romantic: 'Playfair Display', serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: var(--font-main);
+            color: var(--text-white);
+        }
+
+        /* Sabit Yıldızlı Arka Plan Canvas'ı */
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Partikül Konteyneri */
+        #particleContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        /* ====================================================
+           1. GİRİŞ ANİMASYONU (INTRO)
+           ==================================================== */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-dark);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #intro-overlay.fade-out {
+            opacity: 0;
+            transform: scale(1.05);
+        }
+
+        .intro-svg-wrap {
+            width: 240px;
+            height: 240px;
+            margin-bottom: 24px;
+        }
+
+        .web-line {
+            stroke: var(--spider-red);
+            stroke-width: 1.2;
+            fill: none;
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
+            animation: drawWeb 2.8s forwards ease-in-out;
+        }
+
+        .web-ring {
+            stroke: var(--spider-blue);
+            stroke-width: 1.0;
+            fill: none;
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            animation: drawWeb 2.8s forwards ease-in-out;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes drawWeb {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .intro-text {
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            color: var(--text-white);
+            font-weight: 300;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUpText 1.6s forwards ease-out;
+            animation-delay: 2.3s;
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(232, 50, 77, 0.6);
+        }
+
+        @keyframes fadeUpText {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ====================================================
+           4. HERO BÖLÜMÜ
+           ==================================================== */
+        #main-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+        }
+
+        .hero-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-wrap {
+            position: relative;
+            padding: 40px;
+            margin-bottom: 12px;
+        }
+
+        .hero-btn {
+            position: relative;
+            font-family: var(--font-hero);
+            font-size: clamp(1.8rem, 6vw, 3.2rem);
+            font-weight: 700;
+            padding: 20px 60px;
+            background: rgba(6, 4, 15, 0.85);
+            color: var(--text-white);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            outline: none;
+            letter-spacing: 4px;
+            overflow: visible;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(232, 50, 77, 0.15);
+            z-index: 5;
+        }
+
+        .hero-btn::before {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            background: linear-gradient(45deg, var(--spider-red), var(--spider-blue), var(--romantic-pink), var(--spider-red));
+            background-size: 400% 400%;
+            border-radius: 19px;
+            z-index: -1;
+            animation: borderGlow 8s linear infinite, pulseGlow 3.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.99); opacity: 0.6; filter: blur(4px); }
+            100% { transform: scale(1.02); opacity: 1; filter: blur(10px); }
+        }
+
+        .hero-btn:hover, .hero-btn:active {
+            transform: scale(1.05);
+        }
+
+        .corner-web {
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            opacity: 0.7;
+            pointer-events: none;
+            transition: transform 0.4s ease;
+        }
+        .cw-tl { top: 5px; left: 5px; }
+        .cw-tr { top: 5px; right: 5px; transform: rotate(90deg); }
+        .cw-bl { bottom: 5px; left: 5px; transform: rotate(-90deg); }
+        .cw-br { bottom: 5px; right: 5px; transform: rotate(180deg); }
+
+        .hero-btn:hover ~ .cw-tl { transform: translate(-3px, -3px); }
+        .hero-btn:hover ~ .cw-tr { transform: translate(3px, -3px) rotate(90deg); }
+        .hero-btn:hover ~ .cw-bl { transform: translate(-3px, 3px) rotate(-90deg); }
+        .hero-btn:hover ~ .cw-br { transform: translate(3px, 3px) rotate(180deg); }
+
+        .hero-sub {
+            font-size: clamp(0.85rem, 3vw, 1.05rem);
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.65);
+            letter-spacing: 3px;
+            margin-top: 5px;
+            animation: subtleBreathe 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes subtleBreathe {
+            0% { opacity: 0.4; transform: scale(0.98); }
+            100% { opacity: 0.8; transform: scale(1.02); }
+        }
+
+        /* ====================================================
+           5. ÖZÜR MODALI
+           ==================================================== */
+        #modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(4, 3, 10, 0.5);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease, backdrop-filter 0.6s ease, -webkit-backdrop-filter 0.6s ease;
+        }
+
+        #modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .modal-card {
+            background: rgba(11, 8, 32, 0.9);
+            border: 1px solid rgba(232, 50, 77, 0.25);
+            border-radius: 24px;
+            width: min(90%, 460px);
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(232, 50, 77, 0.1);
+            transform: scale(0.9) translateY(15px);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+
+        #modal-backdrop.active .modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: clamp(1.15rem, 4.5vw, 1.4rem);
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            color: var(--text-white);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            min-height: 70px;
+            position: relative;
+        }
+
+        .choice-btn {
+            padding: 14px 40px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            letter-spacing: 1px;
+            transition: background 0.3s, transform 0.2s, opacity 0.3s;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, var(--spider-red), var(--romantic-pink));
+            color: white;
+            box-shadow: 0 4px 15px rgba(232, 50, 77, 0.35);
+        }
+        .btn-yes:hover {
+            transform: scale(1.04);
+            box-shadow: 0 6px 20px rgba(232, 50, 77, 0.5);
+        }
+
+        .btn-no {
+            background: #1c1736;
+            color: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .message-pool-container {
+            height: 30px;
+            margin-top: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pool-msg {
+            position: absolute;
+            width: 100%;
+            left: 0; top: 0;
+            font-size: 1rem;
+            font-weight: 400;
+            font-style: italic;
+            background: linear-gradient(45deg, var(--romantic-pink), var(--gold-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .pool-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .shake-anim {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* ====================================================
+           TEŞEKKÜR VE FİNAL EKRANI
+           ==================================================== */
+        #thanks-message {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) translateY(15px);
+            width: min(90%, 600px);
+            text-align: center;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        #thanks-message.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) translateY(0);
+        }
+
+        .thanks-text {
+            font-family: var(--font-romantic);
+            font-style: italic;
+            font-size: clamp(1.8rem, 6.5vw, 2.8rem);
+            line-height: 1.5;
+            background: linear-gradient(45deg, #ffffff, var(--romantic-pink), var(--gold-accent), #ffffff);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textFlow 5s linear infinite;
+            text-shadow: 0 10px 30px rgba(255, 111, 174, 0.15);
+        }
+
+        @keyframes textFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #final-ui {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #final-ui.visible {
+            opacity: 1;
+        }
+
+        .final-title {
+            font-family: var(--font-hero);
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            font-weight: 700;
+            color: var(--spider-red);
+            text-shadow: 0 0 20px rgba(232, 50, 77, 0.6), 0 0 40px rgba(43, 111, 222, 0.3);
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+            animation: pulseFinal 4s ease-in-out infinite alternate;
+        }
+
+        .final-subtitle {
+            font-family: var(--font-romantic);
+            font-style: italic;
+            font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+            color: var(--romantic-pink);
+            text-shadow: 0 0 10px rgba(255, 111, 174, 0.4);
+            letter-spacing: 2px;
+            animation: pulseFinal 4s ease-in-out infinite alternate;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes pulseFinal {
+            0% { transform: scale(0.97); filter: brightness(0.95); }
+            100% { transform: scale(1.03); filter: brightness(1.05); }
+        }
+
+        .bg-web-texture {
+            position: absolute;
+            width: 110%;
+            height: 110%;
+            opacity: 0;
+            z-index: 2;
+            pointer-events: none;
+            stroke: rgba(232, 50, 77, 0.08);
+            stroke-width: 0.6;
+            fill: none;
+            transform: scale(0.95);
+            transition: opacity 3s ease, transform 3.5s ease;
+        }
+
+        #final-ui.visible .bg-web-texture {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starCanvas"></canvas>
+
+    <div id="particleContainer"></div>
+
+    <div id="intro-overlay">
+        <div class="intro-svg-wrap">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+                <line x1="50" y1="0" x2="50" y2="100" class="web-line" />
+                <line x1="0" y1="50" x2="100" y2="50" class="web-line" />
+                <line x1="14.6" y1="14.6" x2="85.4" y2="85.4" class="web-line" />
+                <line x1="14.6" y1="85.4" x2="85.4" y2="14.6" class="web-line" />
+                
+                <circle cx="50" cy="50" r="12" class="web-ring" />
+                <circle cx="50" cy="50" r="24" class="web-ring" />
+                <circle cx="50" cy="50" r="36" class="web-ring" />
+                <circle cx="50" cy="50" r="46" class="web-ring" />
+            </svg>
+        </div>
+        <div class="intro-text">bir şey hazırlıyorum, Ceren Rahel... 🕷️</div>
+    </div>
+
+    <div id="main-content">
+        <div class="hero-container">
+            <div class="btn-wrap">
+                <svg class="corner-web cw-tl" viewBox="0 0 50 50">
+                    <path d="M0,0 L50,0 M0,0 L0,50 M0,0 L50,50 M0,0 L19.1,46.2 M0,0 L46.2,19.1 M0,15 Q8,8 15,0 M0,30 Q15,15 30,0 M0,45 Q22,22 45,0" stroke="var(--spider-red)" stroke-width="0.8" fill="none"/>
+                </svg>
+                <svg class="corner-web cw-tr" viewBox="0 0 50 50">
+                    <path d="M0,0 L50,0 M0,0 L0,50 M0,0 L50,50 M0,0 L19.1,46.2 M0,0 L46.2,19.1 M0,15 Q8,8 15,0 M0,30 Q15,15 30,0 M0,45 Q22,22 45,0" stroke="var(--spider-blue)" stroke-width="0.8" fill="none"/>
+                </svg>
+                <svg class="corner-web cw-bl" viewBox="0 0 50 50">
+                    <path d="M0,0 L50,0 M0,0 L0,50 M0,0 L50,50 M0,0 L19.1,46.2 M0,0 L46.2,19.1 M0,15 Q8,8 15,0 M0,30 Q15,15 30,0 M0,45 Q22,22 45,0" stroke="var(--spider-blue)" stroke-width="0.8" fill="none"/>
+                </svg>
+                <svg class="corner-web cw-br" viewBox="0 0 50 50">
+                    <path d="M0,0 L50,0 M0,0 L0,50 M0,0 L50,50 M0,0 L19.1,46.2 M0,0 L46.2,19.1 M0,15 Q8,8 15,0 M0,30 Q15,15 30,0 M0,45 Q22,22 45,0" stroke="var(--spider-red)" stroke-width="0.8" fill="none"/>
+                </svg>
+                
+                <button class="hero-btn" id="heroBtn">Ceren Rahel</button>
+            </div>
+            <div class="hero-sub">dokunmaya hazır mısın?</div>
+        </div>
+    </div>
+
+    <div id="modal-backdrop">
+        <div class="modal-card" id="modalCard">
+            <div class="modal-title">Hata yaptım, bi daha yapmıcam aynı hatayı. Lütfen beni affeder misin? 😞💖</div>
+            
+            <div class="modal-buttons">
+                <button class="choice-btn btn-yes" id="btnYes">Evet</button>
+                <button class="choice-btn btn-no" id="btnNo">Hayır</button>
+            </div>
+
+            <div class="message-pool-container">
+                <div class="pool-msg" id="poolMsg">bi daha düşün</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="thanks-message">
+        <div class="thanks-text">Bana bir şans daha verdiğin için çok teşekkür ederim, daha dikkatli olacağım. Sen benim için çok değerlisin 💖</div>
+    </div>
+
+    <div id="final-ui">
+        <svg class="bg-web-texture" viewBox="0 0 100 100">
+            <line x1="50" y1="0" x2="50" y2="100" />
+            <line x1="0" y1="50" x2="100" y2="50" />
+            <line x1="14.6" y1="14.6" x2="85.4" y2="85.4" />
+            <line x1="14.6" y1="85.4" x2="85.4" y2="14.6" />
+            <path d="M50,5 Q68,8 81,21 Q94,36 95,50 Q94,64 81,79 Q68,92 50,95 Q32,92 19,79 Q6,64 5,50 Q6,36 19,21 Q32,8 50,5 Z" />
+            <path d="M50,15 Q64,18 74,28 Q84,40 85,50 Q84,60 74,72 Q64,82 50,85 Q36,82 26,72 Q16,60 15,50 Q16,40 26,28 Q36,18 50,15 Z" />
+            <path d="M50,28 Q59,30 66,37 Q73,44 74,50 Q73,56 66,63 Q59,70 50,72 Q41,70 34,63 Q27,56 26,50 Q27,44 34,37 Q41,30 50,28 Z" />
+        </svg>
+        <h1 class="final-title">I love you</h1>
+        <div class="final-subtitle">Ceren Rahel — sonsuza dek</div>
+    </div>
+
+    <script>
+        /* ====================================================
+           SÜREKLİ KIRMIZI YILDIZLI ARKA PLAN & KALP DÖNÜŞÜMÜ
+           ==================================================== */
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const starCount = 145;
+        let isHeartMode = false;
+        let heartPoints = [];
+        let globalAlphaMultiplier = 1;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if (isHeartMode) calculateHeartPositions();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function calculateHeartPositions() {
+            heartPoints = [];
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) * 0.024;
+
+            for (let i = 0; i < starCount; i++) {
+                const t = (i / starCount) * Math.PI * 2;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                
+                heartPoints.push({
+                    x: centerX + x * scale,
+                    y: centerY + y * scale
+                });
+            }
+        }
+
+        for (let i = 0; i < starCount; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: 0.6 + Math.random() * 1.4,
+                baseTwinkleSpeed: 0.012 + Math.random() * 0.025,
+                phase: Math.random() * Math.PI * 2,
+                driftX: (Math.random() - 0.5) * 0.04,
+                driftY: (Math.random() - 0.5) * 0.04
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < starCount; i++) {
+                let s = stars[i];
+                s.phase += s.baseTwinkleSpeed;
+                
+                let currentAlpha = 0.35 + (Math.sin(s.phase) + 1) * 0.3;
+                
+                if (isHeartMode) {
+                    const target = heartPoints[i];
+                    s.x += (target.x - s.x) * 0.045;
+                    s.y += (target.y - s.y) * 0.045;
+                    currentAlpha = 0.65 + (Math.sin(s.phase) + 1) * 0.18;
+                } else {
+                    s.x += s.driftX;
+                    s.y += s.driftY;
+
+                    if (s.x < 0) s.x = canvas.width;
+                    if (s.x > canvas.width) s.x = 0;
+                    if (s.y < 0) s.y = canvas.height;
+                    if (s.y > canvas.height) s.y = 0;
+                }
+
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, isHeartMode ? s.size * 1.2 : s.size, 0, Math.PI * 2);
+                
+                if (isHeartMode) {
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = "rgba(255, 111, 174, 0.9)";
+                    ctx.fillStyle = `rgba(255, 190, 210, ${currentAlpha * globalAlphaMultiplier})`;
+                } else {
+                    ctx.shadowBlur = 4;
+                    ctx.shadowColor = "rgba(232, 50, 77, 0.4)";
+                    ctx.fillStyle = `rgba(240, 60, 85, ${currentAlpha})`;
+                }
+                ctx.fill();
+            }
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+
+        /* ====================================================
+           INTRO ZAMANLAYICISI
+           ==================================================== */
+        let introActive = true;
+        const introOverlay = document.getElementById('intro-overlay');
+        const mainContent = document.getElementById('main-content');
+
+        setTimeout(() => {
+            introOverlay.classList.add('fade-out');
+            mainContent.classList.add('visible');
+            setTimeout(() => {
+                introOverlay.style.removeProperty;
+                introOverlay.style.display = 'none';
+                introActive = false;
+            }, 1200);
+        }, 4200);
+
+
+        /* ====================================================
+           DOKUNMA / TIKLAMA PARTİKÜL EFEKTİ
+           ==================================================== */
+        const particleContainer = document.getElementById('particleContainer');
+        let activeParticleCount = 0;
+
+        const spiderSvgStr = `<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="12" cy="12" r="2.8" fill="currentColor"/><path d="M12,9 Q12,5 9.5,3.5 M12,9 Q12,5 14.5,3.5 M12,12 Q7.5,12 4.5,10 M12,12 Q16.5,12 19.5,10 M12,14.5 Q8.5,16.5 6.5,19.5 M12,14.5 Q15.5,16.5 17.5,19.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>`;
+        const maskSvgStr = `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12,2 C6.5,2 3.5,6.5 3.5,11.5 Q3.5,18.5 12,22.5 Q20.5,18.5 20.5,11.5 C20.5,6.5 17.5,2 12,2 Z" fill="currentColor"/><path d="M7.5,10.5 Q9.5,12.5 11,12 M16.5,10.5 Q14.5,12.5 13,12" stroke="#06040f" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>`;
+
+        window.addEventListener('pointerdown', (e) => {
+            if (introActive) return;
+            if (e.target.closest('#modalCard')) return;
+
+            const pCount = Math.floor(Math.random() * 3) + 4; 
+            const mCount = Math.floor(Math.random() * 3) + 4; 
+
+            createParticles(e.clientX, e.clientY, pCount, spiderSvgStr, 'var(--spider-blue)');
+            createParticles(e.clientX, e.clientY, mCount, maskSvgStr, 'var(--spider-red)');
+        });
+
+        function createParticles(x, y, count, svgStr, color) {
+            for (let i = 0; i < count; i++) {
+                if (activeParticleCount > 60) return;
+
+                const p = document.createElement('div');
+                p.style.position = 'absolute';
+                p.style.left = `${x}px`;
+                p.style.top = `${y}px`;
+                p.style.width = `${Math.floor(Math.random() * 10) + 16}px`;
+                p.style.height = p.style.width;
+                p.style.color = color;
+                p.style.pointerEvents = 'none';
+                p.innerHTML = svgStr;
+
+                particleContainer.appendChild(p);
+                activeParticleCount++;
+
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 100 + 50; 
+                const targetX = Math.cos(angle) * speed;
+                const targetY = -Math.abs(Math.sin(angle) * speed) - 40; 
+                const rotation = (Math.random() - 0.5) * 400;
+
+                const anim = p.animate([
+                    { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(${targetX * 0.5}px, ${targetY}px) scale(0.85) rotate(${rotation * 0.4}deg)`, opacity: 0.95 },
+                    { transform: `translate(${targetX}px, ${targetY + 160}px) scale(0) rotate(${rotation}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 600 + 950, 
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+
+                anim.onfinish = () => {
+                    p.remove();
+                    activeParticleCount--;
+                };
+            }
+        }
+
+
+        /* ====================================================
+           MODAL AKSİYONLARI VE KAÇIŞ SİSTEMİ
+           ==================================================== */
+        const heroBtn = document.getElementById('heroBtn');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const btnNo = document.getElementById('btnNo');
+        const btnYes = document.getElementById('btnYes');
+        const poolMsg = document.getElementById('poolMsg');
+        const modalCard = document.getElementById('modalCard');
+
+        const messages = [
+            "bi daha düşün",
+            "emin misin?",
+            "lütfen bir şans daha...",
+            "kalbim küçülüyor 💔",
+            "vazgeçme benden",
+            "son bir kez daha düşün olur mu?",
+            "ben hala buradayım, sen?",
+            "yapma böyle 🥺"
+        ];
+        let messagePool = [...messages];
+        let clickCount = 0;
+        let noScale = 1;
+
+        function shufflePool() {
+            for (let i = messagePool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [messagePool[i], messagePool[j]] = [messagePool[j], messagePool[i]];
+            }
+        }
+
+        heroBtn.addEventListener('click', () => {
+            modalBackdrop.classList.add('active');
+        });
+
+        btnNo.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clickCount++;
+
+            modalCard.classList.remove('shake-anim');
+            void modalCard.offsetWidth; 
+            modalCard.classList.add('shake-anim');
+
+            noScale -= 0.09;
+            if (noScale < 0.35) noScale = 0.35; 
+            btnNo.style.transform = `scale(${noScale})`;
+
+            if (messagePool.length === 0) {
+                messagePool = [...messages];
+                shufflePool();
+            }
+            const currentMessage = messagePool.shift();
+            
+            poolMsg.classList.remove('show');
+            setTimeout(() => {
+                poolMsg.innerText = currentMessage;
+                poolMsg.classList.add('show');
+            }, 150);
+
+            if (clickCount >= 7) {
+                btnNo.style.opacity = '0';
+                btnNo.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    btnNo.style.display = 'none';
+                }, 400);
+            }
+        });
+
+        /* ====================================================
+           EVET BASILDIĞINDA: KUTLAMA VE FİNAL SAHNELERİ
+           ==================================================== */
+        const thanksMessage = document.getElementById('thanks-message');
+        const finalUi = document.getElementById('final-ui');
+
+        btnYes.addEventListener('click', () => {
+            modalBackdrop.classList.remove('active');
+            mainContent.style.opacity = '0';
+            setTimeout(() => mainContent.style.display = 'none', 1500);
+
+            const emojis = ['💖', '💗', '💞', '🌸', '🌷', '🌹', '💐'];
+            const emojiCount = 35;
+            
+            for (let i = 0; i < emojiCount; i++) {
+                const em = document.createElement('div');
+                em.style.position = 'fixed';
+                em.style.left = '50%';
+                em.style.top = '50%';
+                em.style.fontSize = `${Math.floor(Math.random() * 14) + 24}px`;
+                em.style.pointerEvents = 'none';
+                em.style.zIndex = '999';
+                em.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+                particleContainer.appendChild(em);
+
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 200 + 100;
+                const targetX = Math.cos(angle) * speed;
+                const targetY = Math.sin(angle) * speed - 130; 
+                const rotation = (Math.random() - 0.5) * 400;
+
+                const anim = em.animate([
+                    { transform: 'translate(-50%, -50%) scale(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${targetX * 0.4}px), calc(-50% + ${targetY}px)) scale(1.15) rotate(${rotation * 0.3}deg)`, opacity: 0.95 },
+                    { transform: `translate(calc(-50% + ${targetX}px), calc(-50% + ${targetY + 230}px)) scale(0) rotate(${rotation}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 700 + 1500, 
+                    easing: 'cubic-bezier(0.1, 0.8, 0.25, 1)'
+                });
+
+                anim.onfinish = () => em.remove();
+            }
+
+            setTimeout(() => {
+                thanksMessage.classList.add('visible');
+                
+                setTimeout(() => {
+                    thanksMessage.remove();
+                    
+                    calculateHeartPositions();
+                    isHeartMode = true;
+
+                    setTimeout(() => {
+                        finalUi.classList.add('visible');
+                    }, 1500);
+
+                }, 5200);
+            }, 500);
+        });
+    </script>
+</body>
+</html>
